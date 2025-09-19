@@ -44,3 +44,10 @@
 .footer__brand{display:flex;align-items:center;gap:10px}
 .footer__logo{width:26px;height:26px;border-radius:6px;border:1px solid #111;padding:2px;background:#fff}
 .footer__link{text-decoration:none;color:#111;opacity:.9}
+•menu-list {margin-
+top:24px;display:grid;gap:16px}
+•menu-item{border:1px
+solid
+radius:16px;padding:16px;background:#fff}
+•menu-item h3{margin:0; font-size:18px;letter-spacing:-.01em}
+•menu-item p{margin:8px 0 0; font-size:14px;line-height:1.5;opacity:.85}
