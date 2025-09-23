@@ -20,26 +20,21 @@
           <div class="brand__tag">Burgers Worth The Chase …</div>
         </div>
       </a>
-      <nav class="nav">
-        <a href="#menu">Menu</a>
-        <a href="#gallery">Gallery</a>
-        <a href="#location">Location</a>
-        <a href="#contact">Contact</a>
-        <a class="cta red" href="tel:01151960048">Call 011-5196-0048</a>
-        <a class="cta blue" href="https://forms.gle/rKJoUeHkgLoqTmmXA" target="_blank" rel="noreferrer">Help Us Improve</a>
-      </nav>
-    </div>
-  </header>
+     <nav class="nav">
+  <!-- LEFT: Help -->
+  <a class="cta" href="https://forms.gle/rKJoUeHkgLoqTmmXA" target="_blank" rel="noreferrer">Help Us Improve</a>
 
-  <!-- Quick access for mobile -->
-  <nav class="quick-nav" aria-label="Quick access">
-    <a href="#menu">Menu</a>
-    <a href="#gallery">Gallery</a>
-    <a href="#location">Location</a>
-    <a href="#contact">Contact</a>
-    <!-- Mobile-only review link -->
-    <a href="https://maps.app.goo.gl/V8U4SKzMqHvT5o2m7" target="_blank" rel="noreferrer">Review</a>
-  </nav>
+  <!-- Middle links -->
+  <a href="#menu">Menu</a>
+  <a href="#gallery">Gallery</a>
+  <a href="#location">Location</a>
+  <a href="#contact">Contact</a>
+
+  <!-- RIGHT: Call + Account -->
+  <a class="cta red" href="tel:01151960048">Call 011-5196-0048</a>
+  <a class="cta" id="navAccountLink" href="#login">Account</a>
+</nav>
+
 
   <!-- Hero -->
   <section class="hero" style="--hero:url('assets/img/poster-tuxify.jpg')">
@@ -211,6 +206,43 @@
       </div>
     </div>
   </section>
+<!-- LOGIN PAGE -->
+<section id="pageLogin" class="section" style="display:none">
+  <div class="container" style="max-width:480px">
+    <h2>Log in</h2>
+    <form id="loginForm" style="display:grid;gap:10px;margin:16px 0">
+      <input type="email" name="email" placeholder="Email" required />
+      <input type="password" name="password" placeholder="Password" required />
+      <button class="btn" type="submit">Log in</button>
+    </form>
+    <div class="actions">
+      <a href="#signup" class="btn outline">Create an account</a>
+      <a href="#" id="forgotLink">Forgot password?</a>
+    </div>
+    <p id="authMsg" style="color:#d7b968;margin-top:10px"></p>
+    <p id="authErr" style="color:#e11919;margin-top:6px"></p>
+  </div>
+</section>
+
+<!-- SIGN-UP PAGE -->
+<section id="pageSignup" class="section" style="display:none">
+  <div class="container" style="max-width:480px">
+    <h2>Create your account</h2>
+    <form id="signupForm" style="display:grid;gap:10px;margin:16px 0">
+      <input name="name" placeholder="Full name" required />
+      <input name="address" placeholder="Address" />
+      <input name="phone" placeholder="Phone (Egypt)" pattern="^01[0-2,5][0-9]{8}$" />
+      <input type="email" name="email" placeholder="Email" required />
+      <input type="password" name="password" placeholder="Password (min 6 chars)" minlength="6" required />
+      <button class="btn" type="submit">Create account</button>
+    </form>
+    <div class="actions">
+      <a href="#login" class="btn outline">Back to login</a>
+    </div>
+    <p id="signupMsg" style="color:#4caf50;margin-top:10px"></p>
+    <p id="signupErr" style="color:#e11919;margin-top:6px"></p>
+  </div>
+</section>
 
   <footer class="footer">
     <div class="container footer__row">
@@ -295,25 +327,15 @@
       .btn.gold-outline{ font-size:18px; }
     }
   </style>
-  <script type="module">
-  // 1) Import Firebase (ES Modules via CDN)
+ <script type="module">
+  // Firebase (CDN ESM)
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
   import {
-    getAuth,
-    onAuthStateChanged,
-    createUserWithEmailAndPassword,
-    signInWithEmailAndPassword,
-    sendPasswordResetEmail,
-    signOut,
-    updateProfile
+    getAuth, onAuthStateChanged, createUserWithEmailAndPassword,
+    signInWithEmailAndPassword, sendPasswordResetEmail, signOut, updateProfile
   } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
   import {
-    getFirestore,
-    doc,
-    setDoc,
-    getDoc,
-    updateDoc,
-    serverTimestamp
+    getFirestore, doc, setDoc, getDoc, updateDoc, serverTimestamp
   } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
   // 2) Your Firebase config (Project settings → General → Web app)
@@ -327,136 +349,128 @@
   measurementId: "G-1T1RRHCCDQ"
 };
 
-  // 3) Init SDKs
+ // Init
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
   const db   = getFirestore(app);
 
-  // 4) Grab UI elements
-  const signupForm  = document.getElementById("signupForm");
-  const loginForm   = document.getElementById("loginForm");
-  const resetForm   = document.getElementById("resetForm");
-  const profileForm = document.getElementById("profileForm");
-  const profilePanel= document.getElementById("profilePanel");
-  const logoutBtn   = document.getElementById("logoutBtn");
-  const authMsg     = document.getElementById("authMsg");
-  const authErr     = document.getElementById("authErr");
-  const profileMsg  = document.getElementById("profileMsg");
-  const profileErr  = document.getElementById("profileErr");
-  const pEmail      = document.getElementById("pEmail");
+  // Elements
+  const navAccountLink = document.getElementById("navAccountLink");
+  const pageLogin  = document.getElementById("pageLogin");
+  const pageSignup = document.getElementById("pageSignup");
+  const loginForm  = document.getElementById("loginForm");
+  const signupForm = document.getElementById("signupForm");
+  const authMsg    = document.getElementById("authMsg");
+  const authErr    = document.getElementById("authErr");
+  const signupMsg  = document.getElementById("signupMsg");
+  const signupErr  = document.getElementById("signupErr");
+  const forgotLink = document.getElementById("forgotLink");
 
-  // Helper to show messages
-  function show(el, msg){ if(el){ el.textContent = msg; } }
-  function clearMsgs(){ show(authMsg,""); show(authErr,""); show(profileMsg,""); show(profileErr,""); }
+  // Helpers
+  const show = (el, txt) => { if (el) el.textContent = txt || ""; };
+  const clear = () => { show(authMsg,""); show(authErr,""); show(signupMsg,""); show(signupErr,""); };
+  const first = (name) => (name || "").trim().split(" ")[0] || null;
 
-  // 5) Sign up → create auth user + Firestore profile
-  if (signupForm) signupForm.addEventListener("submit", async (e) => {
-    e.preventDefault(); clearMsgs();
-    const fd = new FormData(signupForm);
-    const name = fd.get("name")?.trim();
-    const address = fd.get("address")?.trim();
-    const phone = fd.get("phone")?.trim();
-    const email = fd.get("email")?.trim();
-    const password = fd.get("password");
+  // Simple hash "router"
+  function showPageFromHash() {
+    const h = (location.hash || "").toLowerCase();
+    if (pageLogin)  pageLogin.style.display  = (h === "#login")  ? "block" : "none";
+    if (pageSignup) pageSignup.style.display = (h === "#signup") ? "block" : "none";
+    // optional: scroll to top when entering a page
+    if (h === "#login" || h === "#signup") window.scrollTo({ top: 0, behavior: "instant" });
+  }
+  window.addEventListener("hashchange", showPageFromHash);
+  showPageFromHash();
 
-    try {
-      const cred = await createUserWithEmailAndPassword(auth, email, password);
-      // Optional: set displayName in Auth profile
-      if (name) { await updateProfile(cred.user, { displayName: name }); }
-      // Create users/{uid} in Firestore
-      await setDoc(doc(db, "users", cred.user.uid), {
-        name, address, phone, email,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      });
-      show(authMsg, "Account created. You are now logged in!");
-      signupForm.reset();
-    } catch (err) {
-      show(authErr, err.message || "Signup failed.");
+  // Auth State → set nav label + close auth pages if logged in
+  onAuthStateChanged(auth, async (user) => {
+    clear();
+    if (user) {
+      // try Firestore profile for nicer name
+      let name = user.displayName || "";
+      try {
+        const snap = await getDoc(doc(db, "users", user.uid));
+        if (snap.exists() && snap.data().name) name = snap.data().name;
+      } catch {}
+
+      const label = first(name) || first(user.email) || "Account";
+      if (navAccountLink) {
+        navAccountLink.textContent = label;
+        navAccountLink.href = "#"; // stays on main now
+        navAccountLink.title = "You’re signed in";
+      }
+
+      // If we are on a login/signup page, go back to main
+      if (location.hash === "#login" || location.hash === "#signup") {
+        location.hash = ""; // back to main
+        window.scrollTo({ top: 0, behavior: "instant" });
+      }
+    } else {
+      if (navAccountLink) {
+        navAccountLink.textContent = "Account";
+        navAccountLink.href = "#login";
+        navAccountLink.title = "Log in or create account";
+      }
+      // keep pages visible if the user actually wants them
+      showPageFromHash();
     }
   });
 
-  // 6) Login
+  // Login
   if (loginForm) loginForm.addEventListener("submit", async (e) => {
-    e.preventDefault(); clearMsgs();
+    e.preventDefault(); clear();
     const fd = new FormData(loginForm);
     const email = fd.get("email")?.trim();
     const password = fd.get("password");
     try {
       await signInWithEmailAndPassword(auth, email, password);
       show(authMsg, "Logged in!");
-      loginForm.reset();
+      // onAuthStateChanged will bring us to main & update nav name
     } catch (err) {
       show(authErr, err.message || "Login failed.");
     }
   });
 
-  // 7) Password reset (sends email)
-  if (resetForm) resetForm.addEventListener("submit", async (e) => {
-    e.preventDefault(); clearMsgs();
-    const email = new FormData(resetForm).get("email")?.trim();
-    try {
-      await sendPasswordResetEmail(auth, email);
-      show(authMsg, "Reset email sent. Check your inbox.");
-      resetForm.reset();
-    } catch (err) {
-      show(authErr, err.message || "Could not send reset email.");
-    }
-  });
-
-  // 8) Show/hide profile panel based on login
-  onAuthStateChanged(auth, async (user) => {
-    clearMsgs();
-    if (user) {
-      profilePanel.style.display = "block";
-      pEmail.textContent = user.email || "";
-      // Load profile from Firestore (if exists)
+  // Forgot password
+  if (forgotLink) {
+    forgotLink.addEventListener("click", async (e) => {
+      e.preventDefault(); clear();
+      const email = new FormData(loginForm).get("email")?.trim();
+      if (!email) return show(authErr, "Type your email in the login form first.");
       try {
-        const snap = await getDoc(doc(db, "users", user.uid));
-        const data = snap.exists() ? snap.data() : {};
-        if (profileForm) {
-          profileForm.name.value    = data.name    || user.displayName || "";
-          profileForm.address.value = data.address || "";
-          profileForm.phone.value   = data.phone   || "";
-        }
+        await sendPasswordResetEmail(auth, email);
+        show(authMsg, "Password reset email sent. Check your inbox.");
       } catch (err) {
-        show(profileErr, "Could not load profile.");
+        show(authErr, err.message || "Could not send reset email.");
       }
-    } else {
-      profilePanel.style.display = "none";
-    }
-  });
+    });
+  }
 
-  // 9) Save profile updates
-  if (profileForm) profileForm.addEventListener("submit", async (e) => {
-    e.preventDefault(); clearMsgs();
-    const user = auth.currentUser;
-    if (!user) return;
-    const fd = new FormData(profileForm);
+  // Sign-up
+  if (signupForm) signupForm.addEventListener("submit", async (e) => {
+    e.preventDefault(); clear();
+    const fd = new FormData(signupForm);
     const name = fd.get("name")?.trim();
     const address = fd.get("address")?.trim();
     const phone = fd.get("phone")?.trim();
+    const email = fd.get("email")?.trim();
+    const password = fd.get("password");
     try {
-      // Update Firestore doc
-      await updateDoc(doc(db, "users", user.uid), {
-        name, address, phone, updatedAt: serverTimestamp(),
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+      if (name) await updateProfile(cred.user, { displayName: name });
+      await setDoc(doc(db, "users", cred.user.uid), {
+        name, address, phone, email,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
       });
-      if (name && name !== (user.displayName || "")) {
-        await updateProfile(user, { displayName: name });
-      }
-      show(profileMsg, "Profile saved.");
+      show(signupMsg, "Account created!");
+      // Go back to main and show the name
+      location.hash = "";
+      window.scrollTo({ top: 0, behavior: "instant" });
     } catch (err) {
-      show(profileErr, err.message || "Save failed.");
+      show(signupErr, err.message || "Signup failed.");
     }
   });
-
-  // 10) Log out
-  if (logoutBtn) logoutBtn.addEventListener("click", async () => {
-    clearMsgs();
-    await signOut(auth);
-    show(authMsg, "Logged out.");
-  });
 </script>
-
 </body>
 </html>
