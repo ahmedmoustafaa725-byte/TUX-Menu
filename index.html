@@ -21,6 +21,7 @@
         </div>
       </a>
       <nav class="nav">
+                        <a href="#order">Order</a>
         <a href="#menu">Menu</a>
         <a href="#gallery">Gallery</a>
         <a href="#location">Location</a>
@@ -33,6 +34,8 @@
 
   <!-- Quick access for mobile -->
   <nav class="quick-nav" aria-label="Quick access">
+        <a href="#order">Order</a>
+
     <a href="#menu">Menu</a>
     <a href="#gallery">Gallery</a>
     <a href="#location">Location</a>
@@ -58,7 +61,75 @@
       </div>
     </div>
   </section>
+<!-- Order online -->
+  <section id="order" class="section alt">
+    <div class="container">
+      <header class="section__head">
+        <h2>Order Online</h2>
+        <p class="muted">Build your cart, choose pickup or delivery, and share your contact info.</p>
+      </header>
 
+      <div class="order__grid">
+        <div class="panel order__products">
+          <h3>Menu Items</h3>
+          <ul class="order-products" aria-live="polite"></ul>
+        </div>
+
+        <div class="panel order__cart">
+          <h3>Your Cart</h3>
+          <p class="cart-empty">Your cart is empty. Add something tasty!</p>
+          <ul class="cart-items"></ul>
+          <div class="cart-summary">
+            <span class="cart-total">Total: <strong><span class="cart-total-value">0.00</span> EGP</strong></span>
+            <button type="button" class="btn outline cart-clear">Clear Cart</button>
+          </div>
+        </div>
+      </div>
+
+      <form id="order-form" class="panel order__form" novalidate>
+        <h3>Checkout</h3>
+
+        <fieldset class="field-group">
+          <legend>Order Type</legend>
+          <label>
+            <input type="radio" name="orderType" value="pickup" checked>
+            Pickup
+          </label>
+          <label>
+            <input type="radio" name="orderType" value="delivery">
+            Delivery
+          </label>
+        </fieldset>
+
+        <div class="field-group">
+          <label for="customerName">Name</label>
+          <input type="text" id="customerName" name="customerName" autocomplete="name" required>
+        </div>
+
+        <div class="field-group">
+          <label for="customerPhone">Phone <small>(format: +20XXXXXXXXXX)</small></label>
+          <input type="tel" id="customerPhone" name="customerPhone" placeholder="+2010XXXXXXXX" pattern="[+]20[0-9]{10}" required>
+          <p class="input-hint">Phone number must start with +20 and include 10 more digits.</p>
+        </div>
+
+        <div class="field-group field-address" hidden>
+          <label for="customerAddress">Address</label>
+          <textarea id="customerAddress" name="customerAddress" rows="3" placeholder="Building, street, nearby landmark"></textarea>
+        </div>
+
+        <div class="field-group">
+          <label for="paymentType">Payment</label>
+          <input type="text" id="paymentType" name="paymentType" value="Cash on Pickup" readonly>
+        </div>
+
+        <div class="field-group">
+          <button type="submit" class="btn red">Submit Order</button>
+        </div>
+
+        <p class="form-feedback" role="alert" aria-live="polite"></p>
+      </form>
+    </div>
+  </section>
   <!-- Menu -->
   <section id="menu" class="section">
     <div class="container">
@@ -243,5 +314,269 @@
       .btn.gold-outline{ font-size:18px; }
     }
   </style>
+   <script>
+    const products = [
+      { id: 'single-smash', name: 'Single Smashed Patty', price: 95.00, description: 'Smashed patty, cheese, TUX sauce, pickles, tomato, onion, lettuce.' },
+      { id: 'double-smash', name: 'Double Smashed Patty', price: 140.00, description: '2 smashed patties, cheese, TUX sauce, pickles, tomato, onion, lettuce.' },
+      { id: 'triple-smash', name: 'Triple Smashed Patty', price: 160.00, description: '3 smashed patties, cheese, TUX sauce, pickles, tomato, onion, lettuce.' },
+      { id: 'quatro-smash', name: 'TUX Quatro Smashed Patty', price: 190.00, description: '4 smashed patties, cheese, TUX sauce, caramelized onion, mushroom.' },
+      { id: 'tuxify-single', name: 'TUXIFY Single', price: 120.00, description: 'Brioche bun, beef patty, American cheese, pickles, chopped onion, ketchup, TUXIFY sauce.' },
+      { id: 'tuxify-double', name: 'TUXIFY Double', price: 160.00, description: 'Brioche bun, two patties, American cheese, pickles, chopped onion, ketchup, TUXIFY sauce.' },
+      { id: 'tuxify-triple', name: 'TUXIFY Triple', price: 200.00, description: 'Brioche bun, three patties, American cheese, pickles, chopped onion, ketchup, TUXIFY sauce.' },
+      { id: 'tuxify-quatro', name: 'TUXIFY Quatro', price: 240.00, description: 'Brioche bun, four patties, American cheese, pickles, chopped onion, ketchup, TUXIFY sauce.' },
+      { id: 'classic-fries-s', name: 'Classic Fries (S)', price: 25.00 },
+      { id: 'classic-fries-l', name: 'Classic Fries (L)', price: 30.00 },
+      { id: 'cheese-fries', name: 'Cheese Fries', price: 30.00 },
+      { id: 'chili-fries', name: 'Chili Fries', price: 40.00 },
+      { id: 'tux-fries', name: 'TUX Fries', price: 75.00, description: 'Fries with smashed patty, cheese, pickles, caramelized onion, jalapeño, TUX sauce.' },
+      { id: 'doppy-fries', name: 'Doppy Fries', price: 95.00 },
+      { id: 'classic-hawawshi', name: 'Classic Hawawshi', price: 80.00, description: 'Baladi bread, hawawshi meat, onion. Served with chili sauce.' },
+      { id: 'tux-hawawshi', name: 'TUX Hawawshi', price: 100.00, description: 'Baladi bread, hawawshi meat, mozzarella, onion, TUX hawawshi sauce. Served with chili sauce.' },
+      { id: 'extra-patty', name: 'Extra Smashed Patty', price: 40.00 },
+      { id: 'bacon', name: 'Bacon', price: 20.00 },
+      { id: 'cheese', name: 'Cheese Slice', price: 15.00 },
+      { id: 'ranch', name: 'Ranch', price: 10.00 },
+      { id: 'mushroom', name: 'Mushroom', price: 15.00 },
+      { id: 'caramelized-onion', name: 'Caramelized Onion', price: 10.00 },
+      { id: 'jalapeno', name: 'Jalapeño', price: 10.00 },
+      { id: 'tux-sauce', name: 'TUX Sauce', price: 10.00 },
+      { id: 'extra-bun', name: 'Extra Bun', price: 10.00 },
+      { id: 'pickle', name: 'Pickle', price: 5.00 },
+      { id: 'condiments', name: 'Condiments (BBQ / Ketchup / Sweet Chili / Hot Sauce)', price: 5.00 },
+      { id: 'hawawshi-mozzarella', name: 'Hawawshi Mozzarella', price: 20.00 },
+      { id: 'hawawshi-sauce', name: 'TUX Hawawshi Sauce', price: 10.00 },
+      { id: 'drinks-soda', name: 'Soda', price: 20.00 },
+      { id: 'drinks-water', name: 'Water', price: 10.00 }
+    ];
+
+    function activateOrderingSystem() {
+      const productList = document.querySelector('.order-products');
+      const cartList = document.querySelector('.cart-items');
+      const cartEmptyMessage = document.querySelector('.cart-empty');
+      const cartTotalValue = document.querySelector('.cart-total-value');
+      const cartClearBtn = document.querySelector('.cart-clear');
+      const orderForm = document.querySelector('#order-form');
+      const orderTypeRadios = Array.from(orderForm.querySelectorAll('input[name="orderType"]'));
+      const addressGroup = orderForm.querySelector('.field-address');
+      const addressField = orderForm.querySelector('#customerAddress');
+      const paymentField = orderForm.querySelector('#paymentType');
+      const phoneField = orderForm.querySelector('#customerPhone');
+      const feedback = orderForm.querySelector('.form-feedback');
+
+      if (!productList || !cartList || !orderForm) {
+        return;
+      }
+
+      const cart = [];
+
+      const formatPrice = (value) => value.toFixed(2);
+
+      function renderProducts() {
+        products.forEach((item) => {
+          const listItem = document.createElement('li');
+          const head = document.createElement('div');
+          head.className = 'item-head';
+
+          const nameSpan = document.createElement('span');
+          nameSpan.className = 'item-name';
+          nameSpan.textContent = item.name;
+
+          const priceSpan = document.createElement('span');
+          priceSpan.className = 'item-price';
+          priceSpan.textContent = `${formatPrice(item.price)} EGP`;
+
+          head.append(nameSpan, priceSpan);
+          listItem.append(head);
+
+          if (item.description) {
+            const desc = document.createElement('p');
+            desc.className = 'item-desc';
+            desc.textContent = item.description;
+            listItem.append(desc);
+          }
+
+          const addButton = document.createElement('button');
+          addButton.type = 'button';
+          addButton.className = 'btn red';
+          addButton.dataset.action = 'add';
+          addButton.dataset.productId = item.id;
+          addButton.textContent = 'Add to Cart';
+          listItem.append(addButton);
+
+          productList.append(listItem);
+        });
+      }
+
+      function findProduct(productId) {
+        return products.find((product) => product.id === productId);
+      }
+
+      function renderCart() {
+        cartList.innerHTML = '';
+
+        if (!cart.length) {
+          cartEmptyMessage.style.display = 'block';
+          cartClearBtn.disabled = true;
+        } else {
+          cartEmptyMessage.style.display = 'none';
+          cartClearBtn.disabled = false;
+        }
+
+        let total = 0;
+
+        cart.forEach((item) => {
+          total += item.price * item.quantity;
+          const li = document.createElement('li');
+
+          const name = document.createElement('span');
+          name.className = 'cart-item-name';
+          name.textContent = item.name;
+
+          const quantity = document.createElement('span');
+          quantity.className = 'cart-item-qty';
+          quantity.textContent = `×${item.quantity}`;
+
+          const price = document.createElement('span');
+          price.className = 'cart-item-price';
+          price.textContent = `${formatPrice(item.price * item.quantity)} EGP`;
+
+          const removeButton = document.createElement('button');
+          removeButton.type = 'button';
+          removeButton.dataset.action = 'remove';
+          removeButton.dataset.productId = item.id;
+          removeButton.textContent = 'Remove';
+
+          li.append(name, quantity, price, removeButton);
+          cartList.append(li);
+        });
+
+        cartTotalValue.textContent = formatPrice(total);
+      }
+
+      function addToCart(productId) {
+        const product = findProduct(productId);
+        if (!product) return;
+
+        const existing = cart.find((entry) => entry.id === productId);
+        if (existing) {
+          existing.quantity += 1;
+        } else {
+          cart.push({ id: productId, name: product.name, price: product.price, quantity: 1 });
+        }
+
+        renderCart();
+        showFeedback('success', `${product.name} added to your cart.`);
+      }
+
+      function removeFromCart(productId) {
+        const index = cart.findIndex((entry) => entry.id === productId);
+        if (index !== -1) {
+          const [removed] = cart.splice(index, 1);
+          renderCart();
+          showFeedback('success', `${removed.name} removed from your cart.`);
+        }
+      }
+
+      function clearCart() {
+        cart.length = 0;
+        renderCart();
+      }
+
+      function showFeedback(type, message) {
+        feedback.textContent = message;
+        feedback.classList.remove('success', 'error');
+        if (!message) return;
+        feedback.classList.add(type === 'success' ? 'success' : 'error');
+      }
+
+      function updateOrderTypeUI(orderType) {
+        if (orderType === 'delivery') {
+          addressGroup.hidden = false;
+          addressField.required = true;
+          paymentField.value = 'Cash on Delivery';
+        } else {
+          addressGroup.hidden = true;
+          addressField.required = false;
+          addressField.value = '';
+          paymentField.value = 'Cash on Pickup';
+        }
+      }
+
+      function validatePhone() {
+        const isValid = /^\+20\d{10}$/.test(phoneField.value.trim());
+        if (!isValid && phoneField.value.trim() !== '') {
+          phoneField.setCustomValidity('Phone number must start with +20 followed by 10 digits.');
+        } else {
+          phoneField.setCustomValidity('');
+        }
+      }
+
+      renderProducts();
+      renderCart();
+      updateOrderTypeUI('pickup');
+
+      productList.addEventListener('click', (event) => {
+        const button = event.target.closest('button[data-action="add"]');
+        if (!button) return;
+        addToCart(button.dataset.productId);
+      });
+
+      cartList.addEventListener('click', (event) => {
+        const button = event.target.closest('button[data-action="remove"]');
+        if (!button) return;
+        removeFromCart(button.dataset.productId);
+      });
+
+      cartClearBtn.addEventListener('click', () => {
+        clearCart();
+        showFeedback('success', 'Cart cleared.');
+      });
+
+      orderTypeRadios.forEach((radio) => {
+        radio.addEventListener('change', (event) => {
+          if (event.target.checked) {
+            updateOrderTypeUI(event.target.value);
+          }
+        });
+      });
+
+      phoneField.addEventListener('input', validatePhone);
+      phoneField.addEventListener('blur', validatePhone);
+
+      orderForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        validatePhone();
+
+        if (!orderForm.reportValidity()) {
+          showFeedback('error', 'Please fix the highlighted fields and try again.');
+          return;
+        }
+
+        if (!cart.length) {
+          showFeedback('error', 'Your cart is empty. Add at least one item to continue.');
+          return;
+        }
+
+        const orderType = orderForm.querySelector('input[name="orderType"]:checked').value;
+        const name = orderForm.customerName.value.trim();
+        const phone = phoneField.value.trim();
+        const address = addressField.value.trim();
+
+        let confirmation = `Thanks ${name}! We will contact you shortly on ${phone} to confirm your ${orderType} order.`;
+        if (orderType === 'delivery') {
+          confirmation += ` Delivery address: ${address || 'not provided'}.`;
+        }
+
+        showFeedback('success', confirmation);
+        clearCart();
+        orderForm.reset();
+        updateOrderTypeUI('pickup');
+        paymentField.value = 'Cash on Pickup';
+      });
+    }
+
+    // Comment out the next line if you want to temporarily disable the add to cart functionality.
+    activateOrderingSystem();
+  </script>
 </body>
 </html>
