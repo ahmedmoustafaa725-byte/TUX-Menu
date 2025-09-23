@@ -61,6 +61,136 @@
       </div>
     </div>
   </section>
+   <section id="account" class="section">
+    <div class="container">
+      <header class="section__head">
+        <h2>Account</h2>
+        <p class="muted">Create an account or sign in to manage your details and speed through checkout.</p>
+      </header>
+
+      <div class="auth-grid">
+        <div class="panel auth-panel" id="auth-status">
+          <h3>Welcome</h3>
+          <p class="muted" data-auth-status>Sign in to save your contact information for future orders.</p>
+          <button type="button" class="btn outline" data-action="logout" hidden>Log Out</button>
+          <p class="form-feedback" id="auth-global-message" role="alert" aria-live="polite"></p>
+        </div>
+
+        <div class="panel auth-panel" id="login-panel">
+          <h3>Log In</h3>
+          <form id="login-form" novalidate>
+            <div class="field-group">
+              <label for="loginEmail">Email</label>
+              <input type="email" id="loginEmail" name="email" autocomplete="email" required>
+            </div>
+            <div class="field-group">
+              <label for="loginPassword">Password</label>
+              <input type="password" id="loginPassword" name="password" autocomplete="current-password" required>
+            </div>
+            <div class="field-group">
+              <button type="submit" class="btn red">Log In</button>
+              <button type="button" class="btn link" data-action="show-forgot">Forgot password?</button>
+            </div>
+            <p class="form-feedback" data-feedback="login" role="alert" aria-live="polite"></p>
+          </form>
+        </div>
+
+        <div class="panel auth-panel" id="register-panel">
+          <h3>Register</h3>
+          <form id="register-form" novalidate>
+            <div class="field-group">
+              <label for="registerName">Name</label>
+              <input type="text" id="registerName" name="name" autocomplete="name" required>
+            </div>
+            <div class="field-group">
+              <label for="registerEmail">Email</label>
+              <input type="email" id="registerEmail" name="email" autocomplete="email" required>
+            </div>
+            <div class="field-group">
+              <label for="registerPassword">Password</label>
+              <input type="password" id="registerPassword" name="password" autocomplete="new-password" required>
+            </div>
+            <div class="field-group">
+              <label for="registerPhone">Phone</label>
+              <input type="tel" id="registerPhone" name="phone" autocomplete="tel">
+            </div>
+            <div class="field-group">
+              <label for="registerAddress">Address</label>
+              <textarea id="registerAddress" name="address" rows="3"></textarea>
+            </div>
+            <div class="field-group">
+              <button type="submit" class="btn outline">Create Account</button>
+            </div>
+            <p class="form-feedback" data-feedback="register" role="alert" aria-live="polite"></p>
+          </form>
+        </div>
+
+        <div class="panel auth-panel" id="profile-panel" hidden>
+          <h3>Your Profile</h3>
+          <form id="profile-form" novalidate>
+            <div class="field-group">
+              <label for="profileEmail">Email</label>
+              <input type="email" id="profileEmail" name="email" autocomplete="email" required>
+            </div>
+            <div class="field-group">
+              <label for="profileName">Name</label>
+              <input type="text" id="profileName" name="name" autocomplete="name" required>
+            </div>
+            <div class="field-group">
+              <label for="profilePhone">Phone</label>
+              <input type="tel" id="profilePhone" name="phone" autocomplete="tel">
+            </div>
+            <div class="field-group">
+              <label for="profileAddress">Address</label>
+              <textarea id="profileAddress" name="address" rows="3"></textarea>
+            </div>
+            <fieldset class="field-group">
+              <legend>Change Password</legend>
+              <label for="profilePassword">New Password</label>
+              <input type="password" id="profilePassword" name="password" autocomplete="new-password">
+            </fieldset>
+            <div class="field-group">
+              <button type="submit" class="btn outline">Save Changes</button>
+            </div>
+            <p class="form-feedback" data-feedback="profile" role="alert" aria-live="polite"></p>
+          </form>
+        </div>
+
+        <div class="panel auth-panel" id="forgot-panel" hidden>
+          <h3>Forgot Password</h3>
+          <form id="forgot-form" novalidate>
+            <div class="field-group">
+              <label for="forgotEmail">Email</label>
+              <input type="email" id="forgotEmail" name="email" required>
+            </div>
+            <div class="field-group">
+              <button type="submit" class="btn outline">Send Reset Link</button>
+              <button type="button" class="btn link" data-action="show-login">Back to log in</button>
+            </div>
+            <p class="form-feedback" data-feedback="forgot" role="alert" aria-live="polite"></p>
+          </form>
+        </div>
+
+        <div class="panel auth-panel" id="reset-panel">
+          <h3>Reset Password</h3>
+          <form id="reset-form" novalidate>
+            <div class="field-group">
+              <label for="resetToken">Reset Token</label>
+              <input type="text" id="resetToken" name="token" required>
+            </div>
+            <div class="field-group">
+              <label for="resetPassword">New Password</label>
+              <input type="password" id="resetPassword" name="password" required>
+            </div>
+            <div class="field-group">
+              <button type="submit" class="btn outline">Update Password</button>
+            </div>
+            <p class="form-feedback" data-feedback="reset" role="alert" aria-live="polite"></p>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
 <!-- Order online -->
   <section id="order" class="section alt">
     <div class="container">
@@ -88,6 +218,7 @@
 
       <form id="order-form" class="panel order__form" novalidate>
         <h3>Checkout</h3>
+        <p class="auth-hint" data-auth-required hidden>You need to be logged in before placing an order. Please sign in or create an account above.</p>
 
         <fieldset class="field-group">
           <legend>Order Type</legend>
@@ -314,6 +445,8 @@
       .btn.gold-outline{ font-size:18px; }
     }
   </style>
+    <script type="module" src="assets/js/auth.js"></script>
+
    <script>
     const products = [
       { id: 'single-smash', name: 'Single Smashed Patty', price: 95.00, description: 'Smashed patty, cheese, TUX sauce, pickles, tomato, onion, lettuce.' },
@@ -357,11 +490,14 @@
       const cartClearBtn = document.querySelector('.cart-clear');
       const orderForm = document.querySelector('#order-form');
       const orderTypeRadios = Array.from(orderForm.querySelectorAll('input[name="orderType"]'));
-      const addressGroup = orderForm.querySelector('.field-address');
+      const deliveryRadio = orderForm.querySelector('input[value="delivery"]');
+
+    const addressGroup = orderForm.querySelector('.field-address');
       const addressField = orderForm.querySelector('#customerAddress');
       const paymentField = orderForm.querySelector('#paymentType');
       const phoneField = orderForm.querySelector('#customerPhone');
       const feedback = orderForm.querySelector('.form-feedback');
+      const authNotice = orderForm.querySelector('[data-auth-required]');
 
       if (!productList || !cartList || !orderForm) {
         return;
@@ -488,7 +624,23 @@
         if (!message) return;
         feedback.classList.add(type === 'success' ? 'success' : 'error');
       }
+ function populateFromProfile(user) {
+        if (!user) {
+          if (authNotice) authNotice.hidden = false;
+          return;
+        }
+        if (authNotice) authNotice.hidden = true;
 
+        if (user.name) orderForm.customerName.value = user.name;
+        if (user.phone) phoneField.value = user.phone;
+        if (user.address) {
+          addressField.value = user.address;
+          if (addressField.value && deliveryRadio) {
+            deliveryRadio.checked = true;
+            updateOrderTypeUI('delivery');
+          }
+        }
+      }
       function updateOrderTypeUI(orderType) {
         if (orderType === 'delivery') {
           addressGroup.hidden = false;
@@ -542,7 +694,11 @@
 
       phoneField.addEventListener('input', validatePhone);
       phoneField.addEventListener('blur', validatePhone);
+  document.addEventListener('auth:changed', (event) => {
+        populateFromProfile(event.detail && event.detail.user);
+      });
 
+      populateFromProfile(window.__authState && window.__authState.user);
       orderForm.addEventListener('submit', (event) => {
         event.preventDefault();
         validatePhone();
@@ -552,10 +708,18 @@
           return;
         }
 
+        const authState = window.__authState || {};
+        if (!authState.user) {
+          showFeedback('error', 'Please log in or register before submitting your order.');
+          if (authNotice) authNotice.hidden = false;
+          return;
+        }
+
         if (!cart.length) {
           showFeedback('error', 'Your cart is empty. Add at least one item to continue.');
           return;
         }
+        
 
         const orderType = orderForm.querySelector('input[name="orderType"]:checked').value;
         const name = orderForm.customerName.value.trim();
@@ -572,6 +736,8 @@
         orderForm.reset();
         updateOrderTypeUI('pickup');
         paymentField.value = 'Cash on Pickup';
+                populateFromProfile(authState.user);
+
       });
     }
 
