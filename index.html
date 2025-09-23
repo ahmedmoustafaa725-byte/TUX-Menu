@@ -20,20 +20,23 @@
           <div class="brand__tag">Burgers Worth The Chase …</div>
         </div>
       </a>
-     <nav class="nav">
-  <!-- LEFT: Help -->
-  <a class="cta" href="https://forms.gle/rKJoUeHkgLoqTmmXA" target="_blank" rel="noreferrer">Help Us Improve</a>
-
-  <!-- Middle links -->
-  <a href="#menu">Menu</a>
-  <a href="#gallery">Gallery</a>
-  <a href="#location">Location</a>
-  <a href="#contact">Contact</a>
-
-  <!-- RIGHT: Call + Account -->
-  <a class="cta red" href="tel:01151960048">Call 011-5196-0048</a>
-  <a class="cta" id="navAccountLink" href="#login">Account</a>
-</nav>
+  <nav class="nav">
+        <div class="nav__group nav__group--left">
+          <a class="cta" href="https://forms.gle/rKJoUeHkgLoqTmmXA" target="_blank" rel="noreferrer">Help Us Improve</a>
+        </div>
+        <div class="nav__group nav__group--center">
+          <a href="#menu">Menu</a>
+          <a href="#gallery">Gallery</a>
+          <a href="#location">Location</a>
+          <a href="#contact">Contact</a>
+        </div>
+        <div class="nav__group nav__group--right">
+          <a class="cta red" href="tel:01151960048">Call 011-5196-0048</a>
+          <a class="cta" id="navAccountLink" href="login.html">Log In / Sign Up</a>
+        </div>
+      </nav>
+    </div>
+  </header>
 
 
   <!-- Hero -->
@@ -206,43 +209,6 @@
       </div>
     </div>
   </section>
-<!-- LOGIN PAGE -->
-<section id="pageLogin" class="section" style="display:none">
-  <div class="container" style="max-width:480px">
-    <h2>Log in</h2>
-    <form id="loginForm" style="display:grid;gap:10px;margin:16px 0">
-      <input type="email" name="email" placeholder="Email" required />
-      <input type="password" name="password" placeholder="Password" required />
-      <button class="btn" type="submit">Log in</button>
-    </form>
-    <div class="actions">
-      <a href="#signup" class="btn outline">Create an account</a>
-      <a href="#" id="forgotLink">Forgot password?</a>
-    </div>
-    <p id="authMsg" style="color:#d7b968;margin-top:10px"></p>
-    <p id="authErr" style="color:#e11919;margin-top:6px"></p>
-  </div>
-</section>
-
-<!-- SIGN-UP PAGE -->
-<section id="pageSignup" class="section" style="display:none">
-  <div class="container" style="max-width:480px">
-    <h2>Create your account</h2>
-    <form id="signupForm" style="display:grid;gap:10px;margin:16px 0">
-      <input name="name" placeholder="Full name" required />
-      <input name="address" placeholder="Address" />
-      <input name="phone" placeholder="Phone (Egypt)" pattern="^01[0-2,5][0-9]{8}$" />
-      <input type="email" name="email" placeholder="Email" required />
-      <input type="password" name="password" placeholder="Password (min 6 chars)" minlength="6" required />
-      <button class="btn" type="submit">Create account</button>
-    </form>
-    <div class="actions">
-      <a href="#login" class="btn outline">Back to login</a>
-    </div>
-    <p id="signupMsg" style="color:#4caf50;margin-top:10px"></p>
-    <p id="signupErr" style="color:#e11919;margin-top:6px"></p>
-  </div>
-</section>
 
   <footer class="footer">
     <div class="container footer__row">
@@ -254,58 +220,7 @@
         El-Saada St – Zahraa El-Maadi • Open in Maps
       </a>
     </div>
-    <!-- Account -->
-<section id="account" class="section">
-  <div class="container grid2">
-    <!-- LEFT: Sign up / Login / Reset -->
-    <div class="panel">
-      <h2>My Account</h2>
-
-      <h3 style="margin-top:0.4em">Create Account</h3>
-      <form id="signupForm" style="display:grid;gap:10px;margin-bottom:12px">
-        <input name="name" placeholder="Full name" required />
-        <input name="address" placeholder="Address" />
-        <input name="phone" placeholder="Phone (Egypt)" pattern="^01[0-2,5][0-9]{8}$" />
-        <input type="email" name="email" placeholder="Email" required />
-        <input type="password" name="password" placeholder="Password (min 6 chars)" minlength="6" required />
-        <button class="btn red" type="submit">Sign up</button>
-      </form>
-
-      <div class="hr"></div>
-
-      <h3>Log in</h3>
-      <form id="loginForm" style="display:grid;gap:10px;margin-bottom:12px">
-        <input type="email" name="email" placeholder="Email" required />
-        <input type="password" name="password" placeholder="Password" required />
-        <button class="btn" type="submit">Log in</button>
-      </form>
-
-      <form id="resetForm" style="display:grid;gap:10px">
-        <input type="email" name="email" placeholder="Reset email" required />
-        <button class="btn outline" type="submit">Send password reset</button>
-      </form>
-
-      <p id="authMsg" style="color:#d7b968;margin-top:10px"></p>
-      <p id="authErr" style="color:#e11919;margin-top:6px"></p>
-    </div>
-
-    <!-- RIGHT: Profile (only when logged in) -->
-    <div class="panel" id="profilePanel" style="display:none">
-      <h2>Profile</h2>
-      <p><strong>Email:</strong> <span id="pEmail"></span></p>
-      <form id="profileForm" style="display:grid;gap:10px">
-        <input name="name" placeholder="Full name" />
-        <input name="address" placeholder="Address" />
-        <input name="phone" placeholder="Phone" />
-        <button class="btn" type="submit">Save profile</button>
-      </form>
-      <button class="btn outline" id="logoutBtn" style="margin-top:10px">Log out</button>
-      <p id="profileMsg" style="color:#4caf50;margin-top:10px"></p>
-      <p id="profileErr" style="color:#e11919;margin-top:6px"></p>
-    </div>
-  </div>
-</section>
-
+ 
   </footer>
 
   <!-- Tiny CSS: mobile-only visibility + gold outline style to match your image -->
@@ -327,150 +242,7 @@
       .btn.gold-outline{ font-size:18px; }
     }
   </style>
- <script type="module">
-  // Firebase (CDN ESM)
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-  import {
-    getAuth, onAuthStateChanged, createUserWithEmailAndPassword,
-    signInWithEmailAndPassword, sendPasswordResetEmail, signOut, updateProfile
-  } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
-  import {
-    getFirestore, doc, setDoc, getDoc, updateDoc, serverTimestamp
-  } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
-
-  // 2) Your Firebase config (Project settings → General → Web app)
- const firebaseConfig = {
-  apiKey: "AIzaSyDqjdI3ZqFSVY_5Kmowak1DCOL5bZaCYoo",
-  authDomain: "tux-menu.firebaseapp.com",
-  projectId: "tux-menu",
-  storageBucket: "tux-menu.firebasestorage.app",
-  messagingSenderId: "326432857137",
-  appId: "1:326432857137:web:926cc2ffb364b2f5d44910",
-  measurementId: "G-1T1RRHCCDQ"
-};
-
- // Init
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db   = getFirestore(app);
-
-  // Elements
-  const navAccountLink = document.getElementById("navAccountLink");
-  const pageLogin  = document.getElementById("pageLogin");
-  const pageSignup = document.getElementById("pageSignup");
-  const loginForm  = document.getElementById("loginForm");
-  const signupForm = document.getElementById("signupForm");
-  const authMsg    = document.getElementById("authMsg");
-  const authErr    = document.getElementById("authErr");
-  const signupMsg  = document.getElementById("signupMsg");
-  const signupErr  = document.getElementById("signupErr");
-  const forgotLink = document.getElementById("forgotLink");
-
-  // Helpers
-  const show = (el, txt) => { if (el) el.textContent = txt || ""; };
-  const clear = () => { show(authMsg,""); show(authErr,""); show(signupMsg,""); show(signupErr,""); };
-  const first = (name) => (name || "").trim().split(" ")[0] || null;
-
-  // Simple hash "router"
-  function showPageFromHash() {
-    const h = (location.hash || "").toLowerCase();
-    if (pageLogin)  pageLogin.style.display  = (h === "#login")  ? "block" : "none";
-    if (pageSignup) pageSignup.style.display = (h === "#signup") ? "block" : "none";
-    // optional: scroll to top when entering a page
-    if (h === "#login" || h === "#signup") window.scrollTo({ top: 0, behavior: "instant" });
-  }
-  window.addEventListener("hashchange", showPageFromHash);
-  showPageFromHash();
-
-  // Auth State → set nav label + close auth pages if logged in
-  onAuthStateChanged(auth, async (user) => {
-    clear();
-    if (user) {
-      // try Firestore profile for nicer name
-      let name = user.displayName || "";
-      try {
-        const snap = await getDoc(doc(db, "users", user.uid));
-        if (snap.exists() && snap.data().name) name = snap.data().name;
-      } catch {}
-
-      const label = first(name) || first(user.email) || "Account";
-      if (navAccountLink) {
-        navAccountLink.textContent = label;
-        navAccountLink.href = "#"; // stays on main now
-        navAccountLink.title = "You’re signed in";
-      }
-
-      // If we are on a login/signup page, go back to main
-      if (location.hash === "#login" || location.hash === "#signup") {
-        location.hash = ""; // back to main
-        window.scrollTo({ top: 0, behavior: "instant" });
-      }
-    } else {
-      if (navAccountLink) {
-        navAccountLink.textContent = "Account";
-        navAccountLink.href = "#login";
-        navAccountLink.title = "Log in or create account";
-      }
-      // keep pages visible if the user actually wants them
-      showPageFromHash();
-    }
-  });
-
-  // Login
-  if (loginForm) loginForm.addEventListener("submit", async (e) => {
-    e.preventDefault(); clear();
-    const fd = new FormData(loginForm);
-    const email = fd.get("email")?.trim();
-    const password = fd.get("password");
-    try {
-      await signInWithEmailAndPassword(auth, email, password);
-      show(authMsg, "Logged in!");
-      // onAuthStateChanged will bring us to main & update nav name
-    } catch (err) {
-      show(authErr, err.message || "Login failed.");
-    }
-  });
-
-  // Forgot password
-  if (forgotLink) {
-    forgotLink.addEventListener("click", async (e) => {
-      e.preventDefault(); clear();
-      const email = new FormData(loginForm).get("email")?.trim();
-      if (!email) return show(authErr, "Type your email in the login form first.");
-      try {
-        await sendPasswordResetEmail(auth, email);
-        show(authMsg, "Password reset email sent. Check your inbox.");
-      } catch (err) {
-        show(authErr, err.message || "Could not send reset email.");
-      }
-    });
-  }
-
-  // Sign-up
-  if (signupForm) signupForm.addEventListener("submit", async (e) => {
-    e.preventDefault(); clear();
-    const fd = new FormData(signupForm);
-    const name = fd.get("name")?.trim();
-    const address = fd.get("address")?.trim();
-    const phone = fd.get("phone")?.trim();
-    const email = fd.get("email")?.trim();
-    const password = fd.get("password");
-    try {
-      const cred = await createUserWithEmailAndPassword(auth, email, password);
-      if (name) await updateProfile(cred.user, { displayName: name });
-      await setDoc(doc(db, "users", cred.user.uid), {
-        name, address, phone, email,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
-      });
-      show(signupMsg, "Account created!");
-      // Go back to main and show the name
-      location.hash = "";
-      window.scrollTo({ top: 0, behavior: "instant" });
-    } catch (err) {
-      show(signupErr, err.message || "Signup failed.");
-    }
-  });
-</script>
+</style>
+  <script type="module" src="assets/js/site.js"></script>
 </body>
 </html>
