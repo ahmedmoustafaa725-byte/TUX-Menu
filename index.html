@@ -222,6 +222,58 @@
         El-Saada St – Zahraa El-Maadi • Open in Maps
       </a>
     </div>
+    <!-- Account -->
+<section id="account" class="section">
+  <div class="container grid2">
+    <!-- LEFT: Sign up / Login / Reset -->
+    <div class="panel">
+      <h2>My Account</h2>
+
+      <h3 style="margin-top:0.4em">Create Account</h3>
+      <form id="signupForm" style="display:grid;gap:10px;margin-bottom:12px">
+        <input name="name" placeholder="Full name" required />
+        <input name="address" placeholder="Address" />
+        <input name="phone" placeholder="Phone (Egypt)" pattern="^01[0-2,5][0-9]{8}$" />
+        <input type="email" name="email" placeholder="Email" required />
+        <input type="password" name="password" placeholder="Password (min 6 chars)" minlength="6" required />
+        <button class="btn red" type="submit">Sign up</button>
+      </form>
+
+      <div class="hr"></div>
+
+      <h3>Log in</h3>
+      <form id="loginForm" style="display:grid;gap:10px;margin-bottom:12px">
+        <input type="email" name="email" placeholder="Email" required />
+        <input type="password" name="password" placeholder="Password" required />
+        <button class="btn" type="submit">Log in</button>
+      </form>
+
+      <form id="resetForm" style="display:grid;gap:10px">
+        <input type="email" name="email" placeholder="Reset email" required />
+        <button class="btn outline" type="submit">Send password reset</button>
+      </form>
+
+      <p id="authMsg" style="color:#d7b968;margin-top:10px"></p>
+      <p id="authErr" style="color:#e11919;margin-top:6px"></p>
+    </div>
+
+    <!-- RIGHT: Profile (only when logged in) -->
+    <div class="panel" id="profilePanel" style="display:none">
+      <h2>Profile</h2>
+      <p><strong>Email:</strong> <span id="pEmail"></span></p>
+      <form id="profileForm" style="display:grid;gap:10px">
+        <input name="name" placeholder="Full name" />
+        <input name="address" placeholder="Address" />
+        <input name="phone" placeholder="Phone" />
+        <button class="btn" type="submit">Save profile</button>
+      </form>
+      <button class="btn outline" id="logoutBtn" style="margin-top:10px">Log out</button>
+      <p id="profileMsg" style="color:#4caf50;margin-top:10px"></p>
+      <p id="profileErr" style="color:#e11919;margin-top:6px"></p>
+    </div>
+  </div>
+</section>
+
   </footer>
 
   <!-- Tiny CSS: mobile-only visibility + gold outline style to match your image -->
@@ -243,5 +295,168 @@
       .btn.gold-outline{ font-size:18px; }
     }
   </style>
+  <script type="module">
+  // 1) Import Firebase (ES Modules via CDN)
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
+  import {
+    getAuth,
+    onAuthStateChanged,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    sendPasswordResetEmail,
+    signOut,
+    updateProfile
+  } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-auth.js";
+  import {
+    getFirestore,
+    doc,
+    setDoc,
+    getDoc,
+    updateDoc,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+
+  // 2) Your Firebase config (Project settings → General → Web app)
+ const firebaseConfig = {
+  apiKey: "AIzaSyDqjdI3ZqFSVY_5Kmowak1DCOL5bZaCYoo",
+  authDomain: "tux-menu.firebaseapp.com",
+  projectId: "tux-menu",
+  storageBucket: "tux-menu.firebasestorage.app",
+  messagingSenderId: "326432857137",
+  appId: "1:326432857137:web:926cc2ffb364b2f5d44910",
+  measurementId: "G-1T1RRHCCDQ"
+};
+
+  // 3) Init SDKs
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+
+  // 4) Grab UI elements
+  const signupForm  = document.getElementById("signupForm");
+  const loginForm   = document.getElementById("loginForm");
+  const resetForm   = document.getElementById("resetForm");
+  const profileForm = document.getElementById("profileForm");
+  const profilePanel= document.getElementById("profilePanel");
+  const logoutBtn   = document.getElementById("logoutBtn");
+  const authMsg     = document.getElementById("authMsg");
+  const authErr     = document.getElementById("authErr");
+  const profileMsg  = document.getElementById("profileMsg");
+  const profileErr  = document.getElementById("profileErr");
+  const pEmail      = document.getElementById("pEmail");
+
+  // Helper to show messages
+  function show(el, msg){ if(el){ el.textContent = msg; } }
+  function clearMsgs(){ show(authMsg,""); show(authErr,""); show(profileMsg,""); show(profileErr,""); }
+
+  // 5) Sign up → create auth user + Firestore profile
+  if (signupForm) signupForm.addEventListener("submit", async (e) => {
+    e.preventDefault(); clearMsgs();
+    const fd = new FormData(signupForm);
+    const name = fd.get("name")?.trim();
+    const address = fd.get("address")?.trim();
+    const phone = fd.get("phone")?.trim();
+    const email = fd.get("email")?.trim();
+    const password = fd.get("password");
+
+    try {
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+      // Optional: set displayName in Auth profile
+      if (name) { await updateProfile(cred.user, { displayName: name }); }
+      // Create users/{uid} in Firestore
+      await setDoc(doc(db, "users", cred.user.uid), {
+        name, address, phone, email,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp(),
+      });
+      show(authMsg, "Account created. You are now logged in!");
+      signupForm.reset();
+    } catch (err) {
+      show(authErr, err.message || "Signup failed.");
+    }
+  });
+
+  // 6) Login
+  if (loginForm) loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault(); clearMsgs();
+    const fd = new FormData(loginForm);
+    const email = fd.get("email")?.trim();
+    const password = fd.get("password");
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      show(authMsg, "Logged in!");
+      loginForm.reset();
+    } catch (err) {
+      show(authErr, err.message || "Login failed.");
+    }
+  });
+
+  // 7) Password reset (sends email)
+  if (resetForm) resetForm.addEventListener("submit", async (e) => {
+    e.preventDefault(); clearMsgs();
+    const email = new FormData(resetForm).get("email")?.trim();
+    try {
+      await sendPasswordResetEmail(auth, email);
+      show(authMsg, "Reset email sent. Check your inbox.");
+      resetForm.reset();
+    } catch (err) {
+      show(authErr, err.message || "Could not send reset email.");
+    }
+  });
+
+  // 8) Show/hide profile panel based on login
+  onAuthStateChanged(auth, async (user) => {
+    clearMsgs();
+    if (user) {
+      profilePanel.style.display = "block";
+      pEmail.textContent = user.email || "";
+      // Load profile from Firestore (if exists)
+      try {
+        const snap = await getDoc(doc(db, "users", user.uid));
+        const data = snap.exists() ? snap.data() : {};
+        if (profileForm) {
+          profileForm.name.value    = data.name    || user.displayName || "";
+          profileForm.address.value = data.address || "";
+          profileForm.phone.value   = data.phone   || "";
+        }
+      } catch (err) {
+        show(profileErr, "Could not load profile.");
+      }
+    } else {
+      profilePanel.style.display = "none";
+    }
+  });
+
+  // 9) Save profile updates
+  if (profileForm) profileForm.addEventListener("submit", async (e) => {
+    e.preventDefault(); clearMsgs();
+    const user = auth.currentUser;
+    if (!user) return;
+    const fd = new FormData(profileForm);
+    const name = fd.get("name")?.trim();
+    const address = fd.get("address")?.trim();
+    const phone = fd.get("phone")?.trim();
+    try {
+      // Update Firestore doc
+      await updateDoc(doc(db, "users", user.uid), {
+        name, address, phone, updatedAt: serverTimestamp(),
+      });
+      if (name && name !== (user.displayName || "")) {
+        await updateProfile(user, { displayName: name });
+      }
+      show(profileMsg, "Profile saved.");
+    } catch (err) {
+      show(profileErr, err.message || "Save failed.");
+    }
+  });
+
+  // 10) Log out
+  if (logoutBtn) logoutBtn.addEventListener("click", async () => {
+    clearMsgs();
+    await signOut(auth);
+    show(authMsg, "Logged out.");
+  });
+</script>
+
 </body>
 </html>
