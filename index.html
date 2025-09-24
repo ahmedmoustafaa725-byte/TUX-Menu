@@ -26,6 +26,7 @@
         <a href="#location">Location</a>
         <a href="#contact">Contact</a>
         <a href="account.html" id="accountLink">Account</a>
+        <a href="#" id="logoutLink" style="display:none">Log out</a>
         <a class="cta red" href="tel:01151960048">Call 011-5196-0048</a>
         <a class="cta blue" href="https://forms.gle/rKJoUeHkgLoqTmmXA" target="_blank" rel="noreferrer">Help Us Improve</a>
       </nav>
@@ -245,9 +246,9 @@
       .btn.gold-outline{ font-size:18px; }
     }
   </style>
-  <script type="module">
+<script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
   import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
   const firebaseConfig = {
@@ -266,12 +267,16 @@
 
   const headerLink = document.getElementById("accountLink");
   const mobileLink = document.getElementById("accountLinkMobile");
+  const logoutLink = document.getElementById("logoutLink"); // <-- this is your <a id="logoutLink">
 
   onAuthStateChanged(auth, async (user) => {
+    // Show/hide the logout link safely (in case it doesn't exist on some pages)
+    if (logoutLink) logoutLink.style.display = user ? "inline-block" : "none";
+
     if (!headerLink && !mobileLink) return;
 
     if (user) {
-      // Prefer Auth displayName, fall back to profile doc, then email name
+      // Prefer Auth displayName, fall back to Firestore profile, then email prefix
       let displayName = user.displayName || "";
       if (!displayName) {
         try {
@@ -287,7 +292,15 @@
       if (mobileLink) mobileLink.textContent = "Account";
     }
   });
+
+  // Handle logout click
+  logoutLink?.addEventListener("click", async (e) => {
+    e.preventDefault();
+    await signOut(auth);
+    window.location.href = "index.html";
+  });
 </script>
+
 
 </body>
 </html>
