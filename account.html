@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TUX — Account</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container bar">
+      <a href="index.html" class="brand" aria-label="TUX Home">
+        <img src="assets/img/logo.jpg" alt="TUX logo" class="brand__logo">
+        <div class="brand__text">
+          <div class="brand__title">TUX</div>
+          <div class="brand__tag">Burgers Worth The Chase …</div>
+        </div>
+      </a>
+      <nav class="nav">
+        <a href="index.html#menu">Menu</a>
+        <a href="index.html#gallery">Gallery</a>
+        <a href="index.html#location">Location</a>
+        <a href="index.html#contact">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="section">
+    <div class="container" style="max-width:520px">
+      <header class="section__head">
+        <h2>Log in</h2>
+        <p class="muted">Welcome back 👋</p>
+      </header>
+
+      <div class="panel">
+        <form id="loginForm" style="display:grid;gap:12px">
+          <label>Email
+            <input id="loginEmail" type="email" required placeholder="you@example.com" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:#0e0e0e;color:var(--ink)">
+          </label>
+          <label>Password
+            <input id="loginPassword" type="password" required placeholder="••••••••" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:#0e0e0e;color:var(--ink)">
+          </label>
+          <button class="btn red" type="submit">Log in</button>
+          <button class="btn outline" id="forgotBtn" type="button">Forgot password?</button>
+          <div id="loginMsg" class="muted"></div>
+        </form>
+      </div>
+
+      <p style="margin-top:16px">
+        Don’t have an account?
+        <a class="btn" href="register.html">Create an account</a>
+      </p>
+    </div>
+  </main>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDqjdI3ZqFSVY_5Kmowak1DCOL5bZaCYoo",
+      authDomain: "tux-menu.firebaseapp.com",
+      projectId: "tux-menu",
+      storageBucket: "tux-menu.firebasestorage.app",
+      messagingSenderId: "326432857137",
+      appId: "1:326432857137:web:926cc2ffb364b2f5d44910",
+      measurementId: "G-1T1RRHCCDQ"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    const $ = (id) => document.getElementById(id);
+    const loginForm = $("loginForm");
+    const emailEl = $("loginEmail");
+    const passEl  = $("loginPassword");
+    const msg     = $("loginMsg");
+    const forgot  = $("forgotBtn");
+
+    loginForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      msg.textContent = "Logging in…";
+      try {
+        await signInWithEmailAndPassword(auth, emailEl.value.trim(), passEl.value);
+        window.location.href = "index.html"; // go back to main site
+      } catch (err) {
+        msg.textContent = err.message;
+      }
+    });
+
+    forgot.addEventListener("click", async () => {
+      const email = emailEl.value.trim();
+      if (!email) { msg.textContent = "Enter your email above first."; return; }
+      msg.textContent = "Sending reset email…";
+      try {
+        await sendPasswordResetEmail(auth, email);
+        msg.textContent = "Password reset email sent. Check your inbox.";
+      } catch (err) {
+        msg.textContent = err.message;
+      }
+    });
+  </script>
+</body>
+</html>
