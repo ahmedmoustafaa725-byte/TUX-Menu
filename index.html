@@ -25,6 +25,7 @@
         <a href="#gallery">Gallery</a>
         <a href="#location">Location</a>
         <a href="#contact">Contact</a>
+        <a href="account.html" id="accountLink">Account</a>
         <a class="cta red" href="tel:01151960048">Call 011-5196-0048</a>
         <a class="cta blue" href="https://forms.gle/rKJoUeHkgLoqTmmXA" target="_blank" rel="noreferrer">Help Us Improve</a>
       </nav>
@@ -33,6 +34,7 @@
 
   <!-- Quick access for mobile -->
   <nav class="quick-nav" aria-label="Quick access">
+    <a href="account.html" id="accountLinkMobile">Account</a>
     <a href="#menu">Menu</a>
     <a href="#gallery">Gallery</a>
     <a href="#location">Location</a>
@@ -243,5 +245,49 @@
       .btn.gold-outline{ font-size:18px; }
     }
   </style>
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDqjdI3ZqFSVY_5Kmowak1DCOL5bZaCYoo",
+    authDomain: "tux-menu.firebaseapp.com",
+    projectId: "tux-menu",
+    storageBucket: "tux-menu.firebasestorage.app",
+    messagingSenderId: "326432857137",
+    appId: "1:326432857137:web:926cc2ffb364b2f5d44910",
+    measurementId: "G-1T1RRHCCDQ"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db   = getFirestore(app);
+
+  const headerLink = document.getElementById("accountLink");
+  const mobileLink = document.getElementById("accountLinkMobile");
+
+  onAuthStateChanged(auth, async (user) => {
+    if (!headerLink && !mobileLink) return;
+
+    if (user) {
+      // Prefer Auth displayName, fall back to profile doc, then email name
+      let displayName = user.displayName || "";
+      if (!displayName) {
+        try {
+          const snap = await getDoc(doc(db, "profiles", user.uid));
+          if (snap.exists()) displayName = snap.data().name || "";
+        } catch {}
+      }
+      const shown = displayName || (user.email ? user.email.split("@")[0] : "Account");
+      if (headerLink) headerLink.textContent = shown;
+      if (mobileLink) mobileLink.textContent = shown;
+    } else {
+      if (headerLink) headerLink.textContent = "Account";
+      if (mobileLink) mobileLink.textContent = "Account";
+    }
+  });
+</script>
+
 </body>
 </html>
