@@ -22,6 +22,12 @@ body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvet
 .nav a:hover{opacity:1;color:var(--gold)}
 .nav .cta{border:1px solid var(--gold);border-radius:18px;padding:8px 14px;color:var(--gold)}
 .nav .cta.red{border-color:#e11919;background:#e11919;color:#fff}
+.nav .cta.gold{ background: var(--gold); color:#111; border-color: var(--gold); }
+.nav .cta.gold:hover{ color:#111; opacity:1; }
+
+/* Keep quick-nav gold button filled on hover (mobile) */
+.quick-nav a.btn{ background: var(--gold); color:#111; }
+.quick-nav a.btn:hover{ background: var(--gold); color:#111; }
 @media(min-width:840px){.nav{display:flex}}
 
 .hero{position:relative;min-height:64vh;display:flex;align-items:center;border-bottom:1px solid var(--border);background:#0b0b0b}
