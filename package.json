@@ -1,0 +1,11 @@
+{
+  "name": "tux-functions",
+  "main": "index.js",
+  "dependencies": {
+    "firebase-admin": "^11.11.1",
+    "firebase-functions": "^4.9.0"
+  },
+  "engines": {
+    "node": "18"
+  }
+}
