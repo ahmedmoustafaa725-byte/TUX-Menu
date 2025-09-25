@@ -1,0 +1,177 @@
+import { auth, db } from "./firebase-init.js";
+import { onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+import {
+  doc,
+  getDoc,
+  setDoc,
+  serverTimestamp,
+  collection,
+  getDocs,
+  orderBy,
+  query,
+} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
+const form = document.getElementById("profileForm");
+const statusEl = document.getElementById("profileStatus");
+const nameEl = document.getElementById("profileName");
+const addressEl = document.getElementById("profileAddress");
+const phoneEl = document.getElementById("profilePhone");
+const emailEl = document.getElementById("profileEmail");
+const ordersList = document.getElementById("profileOrders");
+const emptyOrders = document.getElementById("profileOrdersEmpty");
+
+let profileRef = null;
+let currentUser = null;
+
+function showStatus(message, isError = false) {
+  if (!statusEl) return;
+  statusEl.textContent = message;
+  statusEl.style.color = isError ? "#e96a6a" : "var(--muted)";
+}
+
+function formatDate(timestamp) {
+  try {
+    if (!timestamp) return new Date().toLocaleString();
+    if (typeof timestamp.toDate === "function") {
+      return timestamp.toDate().toLocaleString();
+    }
+    if (typeof timestamp.seconds === "number") {
+      return new Date(timestamp.seconds * 1000).toLocaleString();
+    }
+    if (timestamp instanceof Date) {
+      return timestamp.toLocaleString();
+    }
+  } catch (err) {
+    console.error("Failed to format timestamp", err);
+  }
+  return new Date().toLocaleString();
+}
+
+async function loadOrders() {
+  if (!profileRef || !ordersList) return;
+  try {
+    const ordersQuery = query(collection(profileRef, "orders"), orderBy("createdAt", "desc"));
+    const snapshot = await getDocs(ordersQuery);
+
+    ordersList.innerHTML = "";
+
+    if (snapshot.empty) {
+      if (emptyOrders) emptyOrders.style.display = "block";
+      return;
+    }
+
+    if (emptyOrders) emptyOrders.style.display = "none";
+
+    snapshot.forEach((docSnap) => {
+      const data = docSnap.data();
+      const li = document.createElement("li");
+
+      const heading = document.createElement("h4");
+      heading.textContent = `${data.items ? data.items.split("\n")[0] : "TUX order"}`;
+      li.appendChild(heading);
+
+      const badge = document.createElement("span");
+      badge.className = `badge ${data.fulfillment === "delivery" ? "delivery" : "pickup"}`;
+      badge.textContent = data.fulfillment === "delivery" ? "Delivery" : "Pickup";
+      li.appendChild(badge);
+
+      const sub = document.createElement("p");
+      sub.textContent = formatDate(data.createdAt);
+      li.appendChild(sub);
+
+      if (data.items) {
+        const items = document.createElement("p");
+        items.textContent = data.items;
+        li.appendChild(items);
+      }
+
+      if (data.instructions) {
+        const instructions = document.createElement("p");
+        instructions.textContent = `Notes: ${data.instructions}`;
+        li.appendChild(instructions);
+      }
+
+      const statusLine = document.createElement("p");
+      statusLine.textContent = `Status: ${data.status || "pending"}`;
+      li.appendChild(statusLine);
+
+      if (data.fulfillment === "delivery" && data.address) {
+        const addressLine = document.createElement("p");
+        addressLine.textContent = `Deliver to: ${data.address}`;
+        li.appendChild(addressLine);
+      }
+
+      ordersList.appendChild(li);
+    });
+  } catch (err) {
+    console.error("Failed to load order history", err);
+  }
+}
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    window.location.href = `account.html?redirect=${encodeURIComponent("profile.html")}`;
+    return;
+  }
+
+  currentUser = user;
+  profileRef = doc(db, "profiles", user.uid);
+
+  try {
+    const snap = await getDoc(profileRef);
+    if (snap.exists()) {
+      const data = snap.data();
+      if (data.name && nameEl) nameEl.value = data.name;
+      if (data.address && addressEl) addressEl.value = data.address;
+      if (data.phone && phoneEl) phoneEl.value = data.phone;
+    } else {
+      await setDoc(profileRef, { createdAt: serverTimestamp() }, { merge: true });
+    }
+  } catch (err) {
+    console.error("Failed to load profile", err);
+  }
+
+  if (emailEl) emailEl.value = user.email || "";
+  if (nameEl && !nameEl.value) nameEl.value = user.displayName || "";
+
+  loadOrders();
+});
+
+form?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  if (!currentUser || !profileRef) {
+    showStatus("Please log in again.", true);
+    return;
+  }
+
+  const name = nameEl.value.trim();
+  const address = addressEl.value.trim();
+  const phone = phoneEl.value.trim();
+
+  if (!name || !phone) {
+    showStatus("Name and phone are required.", true);
+    return;
+  }
+
+  showStatus("Saving changes…");
+
+  try {
+    await setDoc(profileRef, {
+      name,
+      address,
+      phone,
+      updatedAt: serverTimestamp(),
+    }, { merge: true });
+
+    if (currentUser.displayName !== name) {
+      await updateProfile(currentUser, { displayName: name }).catch((err) => {
+        console.error("Failed to update auth display name", err);
+      });
+    }
+
+    showStatus("Details saved!");
+  } catch (err) {
+    console.error("Failed to save profile", err);
+    showStatus(err.message || "Could not save your changes.", true);
+  }
+});
