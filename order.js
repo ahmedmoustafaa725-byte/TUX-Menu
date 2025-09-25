@@ -960,7 +960,6 @@ const orderPayload = Object.entries(baseOrderPayload).reduce((acc, [key, value])
 
     const ordersCol = collection(profileRef, "orders");
     const orderDocRef = await addDoc(ordersCol, orderPayload);
-await syncOrderToPOS({ ...orderPayload, id: orderDocRef.id });
 
     try {
       await setDoc(doc(db, "orders", orderDocRef.id), {
@@ -971,7 +970,7 @@ await syncOrderToPOS({ ...orderPayload, id: orderDocRef.id });
     } catch (err) {
       console.warn("Could not copy order to shared collection", err);
     }
-
+await syncOrderToPOS({ ...orderPayload, id: orderDocRef.id });
     await sendConfirmationEmail({
       ...orderPayload,
       id: orderDocRef.id,
