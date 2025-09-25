@@ -56,33 +56,27 @@
 
       <p style="margin-top:16px">
         Already have an account?
-        <a class="btn outline" href="account.html">Back to login</a>
+        <a class="btn outline" id="backToLogin" href="account.html">Back to login</a>
       </p>
     </div>
   </main>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-    import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyDqjdI3ZqFSVY_5Kmowak1DCOL5bZaCYoo",
-      authDomain: "tux-menu.firebaseapp.com",
-      projectId: "tux-menu",
-      storageBucket: "tux-menu.firebasestorage.app",
-      messagingSenderId: "326432857137",
-      appId: "1:326432857137:web:926cc2ffb364b2f5d44910",
-      measurementId: "G-1T1RRHCCDQ"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db   = getFirestore(app);
-
+ <script type="module">
+    import { auth, db } from "./firebase-init.js";
+    import { createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
     const $ = (id) => document.getElementById(id);
     const form = $("regForm");
     const msg  = $("regMsg");
+ const loginLink = $("backToLogin");
+
+    const params = new URLSearchParams(window.location.search);
+    const redirectParam = params.get("redirect");
+    const safeRedirect = redirectParam && !/^https?:/i.test(redirectParam) ? redirectParam : "";
+
+    if (loginLink && safeRedirect) {
+      loginLink.href = `account.html?redirect=${encodeURIComponent(safeRedirect)}`;
+    }
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -108,8 +102,8 @@
         await updateProfile(cred.user, { displayName: name });
 
         // Done → Back to main site; header will show the name
-        window.location.href = "index.html";
-      } catch (err) {
+const destination = safeRedirect || "index.html";
+        window.location.href = destination;      } catch (err) {
         msg.textContent = err.message;
       }
     });
