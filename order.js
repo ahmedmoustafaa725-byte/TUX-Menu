@@ -14,47 +14,30 @@ import {
   limit,
   getDocs,
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-// In your order.js file, REPLACE the old syncOrderToPOS function with this one.
-
+// In order.js, also UPDATE your syncOrderToPOS function to this version.
 async function syncOrderToPOS(orderData) {
   if (!db) return;
 
-  // We are now writing to a new, temporary collection.
   const incomingOrderRef = collection(db, "incomingWebOrders");
-
+  
   const posPayload = {
-    // --- Key identifiers ---
     shopId: "tux",
-    originalWebsiteOrderId: orderData.id, // Keep a reference to the original ID
-    
-    // --- Order Details ---
+    originalWebsiteOrderId: orderData.id,
     cart: (orderData.cart || []).map(item => ({
-      id: item.itemId,
-      name: item.name,
-      qty: item.quantity,
-      price: item.price,
-      extras: (item.extras || []).map(extra => ({
-        id: extra.id,
-        name: extra.name,
-        price: extra.price,
-      })),
+      id: item.itemId, name: item.name, qty: item.quantity, price: item.price,
+      extras: (item.extras || []).map(extra => ({ id: extra.id, name: extra.name, price: extra.price })),
     })),
-    
-    // --- Customer Details ---
     customerName: orderData.customerName,
     customerPhone: orderData.phone,
     deliveryAddress: orderData.address,
     deliveryZoneId: orderData.deliveryZoneId || "",
-    
-    // --- Financials & Fulfillment ---
     total: orderData.total,
     itemsTotal: orderData.subtotal,
     deliveryFee: orderData.deliveryFee || 0,
     paymentMethod: orderData.paymentMethod,
     orderType: orderData.fulfillment === 'delivery' ? 'Delivery' : 'Pickup',
-    
-    // --- Timestamps & Status ---
-    createdAt: orderData.createdAt,
+    // Use a server timestamp directly in the cloud function for accuracy.
+    createdAt: serverTimestamp(),
     status: "new",
   };
 
@@ -65,7 +48,6 @@ async function syncOrderToPOS(orderData) {
     console.error("Error sending order for processing:", error);
   }
 }
-
 const form = document.getElementById("orderForm");
 const statusEl = document.getElementById("orderStatus");
 const nameEl = document.getElementById("orderName");
@@ -854,138 +836,96 @@ onAuthStateChanged(auth, async (user) => {
   loadRecentOrders();
 });
 
+// In order.js, REPLACE the entire form.addEventListener("submit", ...) function with this one.
+
 form?.addEventListener("submit", async (event) => {
   event.preventDefault();
+
   if (!currentUser || !profileRef) {
     showStatus("Please log in again to place an order.", true);
     return;
   }
+  if (!cart.length) {
+    showStatus("Your cart is empty.", true);
+    return;
+  }
 
+  submitBtn.disabled = true;
+  showStatus("Placing your order...");
+
+  // --- Step 1: Gather all order data ---
   const name = nameEl.value.trim();
   const address = addressEl.value.trim();
   const phone = phoneEl.value.trim();
-  const instructions = notesEl.value.trim();
   const fulfillment = selectedFulfillment();
-  const paymentMethod = selectedPayment();
-  const items = buildCartSummary();
-  const subtotal = calculateCartTotal();
-const selectedZone = getSelectedZone();
-  if (!cart.length || !items) {    showStatus("Cart is Empty.", true);
+  const selectedZone = getSelectedZone();
+
+  if (fulfillment === "delivery" && (!address || !selectedZone)) {
+    showStatus("Delivery orders require an address and a delivery zone.", true);
+    submitBtn.disabled = false;
     return;
   }
 
-  if (fulfillment === "delivery" && !address) {
-    showStatus("Delivery orders need an address.", true);
-    return;
-  }
-  if (fulfillment === "delivery" && !selectedZone) {
-    showStatus("Please choose your delivery zone.", true);
-    return;
-  }
   const deliveryFee = fulfillment === "delivery" ? selectedZone?.fee ?? 0 : 0;
+  const subtotal = calculateCartTotal();
   const total = subtotal + deliveryFee;
-  updateItemsField();
 
-  submitBtn.disabled = true;
-  showStatus("Sending your order…");
-
-  const createdAt = serverTimestamp();
-  const baseOrderPayload = {
+  const orderPayload = {
     userId: currentUser.uid,
     customerName: name,
     phone,
-    address: address || null,
-    email: currentUser.email || emailEl?.value.trim() || "",
-    items,
+    email: currentUser.email || "",
+    items: buildCartSummary(),
+    cart: cart.map(entry => ({ ...entry })), // Create a clean copy
     fulfillment,
-    paymentMethod,
-
-    status: "pending",
-    createdAt,
- subtotal,
+    paymentMethod: selectedPayment(),
+    address: address || null,
+    deliveryZoneId: selectedZone?.id || null,
+    deliveryZone: selectedZone?.name || null,
+    deliveryFee,
+    subtotal,
     total,
+    instructions: notesEl.value.trim(),
+    status: "pending",
+    createdAt: serverTimestamp(),
   };
-
-  if (instructions) {
-    baseOrderPayload.instructions = instructions;
-  }
-
-  if (address) {
-    baseOrderPayload.address = address;
-  }
-
-  if (fulfillment === "delivery" && selectedZone) {
-    baseOrderPayload.deliveryZoneId = selectedZone.id;
-    baseOrderPayload.deliveryZone = selectedZone.name;
-    baseOrderPayload.deliveryFee = deliveryFee;
-  }
-
-  if (Array.isArray(cart) && cart.length) {
-    baseOrderPayload.cart = cart.map((entry) => ({      itemId: entry.itemId,
-      name: entry.name,
-      quantity: entry.quantity,
-      price: entry.price,
-      extras: entry.extras,
-      lineTotal: calculateItemTotal(entry),
-   }));
-  }
-const orderPayload = Object.entries(baseOrderPayload).reduce((acc, [key, value]) => {
-    if (value === undefined || value === null) {
-      return acc;
-    }
-
-    if (typeof value === "string") {
-      const trimmed = value.trim();
-      if (!trimmed) {
-        // Keep required strings like email/items/customerName/phone even if empty.
-        if (["email", "items", "customerName", "phone"].includes(key)) {
-          acc[key] = value;
-        }
-        return acc;
-      }
-      acc[key] = trimmed;
-      return acc;
-    }
-
-    acc[key] = value;
-    return acc;
-  }, {});
+  
+  // --- Step 2: Save the user's private copy of the order ---
+  let orderDocRef;
   try {
-    await setDoc(profileRef, {
-      name,
-      address,
-      phone,
-      updatedAt: serverTimestamp(),
-    }, { merge: true });
-
     const ordersCol = collection(profileRef, "orders");
-    const orderDocRef = await addDoc(ordersCol, orderPayload);
+    orderDocRef = await addDoc(ordersCol, orderPayload);
+    console.log("✅ Step 1/3: Private order saved successfully.", orderDocRef.id);
+  } catch (err) {
+    console.error("❌ FAILED STEP 1: Could not save order to user's profile.", err);
+    showStatus("Error: Could not save your order. Please try again.", true);
+    submitBtn.disabled = false;
+    return;
+  }
 
-    try {
-      await setDoc(doc(db, "orders", orderDocRef.id), {
-        ...orderPayload,
-        profileUid: currentUser.uid,
-        profileOrderId: orderDocRef.id,
-      });
-    } catch (err) {
-      console.warn("Could not copy order to shared collection", err);
-    }
-await syncOrderToPOS({ ...orderPayload, id: orderDocRef.id });
-    await sendConfirmationEmail({
-      ...orderPayload,
-      id: orderDocRef.id,
-      email: orderPayload.email,
-    });
+  // --- Step 3: Sync the order to the POS system ---
+  try {
+    await syncOrderToPOS({ ...orderPayload, id: orderDocRef.id, createdAt: new Date() });
+    console.log("✅ Step 2/3: Order sent to POS for processing.");
+  } catch (err) {
+    console.error("❌ FAILED STEP 2: Could not sync order to POS.", err);
+    // This is not a critical failure for the user, so we just log it and continue.
+  }
 
+  // --- Step 4: Finalize and clean up ---
+  try {
+    await sendConfirmationEmail({ ...orderPayload, id: orderDocRef.id });
+    console.log("✅ Step 3/3: Confirmation email sent.");
+    
     showStatus("Order placed! Check your email for a confirmation.");
     cart = [];
     updateCartUI();
     if (itemsEl) itemsEl.value = "";
     if (notesEl) notesEl.value = "";
     loadRecentOrders();
+
   } catch (err) {
-    console.error("Failed to place order", err);
-    showStatus(err.message || "Something went wrong. Try again.", true);
+    console.error("❌ FAILED STEP 3: Finalization or email error.", err);
   } finally {
     submitBtn.disabled = false;
   }
