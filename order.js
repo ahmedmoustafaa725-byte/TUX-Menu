@@ -15,6 +15,7 @@ import {
   getDocs,
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 // In order.js, also UPDATE your syncOrderToPOS function to this version.
+// In order.js, replace the syncOrderToPOS function with this
 async function syncOrderToPOS(orderData) {
   if (!db) return;
 
@@ -36,7 +37,6 @@ async function syncOrderToPOS(orderData) {
     deliveryFee: orderData.deliveryFee || 0,
     paymentMethod: orderData.paymentMethod,
     orderType: orderData.fulfillment === 'delivery' ? 'Delivery' : 'Pickup',
-    // Use a server timestamp directly in the cloud function for accuracy.
     createdAt: serverTimestamp(),
     status: "new",
   };
@@ -48,6 +48,90 @@ async function syncOrderToPOS(orderData) {
     console.error("Error sending order for processing:", error);
   }
 }
+
+
+// And also replace the entire submit event listener with this final version
+form?.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  if (!currentUser || !profileRef) {
+    showStatus("Please log in again.", true);
+    return;
+  }
+  if (!cart.length) {
+    showStatus("Your cart is empty.", true);
+    return;
+  }
+
+  submitBtn.disabled = true;
+  showStatus("Processing order...");
+  console.log("--- Starting Order Submission ---");
+
+  // --- Step 1: Gather Data ---
+  const name = nameEl.value.trim();
+  const address = addressEl.value.trim();
+  const phone = phoneEl.value.trim();
+  const fulfillment = selectedFulfillment();
+  const selectedZone = getSelectedZone();
+
+  if (fulfillment === "delivery" && (!address || !selectedZone)) {
+    showStatus("Delivery requires an address and zone.", true);
+    submitBtn.disabled = false;
+    return;
+  }
+
+  const deliveryFee = fulfillment === "delivery" ? selectedZone?.fee ?? 0 : 0;
+  const subtotal = calculateCartTotal();
+  const total = subtotal + deliveryFee;
+
+  const orderPayload = {
+    userId: currentUser.uid,
+    customerName: name,
+    phone,
+    email: currentUser.email,
+    // THIS IS THE CORRECTED LINE: We create a clean copy of the cart data
+    cart: (cart || []).map(item => ({ itemId: item.itemId, name: item.name, quantity: item.quantity, price: item.price, extras: item.extras })),
+    fulfillment,
+    paymentMethod: selectedPayment(),
+    address,
+    deliveryZoneId: selectedZone?.id || "",
+    deliveryFee,
+    subtotal,
+    total,
+    instructions: notesEl.value.trim(),
+    status: "pending",
+    createdAt: serverTimestamp(),
+  };
+  
+  // --- Step 2: Save Private Order ---
+  let orderDocRef;
+  try {
+    const ordersCol = collection(profileRef, "orders");
+    orderDocRef = await addDoc(ordersCol, orderPayload);
+    console.log("✅ STEP 1/2: Private order saved successfully.", orderDocRef.id);
+  } catch (err) {
+    console.error("❌ FAILED AT STEP 1: Could not save order to user's profile.", err);
+    showStatus("Error saving your order. Please check the console.", true);
+    submitBtn.disabled = false;
+    return;
+  }
+  
+  // --- Step 3: Sync to POS ---
+  try {
+    const dataToSync = { ...orderPayload, id: orderDocRef.id };
+    await syncOrderToPOS(dataToSync);
+    console.log("✅ STEP 2/2: Order sent to POS system.");
+  } catch (err) {
+    console.error("❌ FAILED AT STEP 2: The syncOrderToPOS function failed.", err);
+  }
+
+  // --- Step 4: Finalize UI ---
+  showStatus("Order placed successfully! Thank you.");
+  cart = [];
+  updateCartUI();
+  if (notesEl) notesEl.value = "";
+  loadRecentOrders();
+  submitBtn.disabled = false;
+});
 const form = document.getElementById("orderForm");
 const statusEl = document.getElementById("orderStatus");
 const nameEl = document.getElementById("orderName");
@@ -840,6 +924,8 @@ onAuthStateChanged(auth, async (user) => {
 
 // In your order.js file, REPLACE the entire form.addEventListener("submit", ...) function
 
+// In order.js, REPLACE the entire `form?.addEventListener` block with this one.
+
 form?.addEventListener("submit", async (event) => {
   event.preventDefault();
   if (!currentUser || !profileRef) {
@@ -872,12 +958,19 @@ form?.addEventListener("submit", async (event) => {
   const subtotal = calculateCartTotal();
   const total = subtotal + deliveryFee;
 
+  // This creates a clean, simple object for Firestore, which is crucial.
   const orderPayload = {
     userId: currentUser.uid,
     customerName: name,
     phone,
     email: currentUser.email,
-    cart, // Pass the clean cart object
+    cart: (cart || []).map(item => ({
+        itemId: item.itemId,
+        name: item.name,
+        quantity: item.quantity,
+        price: item.price,
+        extras: item.extras,
+    })),
     fulfillment,
     paymentMethod: selectedPayment(),
     address,
@@ -887,7 +980,7 @@ form?.addEventListener("submit", async (event) => {
     total,
     instructions: notesEl.value.trim(),
     status: "pending",
-    createdAt: serverTimestamp(), // Let Firestore handle the timestamp
+    createdAt: serverTimestamp(),
   };
   
   // --- Step 2: Save Private Order ---
@@ -895,32 +988,39 @@ form?.addEventListener("submit", async (event) => {
   try {
     const ordersCol = collection(profileRef, "orders");
     orderDocRef = await addDoc(ordersCol, orderPayload);
-    console.log("✅ STEP 1/2: Private order saved successfully.", orderDocRef.id);
+    console.log("✅ STEP 1/3: Private order saved successfully.", orderDocRef.id);
   } catch (err) {
     console.error("❌ FAILED AT STEP 1: Could not save order to user's profile.", err);
-    showStatus("Error saving your order. Please check the console.", true);
+    showStatus("Error saving your order. Please check the browser console for details.", true);
     submitBtn.disabled = false;
     return;
   }
   
-  // --- Step 3: Sync to POS ---
+  // --- Step 3: Sync to POS Staging Area ---
   try {
-    // We pass a fresh object to syncOrderToPOS
     const dataToSync = { ...orderPayload, id: orderDocRef.id };
     await syncOrderToPOS(dataToSync);
-    console.log("✅ STEP 2/2: Order sent to POS system.");
+    console.log("✅ STEP 2/3: Order successfully sent to POS system.");
   } catch (err) {
-    // This function already has its own internal error logging.
-    // We log it here again just in case.
     console.error("❌ FAILED AT STEP 2: The syncOrderToPOS function failed.", err);
+    // We continue so the customer still gets their confirmation.
   }
 
-  // --- Step 4: Finalize UI ---
-  showStatus("Order placed successfully! Thank you.");
-  cart = [];
-  updateCartUI();
-  if (notesEl) notesEl.value = "";
-  loadRecentOrders();
-  submitBtn.disabled = false;
+  // --- Step 4: Finalize and Clean Up ---
+  try {
+    await sendConfirmationEmail({ ...orderPayload, id: orderDocRef.id });
+    console.log("✅ STEP 3/3: Confirmation email sent.");
+    
+    showStatus("Order placed successfully! Thank you.");
+    cart = [];
+    updateCartUI();
+    if (notesEl) notesEl.value = "";
+    loadRecentOrders();
+
+  } catch (err) {
+    console.error("❌ FAILED AT STEP 3: Finalization or email error.", err);
+  } finally {
+    submitBtn.disabled = false;
+  }
 });
 updateFulfillmentUI();
