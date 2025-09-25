@@ -14,23 +14,22 @@ import {
   limit,
   getDocs,
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-// Add this new function to your order.js file
+// In your order.js file, REPLACE the old syncOrderToPOS function with this one.
+
 async function syncOrderToPOS(orderData) {
   if (!db) return;
-  
-  // This is the path your POS app will be listening to
-  const posOrderRef = doc(db, `shops/tux/onlineOrders/${orderData.id}`);
 
-  // We re-format the website order to match what the POS expects
+  // We are now writing to a new, temporary collection.
+  const incomingOrderRef = collection(db, "incomingWebOrders");
+
   const posPayload = {
     // --- Key identifiers ---
     shopId: "tux",
-    idemKey: `website-order-${orderData.id}`, // Idempotency key
+    originalWebsiteOrderId: orderData.id, // Keep a reference to the original ID
     
     // --- Order Details ---
-    orderNo: orderData.id.slice(-6).toUpperCase(), // A short order number for the ticket
     cart: (orderData.cart || []).map(item => ({
-      id: item.itemId, // Use the menu item ID
+      id: item.itemId,
       name: item.name,
       qty: item.quantity,
       price: item.price,
@@ -55,15 +54,15 @@ async function syncOrderToPOS(orderData) {
     orderType: orderData.fulfillment === 'delivery' ? 'Delivery' : 'Pickup',
     
     // --- Timestamps & Status ---
-    createdAt: orderData.createdAt, // Use the same timestamp
+    createdAt: orderData.createdAt,
     status: "new",
   };
-  
+
   try {
-    await setDoc(posOrderRef, posPayload);
-    console.log("Order successfully synced to POS:", orderData.id);
+    await addDoc(incomingOrderRef, posPayload);
+    console.log("Order sent for processing:", orderData.id);
   } catch (error) {
-    console.error("Error syncing order to POS:", error);
+    console.error("Error sending order for processing:", error);
   }
 }
 
