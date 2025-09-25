@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TUX — Your Profile</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="container bar">
+      <a href="index.html" class="brand" aria-label="TUX Home">
+        <img src="assets/img/logo.jpg" alt="TUX logo" class="brand__logo">
+        <div class="brand__text">
+          <div class="brand__title">TUX</div>
+          <div class="brand__tag">Burgers Worth The Chase …</div>
+        </div>
+      </a>
+      <nav class="nav">
+        <a href="index.html#menu">Menu</a>
+        <a href="index.html#gallery">Gallery</a>
+        <a href="index.html#location">Location</a>
+        <a href="index.html#contact">Contact</a>
+        <a href="order.html" id="orderLink" class="cta green">Order Online</a>
+        <a href="profile.html" id="accountLink" class="cta gold">Account</a>
+        <a href="#" id="logoutLink" style="display:none">Log out</a>
+        <a class="cta blue" href="https://forms.gle/rKJoUeHkgLoqTmmXA" target="_blank" rel="noreferrer">Help Us Improve</a>
+      </nav>
+    </div>
+  </header>
+
+  <nav class="quick-nav" aria-label="Quick access">
+    <a href="order.html" id="orderLinkMobile" class="btn green">Order Online</a>
+    <a href="profile.html" id="accountLinkMobile" class="btn">Account</a>
+    <a href="index.html#menu">Menu</a>
+    <a href="index.html#gallery">Gallery</a>
+    <a href="index.html#location">Location</a>
+    <a href="index.html#contact">Contact</a>
+  </nav>
+
+  <main class="section">
+    <div class="container" style="max-width:760px">
+      <header class="section__head">
+        <h2>Your saved details</h2>
+        <p class="muted">Update your contact information and review previous orders.</p>
+      </header>
+
+      <div class="panel">
+        <form id="profileForm" class="form-stack">
+          <label>Name
+            <input id="profileName" class="form-field" type="text" required placeholder="Full name">
+          </label>
+          <label>Delivery address
+            <input id="profileAddress" class="form-field" type="text" placeholder="Street, City">
+          </label>
+          <label>Phone number
+            <input id="profilePhone" class="form-field" type="tel" required placeholder="01X-XXXX-XXXX">
+          </label>
+          <label>Email
+            <input id="profileEmail" class="form-field" type="email" required readonly>
+          </label>
+          <div class="text-right">
+            <a class="btn outline" href="order.html">Start a new order</a>
+          </div>
+          <button class="btn" type="submit">Save changes</button>
+          <div id="profileStatus" class="muted"></div>
+        </form>
+      </div>
+
+      <div class="panel">
+        <h3>Order history</h3>
+        <p id="profileOrdersEmpty" class="muted">You haven’t placed any orders yet.</p>
+        <ul id="profileOrders" class="order-history"></ul>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__row">
+      <div class="footer__brand">
+        <img src="assets/img/logo.jpg" alt="TUX" class="footer__logo">
+        <span>© 2025 TUX — Egypt</span>
+      </div>
+      <a class="footer__link" href="https://maps.app.goo.gl/V8U4SKzMqHvT5o2m7" target="_blank" rel="noreferrer">
+        El-Saada St – Zahraa El-Maadi • Open in Maps
+      </a>
+    </div>
+  </footer>
+
+  <script type="module" src="nav.js"></script>
+  <script type="module" src="profile.js"></script>
+</body>
+</html>
