@@ -48,27 +48,14 @@
 
       <p style="margin-top:16px">
         Don’t have an account?
-        <a class="btn" href="register.html">Create an account</a>
+        <a class="btn" id="createAccountLink" href="register.html">Create an account</a>
       </p>
     </div>
   </main>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import { getAuth, signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyDqjdI3ZqFSVY_5Kmowak1DCOL5bZaCYoo",
-      authDomain: "tux-menu.firebaseapp.com",
-      projectId: "tux-menu",
-      storageBucket: "tux-menu.firebasestorage.app",
-      messagingSenderId: "326432857137",
-      appId: "1:326432857137:web:926cc2ffb364b2f5d44910",
-      measurementId: "G-1T1RRHCCDQ"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+ import { auth } from "./firebase-init.js";
+    import { signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
     const $ = (id) => document.getElementById(id);
     const loginForm = $("loginForm");
@@ -76,13 +63,22 @@
     const passEl  = $("loginPassword");
     const msg     = $("loginMsg");
     const forgot  = $("forgotBtn");
+  const registerLink = $("createAccountLink");
 
+    const params = new URLSearchParams(window.location.search);
+    const redirectParam = params.get("redirect");
+    const safeRedirect = redirectParam && !/^https?:/i.test(redirectParam) ? redirectParam : "";
+
+    if (registerLink && safeRedirect) {
+      registerLink.href = `register.html?redirect=${encodeURIComponent(safeRedirect)}`;
+    }
     loginForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       msg.textContent = "Logging in…";
       try {
         await signInWithEmailAndPassword(auth, emailEl.value.trim(), passEl.value);
-        window.location.href = "index.html"; // go back to main site
+  const destination = safeRedirect || "index.html";
+        window.location.href = destination;
       } catch (err) {
         msg.textContent = err.message;
       }
