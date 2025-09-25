@@ -46,40 +46,67 @@
         <p class="muted">Place a pickup or delivery order in seconds. We’ll use your saved details so you can check out faster.</p>
       </header>
 
-      <div class="panel">
-        <form id="orderForm" class="form-stack" data-email-service="" data-email-template="" data-email-public="">
-          <label>Full name
-            <input id="orderName" class="form-field" type="text" required placeholder="Full name">
-          </label>
+      <div class="grid2 order-layout">
+        <div class="panel">
+          <form id="orderForm" class="form-stack" data-email-service="" data-email-template="" data-email-public="">
+            <label>Full name
+              <input id="orderName" class="form-field" type="text" required placeholder="Full name">
+            </label>
 
-          <div class="order-options" role="group" aria-label="Order type">
-            <label><input type="radio" name="fulfillment" value="pickup" checked> Pickup</label>
-            <label><input type="radio" name="fulfillment" value="delivery"> Delivery</label>
+            <div class="order-options" role="group" aria-label="Order type">
+              <label><input type="radio" name="fulfillment" value="pickup" checked> Pickup</label>
+              <label><input type="radio" name="fulfillment" value="delivery"> Delivery</label>
+            </div>
+
+            <label>Delivery address
+              <input id="orderAddress" class="form-field" type="text" placeholder="Street, City (required for delivery)">
+            </label>
+
+            <label>Phone number
+              <input id="orderPhone" class="form-field" type="tel" required placeholder="01X-XXXX-XXXX">
+            </label>
+
+        <label>Email
+              <input id="orderEmail" class="form-field" type="email" required readonly>
+            </label>
+
+           <fieldset class="order-fieldset" aria-labelledby="paymentLegend">
+              <legend id="paymentLegend">Payment method</legend>
+              <p class="muted small">We currently accept cash for both pickup and delivery.</p>
+              <div class="order-options">
+                <label><input type="radio" name="payment" value="cash" checked> Cash</label>
+                <label><input type="radio" name="payment" value="card"> Card on delivery</label>
+              </div>
+            </fieldset>
+
+            <label class="order-notes-label">Any notes for us?
+              <textarea id="orderNotes" class="form-field order-notes" placeholder="Add sauce preferences, entrance instructions, etc."></textarea>
+            </label>
+
+                  <textarea id="orderItems" class="form-field" hidden></textarea>
+
+
+         <button id="orderSubmit" class="btn green" type="submit">Place order</button>
+            <div id="orderStatus" class="muted"></div>
+          </form>
+        </div>
+
+        <aside class="panel panel--cart" aria-live="polite">
+          <h3>Your cart</h3>
+          <p id="emptyCart" class="muted">Pick your favorites from the menu to start an order.</p>
+          <ul id="cartItems" class="cart-list"></ul>
+          <div class="cart-summary">
+            <div>Subtotal</div>
+            <div id="cartTotal">EGP 0.00</div>
           </div>
+          <button id="clearCart" class="btn outline" type="button">Clear cart</button>
+        </aside>
+      </div>
 
-          <label>Delivery address
-            <input id="orderAddress" class="form-field" type="text" placeholder="Street, City (required for delivery)">
-          </label>
-
-          <label>Phone number
-            <input id="orderPhone" class="form-field" type="tel" required placeholder="01X-XXXX-XXXX">
-          </label>
-
-          <label>Email
-            <input id="orderEmail" class="form-field" type="email" required readonly>
-          </label>
-
-          <label>What would you like?
-            <textarea id="orderItems" class="form-field" required placeholder="List the items and quantities you’d like to order"></textarea>
-          </label>
-
-          <label>Any notes for us?
-            <textarea id="orderNotes" class="form-field order-notes" placeholder="Add sauce preferences, entrance instructions, etc."></textarea>
-          </label>
-
-          <button id="orderSubmit" class="btn green" type="submit">Place order</button>
-          <div id="orderStatus" class="muted"></div>
-        </form>
+         <div class="panel panel--menu">
+        <h3>Menu</h3>
+        <p class="muted">Tap an item to add it to your order. Extras are optional and priced per sandwich.</p>
+        <div id="menuList" class="menu-groups"></div>
       </div>
 
       <div class="panel">
