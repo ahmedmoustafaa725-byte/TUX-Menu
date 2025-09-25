@@ -14,6 +14,58 @@ import {
   limit,
   getDocs,
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+// Add this new function to your order.js file
+async function syncOrderToPOS(orderData) {
+  if (!db) return;
+  
+  // This is the path your POS app will be listening to
+  const posOrderRef = doc(db, `shops/tux/onlineOrders/${orderData.id}`);
+
+  // We re-format the website order to match what the POS expects
+  const posPayload = {
+    // --- Key identifiers ---
+    shopId: "tux",
+    idemKey: `website-order-${orderData.id}`, // Idempotency key
+    
+    // --- Order Details ---
+    orderNo: orderData.id.slice(-6).toUpperCase(), // A short order number for the ticket
+    cart: (orderData.cart || []).map(item => ({
+      id: item.itemId, // Use the menu item ID
+      name: item.name,
+      qty: item.quantity,
+      price: item.price,
+      extras: (item.extras || []).map(extra => ({
+        id: extra.id,
+        name: extra.name,
+        price: extra.price,
+      })),
+    })),
+    
+    // --- Customer Details ---
+    customerName: orderData.customerName,
+    customerPhone: orderData.phone,
+    deliveryAddress: orderData.address,
+    deliveryZoneId: orderData.deliveryZoneId || "",
+    
+    // --- Financials & Fulfillment ---
+    total: orderData.total,
+    itemsTotal: orderData.subtotal,
+    deliveryFee: orderData.deliveryFee || 0,
+    paymentMethod: orderData.paymentMethod,
+    orderType: orderData.fulfillment === 'delivery' ? 'Delivery' : 'Pickup',
+    
+    // --- Timestamps & Status ---
+    createdAt: orderData.createdAt, // Use the same timestamp
+    status: "new",
+  };
+  
+  try {
+    await setDoc(posOrderRef, posPayload);
+    console.log("Order successfully synced to POS:", orderData.id);
+  } catch (error) {
+    console.error("Error syncing order to POS:", error);
+  }
+}
 
 const form = document.getElementById("orderForm");
 const statusEl = document.getElementById("orderStatus");
@@ -909,6 +961,7 @@ const orderPayload = Object.entries(baseOrderPayload).reduce((acc, [key, value])
 
     const ordersCol = collection(profileRef, "orders");
     const orderDocRef = await addDoc(ordersCol, orderPayload);
+await syncOrderToPOS({ ...orderPayload, id: orderDocRef.id });
 
     try {
       await setDoc(doc(db, "orders", orderDocRef.id), {
