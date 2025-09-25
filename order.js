@@ -1,5 +1,3 @@
-
-
 import { auth, db } from "./firebase-init.js";
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import {
@@ -14,124 +12,7 @@ import {
   limit,
   getDocs,
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-// In order.js, also UPDATE your syncOrderToPOS function to this version.
-// In order.js, replace the syncOrderToPOS function with this
-async function syncOrderToPOS(orderData) {
-  if (!db) return;
 
-  const incomingOrderRef = collection(db, "incomingWebOrders");
-  
-  const posPayload = {
-    shopId: "tux",
-    originalWebsiteOrderId: orderData.id,
-    cart: (orderData.cart || []).map(item => ({
-      id: item.itemId, name: item.name, qty: item.quantity, price: item.price,
-      extras: (item.extras || []).map(extra => ({ id: extra.id, name: extra.name, price: extra.price })),
-    })),
-    customerName: orderData.customerName,
-    customerPhone: orderData.phone,
-    deliveryAddress: orderData.address,
-    deliveryZoneId: orderData.deliveryZoneId || "",
-    total: orderData.total,
-    itemsTotal: orderData.subtotal,
-    deliveryFee: orderData.deliveryFee || 0,
-    paymentMethod: orderData.paymentMethod,
-    orderType: orderData.fulfillment === 'delivery' ? 'Delivery' : 'Pickup',
-    createdAt: serverTimestamp(),
-    status: "new",
-  };
-
-  try {
-    await addDoc(incomingOrderRef, posPayload);
-    console.log("Order sent for processing:", orderData.id);
-  } catch (error) {
-    console.error("Error sending order for processing:", error);
-  }
-}
-
-
-// And also replace the entire submit event listener with this final version
-form?.addEventListener("submit", async (event) => {
-  event.preventDefault();
-  if (!currentUser || !profileRef) {
-    showStatus("Please log in again.", true);
-    return;
-  }
-  if (!cart.length) {
-    showStatus("Your cart is empty.", true);
-    return;
-  }
-
-  submitBtn.disabled = true;
-  showStatus("Processing order...");
-  console.log("--- Starting Order Submission ---");
-
-  // --- Step 1: Gather Data ---
-  const name = nameEl.value.trim();
-  const address = addressEl.value.trim();
-  const phone = phoneEl.value.trim();
-  const fulfillment = selectedFulfillment();
-  const selectedZone = getSelectedZone();
-
-  if (fulfillment === "delivery" && (!address || !selectedZone)) {
-    showStatus("Delivery requires an address and zone.", true);
-    submitBtn.disabled = false;
-    return;
-  }
-
-  const deliveryFee = fulfillment === "delivery" ? selectedZone?.fee ?? 0 : 0;
-  const subtotal = calculateCartTotal();
-  const total = subtotal + deliveryFee;
-
-  const orderPayload = {
-    userId: currentUser.uid,
-    customerName: name,
-    phone,
-    email: currentUser.email,
-    // THIS IS THE CORRECTED LINE: We create a clean copy of the cart data
-    cart: (cart || []).map(item => ({ itemId: item.itemId, name: item.name, quantity: item.quantity, price: item.price, extras: item.extras })),
-    fulfillment,
-    paymentMethod: selectedPayment(),
-    address,
-    deliveryZoneId: selectedZone?.id || "",
-    deliveryFee,
-    subtotal,
-    total,
-    instructions: notesEl.value.trim(),
-    status: "pending",
-    createdAt: serverTimestamp(),
-  };
-  
-  // --- Step 2: Save Private Order ---
-  let orderDocRef;
-  try {
-    const ordersCol = collection(profileRef, "orders");
-    orderDocRef = await addDoc(ordersCol, orderPayload);
-    console.log("✅ STEP 1/2: Private order saved successfully.", orderDocRef.id);
-  } catch (err) {
-    console.error("❌ FAILED AT STEP 1: Could not save order to user's profile.", err);
-    showStatus("Error saving your order. Please check the console.", true);
-    submitBtn.disabled = false;
-    return;
-  }
-  
-  // --- Step 3: Sync to POS ---
-  try {
-    const dataToSync = { ...orderPayload, id: orderDocRef.id };
-    await syncOrderToPOS(dataToSync);
-    console.log("✅ STEP 2/2: Order sent to POS system.");
-  } catch (err) {
-    console.error("❌ FAILED AT STEP 2: The syncOrderToPOS function failed.", err);
-  }
-
-  // --- Step 4: Finalize UI ---
-  showStatus("Order placed successfully! Thank you.");
-  cart = [];
-  updateCartUI();
-  if (notesEl) notesEl.value = "";
-  loadRecentOrders();
-  submitBtn.disabled = false;
-});
 const form = document.getElementById("orderForm");
 const statusEl = document.getElementById("orderStatus");
 const nameEl = document.getElementById("orderName");
@@ -920,107 +801,141 @@ onAuthStateChanged(auth, async (user) => {
   loadRecentOrders();
 });
 
-// In order.js, REPLACE the entire form.addEventListener("submit", ...) function with this one.
-
-// In your order.js file, REPLACE the entire form.addEventListener("submit", ...) function
-
-// In order.js, REPLACE the entire `form?.addEventListener` block with this one.
-
 form?.addEventListener("submit", async (event) => {
   event.preventDefault();
   if (!currentUser || !profileRef) {
-    showStatus("Please log in again.", true);
-    return;
-  }
-  if (!cart.length) {
-    showStatus("Your cart is empty.", true);
+    showStatus("Please log in again to place an order.", true);
     return;
   }
 
-  submitBtn.disabled = true;
-  showStatus("Processing order...");
-  console.log("--- Starting Order Submission ---");
-
-  // --- Step 1: Gather Data ---
   const name = nameEl.value.trim();
   const address = addressEl.value.trim();
   const phone = phoneEl.value.trim();
+  const instructions = notesEl.value.trim();
   const fulfillment = selectedFulfillment();
-  const selectedZone = getSelectedZone();
-
-  if (fulfillment === "delivery" && (!address || !selectedZone)) {
-    showStatus("Delivery requires an address and zone.", true);
-    submitBtn.disabled = false;
+  const paymentMethod = selectedPayment();
+  const items = buildCartSummary();
+  const subtotal = calculateCartTotal();
+const selectedZone = getSelectedZone();
+  if (!cart.length || !items) {    showStatus("Cart is Empty.", true);
     return;
   }
 
+  if (fulfillment === "delivery" && !address) {
+    showStatus("Delivery orders need an address.", true);
+    return;
+  }
+  if (fulfillment === "delivery" && !selectedZone) {
+    showStatus("Please choose your delivery zone.", true);
+    return;
+  }
   const deliveryFee = fulfillment === "delivery" ? selectedZone?.fee ?? 0 : 0;
-  const subtotal = calculateCartTotal();
   const total = subtotal + deliveryFee;
+  updateItemsField();
 
-  // This creates a clean, simple object for Firestore, which is crucial.
-  const orderPayload = {
+  submitBtn.disabled = true;
+  showStatus("Sending your order…");
+
+  const createdAt = serverTimestamp();
+  const baseOrderPayload = {
     userId: currentUser.uid,
     customerName: name,
     phone,
-    email: currentUser.email,
-    cart: (cart || []).map(item => ({
-        itemId: item.itemId,
-        name: item.name,
-        quantity: item.quantity,
-        price: item.price,
-        extras: item.extras,
-    })),
+    address: address || null,
+    email: currentUser.email || emailEl?.value.trim() || "",
+    items,
     fulfillment,
-    paymentMethod: selectedPayment(),
-    address,
-    deliveryZoneId: selectedZone?.id || "",
-    deliveryFee,
-    subtotal,
-    total,
-    instructions: notesEl.value.trim(),
+    paymentMethod,
+
     status: "pending",
-    createdAt: serverTimestamp(),
+    createdAt,
+ subtotal,
+    total,
   };
-  
-  // --- Step 2: Save Private Order ---
-  let orderDocRef;
-  try {
-    const ordersCol = collection(profileRef, "orders");
-    orderDocRef = await addDoc(ordersCol, orderPayload);
-    console.log("✅ STEP 1/3: Private order saved successfully.", orderDocRef.id);
-  } catch (err) {
-    console.error("❌ FAILED AT STEP 1: Could not save order to user's profile.", err);
-    showStatus("Error saving your order. Please check the browser console for details.", true);
-    submitBtn.disabled = false;
-    return;
-  }
-  
-  // --- Step 3: Sync to POS Staging Area ---
-  try {
-    const dataToSync = { ...orderPayload, id: orderDocRef.id };
-    await syncOrderToPOS(dataToSync);
-    console.log("✅ STEP 2/3: Order successfully sent to POS system.");
-  } catch (err) {
-    console.error("❌ FAILED AT STEP 2: The syncOrderToPOS function failed.", err);
-    // We continue so the customer still gets their confirmation.
+
+  if (instructions) {
+    baseOrderPayload.instructions = instructions;
   }
 
-  // --- Step 4: Finalize and Clean Up ---
+  if (address) {
+    baseOrderPayload.address = address;
+  }
+
+  if (fulfillment === "delivery" && selectedZone) {
+    baseOrderPayload.deliveryZoneId = selectedZone.id;
+    baseOrderPayload.deliveryZone = selectedZone.name;
+    baseOrderPayload.deliveryFee = deliveryFee;
+  }
+
+  if (Array.isArray(cart) && cart.length) {
+    baseOrderPayload.cart = cart.map((entry) => ({      itemId: entry.itemId,
+      name: entry.name,
+      quantity: entry.quantity,
+      price: entry.price,
+      extras: entry.extras,
+      lineTotal: calculateItemTotal(entry),
+   }));
+  }
+const orderPayload = Object.entries(baseOrderPayload).reduce((acc, [key, value]) => {
+    if (value === undefined || value === null) {
+      return acc;
+    }
+
+    if (typeof value === "string") {
+      const trimmed = value.trim();
+      if (!trimmed) {
+        // Keep required strings like email/items/customerName/phone even if empty.
+        if (["email", "items", "customerName", "phone"].includes(key)) {
+          acc[key] = value;
+        }
+        return acc;
+      }
+      acc[key] = trimmed;
+      return acc;
+    }
+
+    acc[key] = value;
+    return acc;
+  }, {});
   try {
-    await sendConfirmationEmail({ ...orderPayload, id: orderDocRef.id });
-    console.log("✅ STEP 3/3: Confirmation email sent.");
-    
-    showStatus("Order placed successfully! Thank you.");
+    await setDoc(profileRef, {
+      name,
+      address,
+      phone,
+      updatedAt: serverTimestamp(),
+    }, { merge: true });
+
+    const ordersCol = collection(profileRef, "orders");
+    const orderDocRef = await addDoc(ordersCol, orderPayload);
+
+    try {
+      await setDoc(doc(db, "orders", orderDocRef.id), {
+        ...orderPayload,
+        profileUid: currentUser.uid,
+        profileOrderId: orderDocRef.id,
+      });
+    } catch (err) {
+      console.warn("Could not copy order to shared collection", err);
+    }
+
+    await sendConfirmationEmail({
+      ...orderPayload,
+      id: orderDocRef.id,
+      email: orderPayload.email,
+    });
+
+    showStatus("Order placed! Check your email for a confirmation.");
     cart = [];
     updateCartUI();
+    if (itemsEl) itemsEl.value = "";
     if (notesEl) notesEl.value = "";
     loadRecentOrders();
-
   } catch (err) {
-    console.error("❌ FAILED AT STEP 3: Finalization or email error.", err);
+    console.error("Failed to place order", err);
+    showStatus(err.message || "Something went wrong. Try again.", true);
   } finally {
     submitBtn.disabled = false;
   }
 });
+
 updateFulfillmentUI();
