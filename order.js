@@ -26,7 +26,7 @@ async function syncOrderToPOS(orderData) {
     idemKey: `website-order-${orderData.id}`, // Idempotency key
     
     // --- Order Details ---
-    orderNo: orderData.id.slice(-6).toUpperCase(), // A short order number for the ticket
+    orderNo: "Pending...", // The Cloud Function will assign the real number.
     cart: (orderData.cart || []).map(item => ({
       id: item.itemId, // Use the menu item ID
       name: item.name,
@@ -733,7 +733,7 @@ async function loadRecentOrders() {
       const li = document.createElement("li");
 
       const heading = document.createElement("h4");
-      heading.textContent = `${data.customerName || "Your order"} • ${formatDate(data.createdAt)}`;
+      heading.textContent = `Order #${data.orderNo || docSnap.id.slice(-5)} • ${formatDate(data.createdAt)}`;
       li.appendChild(heading);
 
       const badge = document.createElement("span");
