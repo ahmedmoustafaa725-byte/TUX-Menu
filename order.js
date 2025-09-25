@@ -838,11 +838,12 @@ onAuthStateChanged(auth, async (user) => {
 
 // In order.js, REPLACE the entire form.addEventListener("submit", ...) function with this one.
 
+// In your order.js file, REPLACE the entire form.addEventListener("submit", ...) function
+
 form?.addEventListener("submit", async (event) => {
   event.preventDefault();
-
   if (!currentUser || !profileRef) {
-    showStatus("Please log in again to place an order.", true);
+    showStatus("Please log in again.", true);
     return;
   }
   if (!cart.length) {
@@ -851,9 +852,10 @@ form?.addEventListener("submit", async (event) => {
   }
 
   submitBtn.disabled = true;
-  showStatus("Placing your order...");
+  showStatus("Processing order...");
+  console.log("--- Starting Order Submission ---");
 
-  // --- Step 1: Gather all order data ---
+  // --- Step 1: Gather Data ---
   const name = nameEl.value.trim();
   const address = addressEl.value.trim();
   const phone = phoneEl.value.trim();
@@ -861,7 +863,7 @@ form?.addEventListener("submit", async (event) => {
   const selectedZone = getSelectedZone();
 
   if (fulfillment === "delivery" && (!address || !selectedZone)) {
-    showStatus("Delivery orders require an address and a delivery zone.", true);
+    showStatus("Delivery requires an address and zone.", true);
     submitBtn.disabled = false;
     return;
   }
@@ -874,61 +876,51 @@ form?.addEventListener("submit", async (event) => {
     userId: currentUser.uid,
     customerName: name,
     phone,
-    email: currentUser.email || "",
-    items: buildCartSummary(),
-    cart: cart.map(entry => ({ ...entry })), // Create a clean copy
+    email: currentUser.email,
+    cart, // Pass the clean cart object
     fulfillment,
     paymentMethod: selectedPayment(),
-    address: address || null,
-    deliveryZoneId: selectedZone?.id || null,
-    deliveryZone: selectedZone?.name || null,
+    address,
+    deliveryZoneId: selectedZone?.id || "",
     deliveryFee,
     subtotal,
     total,
     instructions: notesEl.value.trim(),
     status: "pending",
-    createdAt: serverTimestamp(),
+    createdAt: serverTimestamp(), // Let Firestore handle the timestamp
   };
   
-  // --- Step 2: Save the user's private copy of the order ---
+  // --- Step 2: Save Private Order ---
   let orderDocRef;
   try {
     const ordersCol = collection(profileRef, "orders");
     orderDocRef = await addDoc(ordersCol, orderPayload);
-    console.log("✅ Step 1/3: Private order saved successfully.", orderDocRef.id);
+    console.log("✅ STEP 1/2: Private order saved successfully.", orderDocRef.id);
   } catch (err) {
-    console.error("❌ FAILED STEP 1: Could not save order to user's profile.", err);
-    showStatus("Error: Could not save your order. Please try again.", true);
+    console.error("❌ FAILED AT STEP 1: Could not save order to user's profile.", err);
+    showStatus("Error saving your order. Please check the console.", true);
     submitBtn.disabled = false;
     return;
   }
-
-  // --- Step 3: Sync the order to the POS system ---
+  
+  // --- Step 3: Sync to POS ---
   try {
-    await syncOrderToPOS({ ...orderPayload, id: orderDocRef.id, createdAt: new Date() });
-    console.log("✅ Step 2/3: Order sent to POS for processing.");
+    // We pass a fresh object to syncOrderToPOS
+    const dataToSync = { ...orderPayload, id: orderDocRef.id };
+    await syncOrderToPOS(dataToSync);
+    console.log("✅ STEP 2/2: Order sent to POS system.");
   } catch (err) {
-    console.error("❌ FAILED STEP 2: Could not sync order to POS.", err);
-    // This is not a critical failure for the user, so we just log it and continue.
+    // This function already has its own internal error logging.
+    // We log it here again just in case.
+    console.error("❌ FAILED AT STEP 2: The syncOrderToPOS function failed.", err);
   }
 
-  // --- Step 4: Finalize and clean up ---
-  try {
-    await sendConfirmationEmail({ ...orderPayload, id: orderDocRef.id });
-    console.log("✅ Step 3/3: Confirmation email sent.");
-    
-    showStatus("Order placed! Check your email for a confirmation.");
-    cart = [];
-    updateCartUI();
-    if (itemsEl) itemsEl.value = "";
-    if (notesEl) notesEl.value = "";
-    loadRecentOrders();
-
-  } catch (err) {
-    console.error("❌ FAILED STEP 3: Finalization or email error.", err);
-  } finally {
-    submitBtn.disabled = false;
-  }
+  // --- Step 4: Finalize UI ---
+  showStatus("Order placed successfully! Thank you.");
+  cart = [];
+  updateCartUI();
+  if (notesEl) notesEl.value = "";
+  loadRecentOrders();
+  submitBtn.disabled = false;
 });
-
 updateFulfillmentUI();
