@@ -97,8 +97,11 @@ body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvet
 .cart-item__qty{width:52px;padding:6px;border-radius:8px;border:1px solid var(--border);background:#111;color:var(--ink);text-align:center}
 .cart-item__btn{background:#111;color:var(--ink);border:1px solid var(--border);border-radius:8px;padding:6px 10px;font-weight:700;cursor:pointer}
 .cart-item__btn:hover{border-color:var(--gold);color:var(--gold)}
-.cart-summary{margin-top:auto;display:flex;justify-content:space-between;align-items:center;font-weight:700;padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:#0b0b0b}
 .cart-summary + #clearCart{align-self:flex-end}
+.cart-summary{margin-top:auto;display:flex;flex-direction:column;gap:8px;font-weight:700;padding:10px 12px;border:1px solid var(--border);border-radius:12px;background:#0b0b0b}
+.cart-summary__row{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%}
+.cart-summary__row--total{font-size:18px}
+#deliveryFeeRow{display:none}
 .menu-groups{display:grid;gap:18px}
 .menu-group{border:1px solid var(--border);border-radius:18px;padding:16px;background:#0d0d0d;display:grid;gap:16px}
 .menu-group h4{margin:0;font-size:20px}
@@ -113,6 +116,8 @@ body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvet
 .order-menu-card__extras label{display:flex;justify-content:space-between;gap:8px;font-size:14px;background:#111;border-radius:10px;padding:8px 10px;border:1px solid transparent}
 .order-menu-card__extras input{accent-color:var(--gold)}
 .order-menu-card__extras label:hover{border-color:var(--gold)}
+.order-menu-card__extras[hidden]{display:none}
+.order-menu-card__extras-toggle{align-self:flex-start}
 .order-menu-card__actions{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 .order-menu-card__qty{display:flex;align-items:center;gap:8px;font-weight:600}
 .order-menu-card__qty input{width:60px;padding:6px;border-radius:8px;border:1px solid var(--border);background:#111;color:var(--ink)}
