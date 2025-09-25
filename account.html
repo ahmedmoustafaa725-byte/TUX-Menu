@@ -53,48 +53,80 @@
     </div>
   </main>
 
-  <script type="module">
- import { auth } from "./firebase-init.js";
-    import { signInWithEmailAndPassword, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+ <script type="module">
+  import { auth } from "./firebase-init.js";
+  import {
+    signInWithEmailAndPassword,
+    sendPasswordResetEmail,
+  } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
-    const $ = (id) => document.getElementById(id);
-    const loginForm = $("loginForm");
-    const emailEl = $("loginEmail");
-    const passEl  = $("loginPassword");
-    const msg     = $("loginMsg");
-    const forgot  = $("forgotBtn");
+  // Map Firebase auth error codes to friendly messages
+  function mapAuthError(err) {
+    const code = (err && err.code) || "";
+    switch (code) {
+      case "auth/invalid-credential":
+      case "auth/wrong-password":
+      case "auth/user-not-found":
+        return "Email or password is incorrect.";
+      case "auth/invalid-email":
+        return "Please enter a valid email address.";
+      case "auth/user-disabled":
+        return "This account has been disabled. Contact support.";
+      case "auth/too-many-requests":
+        return "Too many attempts. Please try again later.";
+      case "auth/network-request-failed":
+        return "Network error. Check your connection and try again.";
+      default:
+        return "Something went wrong. Please try again.";
+    }
+  }
+
+  const $ = (id) => document.getElementById(id);
+  const loginForm = $("loginForm");
+  const emailEl   = $("loginEmail");
+  const passEl    = $("loginPassword");
+  const msg       = $("loginMsg");
+  const forgot    = $("forgotBtn");
   const registerLink = $("createAccountLink");
 
-    const params = new URLSearchParams(window.location.search);
-    const redirectParam = params.get("redirect");
-    const safeRedirect = redirectParam && !/^https?:/i.test(redirectParam) ? redirectParam : "";
+  const params = new URLSearchParams(window.location.search);
+  const redirectParam = params.get("redirect");
+  const safeRedirect =
+    redirectParam && !/^https?:/i.test(redirectParam) ? redirectParam : "";
 
-    if (registerLink && safeRedirect) {
-      registerLink.href = `register.html?redirect=${encodeURIComponent(safeRedirect)}`;
+  if (registerLink && safeRedirect) {
+    registerLink.href = `register.html?redirect=${encodeURIComponent(safeRedirect)}`;
+  }
+
+  // Helper to show status text
+  function setMsg(text) {
+    msg.textContent = text || "";
+  }
+
+  loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    setMsg("Logging in…");
+    try {
+      await signInWithEmailAndPassword(auth, emailEl.value.trim(), passEl.value);
+      const destination = safeRedirect || "index.html";
+      window.location.href = destination;
+    } catch (err) {
+      setMsg(mapAuthError(err)); // <-- friendly message here
     }
-    loginForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      msg.textContent = "Logging in…";
-      try {
-        await signInWithEmailAndPassword(auth, emailEl.value.trim(), passEl.value);
-  const destination = safeRedirect || "index.html";
-        window.location.href = destination;
-      } catch (err) {
-        msg.textContent = err.message;
-      }
-    });
+  });
 
-    forgot.addEventListener("click", async () => {
-      const email = emailEl.value.trim();
-      if (!email) { msg.textContent = "Enter your email above first."; return; }
-      msg.textContent = "Sending reset email…";
-      try {
-        await sendPasswordResetEmail(auth, email);
-        msg.textContent = "Password reset email sent. Check your inbox.";
-      } catch (err) {
-        msg.textContent = err.message;
-      }
-    });
-  </script>
+  forgot.addEventListener("click", async () => {
+    const email = emailEl.value.trim();
+    if (!email) { setMsg("Enter your email above first."); return; }
+    setMsg("Sending reset email…");
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setMsg("Password reset email sent. Check your inbox.");
+    } catch (err) {
+      setMsg(mapAuthError(err)); // <-- friendly message here too
+    }
+  });
+</script>
+
 </body>
 </html>
