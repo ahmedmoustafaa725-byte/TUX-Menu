@@ -739,7 +739,37 @@ const deliveryNote =
   }
 }
 
+async function sendConfirmationEmail(order) {
+  if (!window.emailjs || !emailConfig.service || !emailConfig.template || !emailConfig.publicKey) {
+    return;
+  }
 
+  try {
+    await window.emailjs.send(emailConfig.service, emailConfig.template, {
+      to_email: order.email,
+      to_name: order.customerName || "TUX Guest",
+      order_id: order.id,
+      fulfillment: order.fulfillment === "delivery" ? "Delivery" : "Pickup",
+ payment_method: formatPayment(order.paymentMethod),
+      delivery_zone: order.fulfillment === "delivery" ? order.deliveryZone || "" : "Pickup",
+      delivery_fee: typeof order.deliveryFee === "number" ? formatCurrency(order.deliveryFee) : "",
+      order_details: order.items,
+      address: order.fulfillment === "delivery" ? (order.address || "") : "Pickup at TUX",
+      phone: order.phone,
+      instructions: order.instructions || "",
+ order_subtotal: typeof order.subtotal === "number" ? formatCurrency(order.subtotal) : "",
+      order_total:
+        typeof order.total === "number"
+          ? formatCurrency(order.total)
+          : typeof order.subtotal === "number"
+            ? formatCurrency(order.subtotal)
+            : "",
+      placed_at: new Date().toLocaleString(),
+    });
+  } catch (err) {
+    console.error("Failed to send confirmation email", err);
+  }
+}
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
@@ -888,8 +918,13 @@ const orderPayload = Object.entries(baseOrderPayload).reduce((acc, [key, value])
       console.warn("Could not copy order to shared collection", err);
     }
 
-      showStatus("Order placed!");
+    await sendConfirmationEmail({
+      ...orderPayload,
+      id: orderDocRef.id,
+      email: orderPayload.email,
+    });
 
+    showStatus("Order placed! Check your email for a confirmation.");
     cart = [];
     updateCartUI();
     if (itemsEl) itemsEl.value = "";
