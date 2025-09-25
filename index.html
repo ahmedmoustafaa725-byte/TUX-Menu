@@ -25,8 +25,8 @@
         <a href="#gallery">Gallery</a>
         <a href="#location">Location</a>
         <a href="#contact">Contact</a>
-        <!-- AFTER -->
-<a href="account.html" id="accountLink" class="cta gold">Login / Sign up</a>
+       <a href="order.html" id="orderLink" class="cta green">Order Online</a>
+        <a href="account.html" id="accountLink" class="cta gold">Login / Sign up</a>
         <a href="#" id="logoutLink" style="display:none">Log out</a>
         <a class="cta blue" href="https://forms.gle/rKJoUeHkgLoqTmmXA" target="_blank" rel="noreferrer">Help Us Improve</a>
       </nav>
@@ -35,8 +35,8 @@
 
   <!-- Quick access for mobile -->
   <nav class="quick-nav" aria-label="Quick access">
-<!-- AFTER -->
-<a href="account.html" id="accountLinkMobile" class="btn">Login / Sign up</a>
+  <a href="order.html" id="orderLinkMobile" class="btn green">Order Online</a>
+    <a href="account.html" id="accountLinkMobile" class="btn">Login / Sign up</a>
     <a href="#menu">Menu</a>
     <a href="#gallery">Gallery</a>
     <a href="#location">Location</a>
@@ -247,60 +247,8 @@
       .btn.gold-outline{ font-size:18px; }
     }
   </style>
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+  <script type="module" src="nav.js"></script>
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyDqjdI3ZqFSVY_5Kmowak1DCOL5bZaCYoo",
-    authDomain: "tux-menu.firebaseapp.com",
-    projectId: "tux-menu",
-    storageBucket: "tux-menu.firebasestorage.app",
-    messagingSenderId: "326432857137",
-    appId: "1:326432857137:web:926cc2ffb364b2f5d44910",
-    measurementId: "G-1T1RRHCCDQ"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db   = getFirestore(app);
-
-  const headerLink = document.getElementById("accountLink");
-  const mobileLink = document.getElementById("accountLinkMobile");
-  const logoutLink = document.getElementById("logoutLink"); // <-- this is your <a id="logoutLink">
-
-  onAuthStateChanged(auth, async (user) => {
-    // Show/hide the logout link safely (in case it doesn't exist on some pages)
-    if (logoutLink) logoutLink.style.display = user ? "inline-block" : "none";
-
-    if (!headerLink && !mobileLink) return;
-
-    if (user) {
-      // Prefer Auth displayName, fall back to Firestore profile, then email prefix
-      let displayName = user.displayName || "";
-      if (!displayName) {
-        try {
-          const snap = await getDoc(doc(db, "profiles", user.uid));
-          if (snap.exists()) displayName = snap.data().name || "";
-        } catch {}
-      }
-      const shown = displayName || (user.email ? user.email.split("@")[0] : "Account");
-      if (headerLink) headerLink.textContent = shown;
-      if (mobileLink) mobileLink.textContent = shown;
-    } else {
-     if (headerLink) headerLink.textContent = "Login / Sign up";
-if (mobileLink) mobileLink.textContent = "Login / Sign up";
-    }
-  });
-
-  // Handle logout click
-  logoutLink?.addEventListener("click", async (e) => {
-    e.preventDefault();
-    await signOut(auth);
-    window.location.href = "index.html";
-  });
-</script>
 
 
 </body>
