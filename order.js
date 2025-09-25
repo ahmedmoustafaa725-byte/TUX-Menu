@@ -16,9 +16,7 @@ import {
 async function syncOrderToPOS(orderData) {
   if (!db) return;
   
-  // This is the path your POS app will be listening to
-  const posOrderRef = doc(db, `shops/tux/onlineOrders/${orderData.id}`);
-
+ const posOrderRef = doc(db, `incomingWebOrders/${orderData.id}`);
   // We re-format the website order to match what the POS expects
   const posPayload = {
     // --- Key identifiers ---
