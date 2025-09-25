@@ -29,7 +29,13 @@ const paymentInputs = Array.from(document.querySelectorAll("input[name='payment'
 const menuContainer = document.getElementById("menuList");
 const cartItemsContainer = document.getElementById("cartItems");
 const emptyCartEl = document.getElementById("emptyCart");
+const cartSubtotalEl = document.getElementById("cartSubtotal");
+const cartDeliveryEl = document.getElementById("cartDeliveryFee");
 const cartTotalEl = document.getElementById("cartTotal");
+const deliveryFeeRow = document.getElementById("deliveryFeeRow");
+const zoneSelect = document.getElementById("deliveryZone");
+const deliveryZoneField = document.getElementById("deliveryZoneField");
+const deliveryZoneNote = document.getElementById("deliveryZoneNote");
 const clearCartBtn = document.getElementById("clearCart");
 let currentUser = null;
 let profileRef = null;
@@ -40,84 +46,168 @@ const currencyFormatter = new Intl.NumberFormat("en-EG", {
   style: "currency",
   currency: "EGP",
 });
+const deliveryZones = [
+  { id: "zahraa-el-maadi", name: "Zahraa El Maadi", fee: 25 },
+  { id: "kornish-el-maadi", name: "Kornish El Maadi", fee: 40 },
+];
+
+const burgerExtras = [
+  { id: "extra-smashed-patty", name: "Extra Smashed Patty", price: 40 },
+  { id: "bacon", name: "Bacon", price: 20 },
+  { id: "cheese", name: "Cheese", price: 15 },
+  { id: "ranch", name: "Ranch", price: 10 },
+  { id: "mushroom", name: "Mushroom", price: 15 },
+  { id: "caramelized-onion", name: "Caramelized Onion", price: 10 },
+  { id: "jalapeno", name: "Jalapeño", price: 10 },
+  { id: "tux-sauce", name: "TUX Sauce", price: 10 },
+  { id: "extra-bun", name: "Extra Bun", price: 10 },
+  { id: "pickle", name: "Pickle", price: 5 },
+  { id: "condiments", name: "BBQ / Ketchup / Sweet Chili / Hot Sauce", price: 5 },
+];
+
+const hawawshiExtras = [
+  { id: "mozzarella-cheese", name: "Mozzarella Cheese", price: 20 },
+  { id: "tux-hawawshi-sauce", name: "TUX Hawawshi Sauce", price: 10 },
+  { id: "hawawshi-condiments", name: "BBQ / Ketchup / Sweet Chili / Hot Sauce", price: 5 },
+];
 
 const menuData = [
   {
-    id: "classic-burger",
-    name: "Classic TUX Burger",
-    description: "Signature beef patty, cheddar, lettuce, tomato, pickles, and TUX sauce.",
-    price: 165,
-    category: "Burgers",
-    extras: [
-      { id: "extra-cheese", name: "Extra cheese", price: 15 },
-      { id: "jalapenos", name: "Jalapeños", price: 12 },
-      { id: "tux-sauce", name: "Extra TUX sauce", price: 8 },
-    ],
-  },
-  {
-    id: "bbq-burger",
-    name: "Smoky BBQ Burger",
-    description: "Char-grilled beef, caramelised onions, beef bacon, and smoky BBQ glaze.",
-    price: 175,
-    category: "Burgers",
-    extras: [
-      { id: "double-patty", name: "Double patty", price: 45 },
-      { id: "cheddar", name: "Cheddar slice", price: 15 },
-      { id: "fried-egg", name: "Fried egg", price: 18 },
-    ],
-  },
-  {
-    id: "crispy-chicken",
-    name: "Crispy Chicken Sandwich",
-    description: "Buttermilk chicken, pickles, slaw, and spicy mayo on a toasted bun.",
-    price: 155,
-    category: "Chicken",
-    extras: [
-      { id: "honey-heat", name: "Honey heat glaze", price: 10 },
-      { id: "cheese-chicken", name: "Cheddar slice", price: 15 },
-      { id: "extra-mayo", name: "Extra spicy mayo", price: 7 },
-    ],
-  },
-  {
-    id: "loaded-fries",
-    name: "Loaded Fries",
-    description: "Crispy fries topped with cheese sauce, caramelised onions, and jalapeños.",
+    id: "single-smashed-patty",
+    name: "Single Smashed Patty",
+    description: "Smashed patty, cheese, TUX sauce, pickles, tomato, onion, lettuce.",
     price: 95,
-    category: "Sides",
-    extras: [
-      { id: "beef-bacon", name: "Beef bacon", price: 25 },
-      { id: "extra-cheese-sauce", name: "Extra cheese sauce", price: 18 },
-    ],
+    category: "Smash Burgers",
+    extras: burgerExtras,
   },
   {
-    id: "onion-rings",
-    name: "Onion Rings",
-    description: "Panko fried onion rings with smoky paprika seasoning and ranch dip.",
-    price: 70,
-    category: "Sides",
-    extras: [
-      { id: "cheese-dip", name: "Cheese dip", price: 12 },
-      { id: "buffalo-dip", name: "Buffalo dip", price: 12 },
-    ],
+    id: "double-smashed-patty",
+    name: "Double Smashed Patty",
+    description: "Two smashed patties, cheese, TUX sauce, pickles, tomato, onion, lettuce.",
+    price: 140,
+    category: "Smash Burgers",
+    extras: burgerExtras,
   },
   {
-    id: "craft-soda",
-    name: "Craft Soda",
-    description: "House-made soda. Choose from lemon-mint, hibiscus, or cola.",
-    price: 45,
+    id: "triple-smashed-patty",
+    name: "Triple Smashed Patty",
+    description: "Triple the patties with all the classic TUX toppings and sauce.",
+    price: 160,
+    category: "Smash Burgers",
+    extras: burgerExtras,
+  },
+  {
+    id: "quatro-smashed-patty",
+    name: "TUX Quatro Smashed Patty",
+    description: "Four smashed patties, cheese, caramelized onion, mushroom, TUX sauce.",
+    price: 190,
+    category: "Smash Burgers",
+    extras: burgerExtras,
+  },
+  {
+    id: "tuxify-single",
+    name: "TUXIFY Single",
+    description: "Brioche bun, beef patty, American cheese, pickles, chopped onion, ketchup, TUXIFY sauce.",
+    price: 120,
+    category: "TUXIFY",
+    extras: burgerExtras,
+  },
+  {
+    id: "tuxify-double",
+    name: "TUXIFY Double",
+    description: "Double beef patties with American cheese, pickles, onion, ketchup, TUXIFY sauce.",
+    price: 160,
+    category: "TUXIFY",
+    extras: burgerExtras,
+  },
+  {
+    id: "tuxify-triple",
+    name: "TUXIFY Triple",
+    description: "Three beef patties layered with American cheese and TUXIFY sauce.",
+    price: 200,
+    category: "TUXIFY",
+    extras: burgerExtras,
+  },
+  {
+  id: "tuxify-quatro",
+    name: "TUXIFY Quatro",
+    description: "Four beef patties, American cheese, pickles, chopped onion, ketchup, TUXIFY sauce.",
+    price: 240,
+    category: "TUXIFY",
+    extras: burgerExtras,
+  },
+  {
+   id: "classic-fries-small",
+    name: "Classic Fries (Small)",
+    price: 25,
+    category: "Fries",
+    extras: [],
+  },
+  {
+    id: "classic-fries-large",
+    name: "Classic Fries (Large)",
+    price: 30,
+    category: "Fries",
+    extras: [],
+  },
+  {
+    id: "cheese-fries",
+    name: "Cheese Fries",
+    price: 30,
+    category: "Fries",
+    extras: [],
+  },
+  {
+    id: "chili-fries",
+    name: "Chili Fries",
+    price: 40,
+    category: "Fries",
+    extras: [],
+  },
+  {
+    id: "tux-fries",
+    name: "TUX Fries",
+    description: "Fries, smashed patty, cheese, pickles, caramelised onion, jalapeño, TUX sauce.",
+    price: 75,
+    category: "Fries",
+    extras: [],
+  },
+  {
+    id: "doppy-fries",
+    name: "Doppy Fries",
+    price: 95,
+   category: "Fries",
+    extras: [],
+  },
+  {
+    id: "classic-hawawshi",
+    name: "Classic Hawawshi",
+    description: "Baladi bread, hawawshi meat, onion. Served with chili sauce.",
+    price: 80,
+    category: "Hawawshi",
+    extras: hawawshiExtras,
+  },
+  {
+  id: "tux-hawawshi",
+    name: "TUX Hawawshi",
+    description: "Baladi bread, hawawshi meat, mozzarella, onion, TUX hawawshi sauce.",
+    price: 100,
+    category: "Hawawshi",
+    extras: hawawshiExtras,
+  },
+  {
+    id: "soda",
+    name: "Soda",
+    price: 20,
     category: "Drinks",
     extras: [],
   },
   {
-    id: "milkshake",
-    name: "Thick Milkshake",
-    description: "Vanilla ice cream blended with your choice of chocolate or caramel.",
-    price: 80,
+     id: "water",
+    name: "Water",
+    price: 10,
     category: "Drinks",
-    extras: [
-      { id: "whipped-cream", name: "Whipped cream", price: 10 },
-      { id: "cookie-crumb", name: "Cookie crumble", price: 10 },
-    ],
+    
   },
 ];
 if (form) {
@@ -147,22 +237,52 @@ function selectedPayment() {
   return selected ? selected.value : "cash";
 }
 
-function updateAddressRequirement() {
-  const needsAddress = selectedFulfillment() === "delivery";
+function getSelectedZone() {
+  if (!zoneSelect) return null;
+  const zoneId = zoneSelect.value;
+  if (!zoneId) return null;
+  return deliveryZones.find((zone) => zone.id === zoneId) || null;
+}
+
+function updateFulfillmentUI() {
+  const needsDelivery = selectedFulfillment() === "delivery";
+
   if (addressEl) {
-    addressEl.required = needsAddress;
-    if (needsAddress) {
-      addressEl.placeholder = "Street, City (required for delivery)";
-    } else {
-      addressEl.placeholder = "Street, City (optional for pickup)";
+    addressEl.required = needsDelivery;
+    addressEl.placeholder = needsDelivery
+      ? "Street, City (required for delivery)"
+      : "Street, City (optional for pickup)";
+  }
+
+  if (zoneSelect) {
+    zoneSelect.required = needsDelivery;
+    zoneSelect.disabled = !needsDelivery;
+    if (!needsDelivery) {
+      zoneSelect.value = "";
     }
   }
+  if (deliveryZoneField) {
+    deliveryZoneField.style.display = needsDelivery ? "" : "none";
+  }
+
+  if (deliveryZoneNote) {
+    deliveryZoneNote.style.display = needsDelivery ? "" : "none";
+  }
+
+  if (!needsDelivery && deliveryFeeRow) {
+    deliveryFeeRow.style.display = "none";
+  }
+
+  updateCartUI();
 }
 
 fulfillmentInputs.forEach((input) => {
   input.addEventListener("change", () => {
-    updateAddressRequirement();
+    updateFulfillmentUI();
   });
+});
+zoneSelect?.addEventListener("change", () => {
+  updateCartUI();
 });
 function formatCurrency(value) {
   try {
@@ -226,9 +346,16 @@ function renderMenu() {
       card.appendChild(header);
 
       if (menuItem.extras && menuItem.extras.length) {
+         const extrasToggle = document.createElement("button");
+        extrasToggle.type = "button";
+        extrasToggle.className = "btn outline small order-menu-card__extras-toggle";
+        extrasToggle.textContent = "Add extras";
+        extrasToggle.setAttribute("aria-expanded", "false");
+
         const extrasFieldset = document.createElement("fieldset");
         extrasFieldset.className = "order-menu-card__extras";
-
+ extrasFieldset.hidden = true;
+        extrasFieldset.setAttribute("aria-hidden", "true");
         const legend = document.createElement("legend");
         legend.textContent = "Extras";
         extrasFieldset.appendChild(legend);
@@ -253,7 +380,15 @@ function renderMenu() {
 
           extrasFieldset.appendChild(label);
         });
+extrasToggle.addEventListener("click", () => {
+          const willShow = extrasFieldset.hidden;
+          extrasFieldset.hidden = !willShow;
+          extrasFieldset.setAttribute("aria-hidden", extrasFieldset.hidden ? "true" : "false");
+          extrasToggle.setAttribute("aria-expanded", willShow ? "true" : "false");
+          extrasToggle.textContent = willShow ? "Hide extras" : "Add extras";
+        });
 
+        card.appendChild(extrasToggle);
         card.appendChild(extrasFieldset);
       }
 
@@ -320,7 +455,7 @@ function updateItemsField() {
 }
 
 function updateCartUI() {
-  if (!cartItemsContainer || !cartTotalEl) return;
+  if (!cartItemsContainer || !cartTotalEl || !cartSubtotalEl || !cartDeliveryEl) return;
 
   cartItemsContainer.innerHTML = "";
 
@@ -398,7 +533,17 @@ function updateCartUI() {
     });
   }
 
-  cartTotalEl.textContent = formatCurrency(calculateCartTotal());
+const subtotal = calculateCartTotal();
+  const zone = getSelectedZone();
+  const deliveryFee = zone ? zone.fee : 0;
+
+  cartSubtotalEl.textContent = formatCurrency(subtotal);
+  cartDeliveryEl.textContent = zone ? formatCurrency(deliveryFee) : "Select zone";
+  cartTotalEl.textContent = formatCurrency(subtotal + deliveryFee);
+
+  if (deliveryFeeRow) {
+    deliveryFeeRow.style.display = selectedFulfillment() === "delivery" ? "flex" : "none";
+  }
   updateItemsField();
 }
 
@@ -427,7 +572,18 @@ function handleAddToCart(menuItem, cardEl) {
   cardEl.querySelectorAll("input[data-extra-id]").forEach((checkbox) => {
     checkbox.checked = false;
   });
+const extrasFieldset = cardEl.querySelector(".order-menu-card__extras");
+  const extrasToggleBtn = cardEl.querySelector(".order-menu-card__extras-toggle");
 
+  if (extrasFieldset instanceof HTMLElement) {
+    extrasFieldset.hidden = true;
+    extrasFieldset.setAttribute("aria-hidden", "true");
+  }
+
+  if (extrasToggleBtn instanceof HTMLButtonElement) {
+    extrasToggleBtn.setAttribute("aria-expanded", "false");
+    extrasToggleBtn.textContent = "Add extras";
+  }
   if (qtyInput) qtyInput.value = "1";
 
   updateCartUI();
@@ -553,17 +709,29 @@ if (data.paymentMethod) {
         li.appendChild(paymentLine);
       }
 
-      if (typeof data.subtotal === "number") {
+      if (typeof data.total === "number") {
         const totalLine = document.createElement("p");
-        totalLine.textContent = `Total: ${formatCurrency(data.subtotal)}`;
+const deliveryNote =
+          data.fulfillment === "delivery" && typeof data.deliveryFee === "number"
+            ? ` (includes ${formatCurrency(data.deliveryFee)} delivery fee)`
+            : "";
+        totalLine.textContent = `Total: ${formatCurrency(data.total)}${deliveryNote}`;
         li.appendChild(totalLine);
+              } else if (typeof data.subtotal === "number") {
+        const subtotalLine = document.createElement("p");
+        subtotalLine.textContent = `Subtotal: ${formatCurrency(data.subtotal)}`;
+        li.appendChild(subtotalLine);
       }
       if (data.fulfillment === "delivery" && data.address) {
         const address = document.createElement("p");
         address.textContent = `Deliver to: ${data.address}`;
         li.appendChild(address);
       }
-
+  if (data.fulfillment === "delivery" && data.deliveryZone) {
+        const zoneLine = document.createElement("p");
+        zoneLine.textContent = `Zone: ${data.deliveryZone}`;
+        li.appendChild(zoneLine);
+      }
       recentOrdersList.appendChild(li);
     });
   } catch (err) {
@@ -582,14 +750,20 @@ async function sendConfirmationEmail(order) {
       to_name: order.customerName || "TUX Guest",
       order_id: order.id,
       fulfillment: order.fulfillment === "delivery" ? "Delivery" : "Pickup",
-            payment_method: formatPayment(order.paymentMethod),
-
+ payment_method: formatPayment(order.paymentMethod),
+      delivery_zone: order.fulfillment === "delivery" ? order.deliveryZone || "" : "Pickup",
+      delivery_fee: typeof order.deliveryFee === "number" ? formatCurrency(order.deliveryFee) : "",
       order_details: order.items,
       address: order.fulfillment === "delivery" ? (order.address || "") : "Pickup at TUX",
       phone: order.phone,
       instructions: order.instructions || "",
-            order_total: typeof order.subtotal === "number" ? formatCurrency(order.subtotal) : "",
-
+ order_subtotal: typeof order.subtotal === "number" ? formatCurrency(order.subtotal) : "",
+      order_total:
+        typeof order.total === "number"
+          ? formatCurrency(order.total)
+          : typeof order.subtotal === "number"
+            ? formatCurrency(order.subtotal)
+            : "",
       placed_at: new Date().toLocaleString(),
     });
   } catch (err) {
@@ -623,7 +797,7 @@ onAuthStateChanged(auth, async (user) => {
   if (emailEl) emailEl.value = user.email || "";
   if (nameEl && !nameEl.value) nameEl.value = user.displayName || "";
 
-  updateAddressRequirement();
+  updateFulfillmentUI();
   loadRecentOrders();
 });
 
@@ -639,11 +813,11 @@ form?.addEventListener("submit", async (event) => {
   const phone = phoneEl.value.trim();
   const instructions = notesEl.value.trim();
   const fulfillment = selectedFulfillment();
- const paymentMethod = selectedPayment();
+  const paymentMethod = selectedPayment();
   const items = buildCartSummary();
   const subtotal = calculateCartTotal();
- if (!cart.length || !items) {
-    showStatus("Cart is Empty.", true);
+const selectedZone = getSelectedZone();
+  if (!cart.length || !items) {    showStatus("Cart is Empty.", true);
     return;
   }
 
@@ -651,6 +825,12 @@ form?.addEventListener("submit", async (event) => {
     showStatus("Delivery orders need an address.", true);
     return;
   }
+  if (fulfillment === "delivery" && !selectedZone) {
+    showStatus("Please choose your delivery zone.", true);
+    return;
+  }
+  const deliveryFee = fulfillment === "delivery" ? selectedZone?.fee ?? 0 : 0;
+  const total = subtotal + deliveryFee;
   updateItemsField();
 
   submitBtn.disabled = true;
@@ -666,11 +846,13 @@ form?.addEventListener("submit", async (event) => {
     items,
     instructions: instructions || null,
     fulfillment,
-        paymentMethod,
-
+paymentMethod,
+    deliveryZoneId: selectedZone?.id ?? null,
+    deliveryZone: selectedZone?.name ?? null,
+    deliveryFee,
     status: "pending",
     createdAt,
-     cart: cart.map((entry) => ({
+    cart: cart.map((entry) => ({
       itemId: entry.itemId,
       name: entry.name,
       quantity: entry.quantity,
@@ -679,6 +861,8 @@ form?.addEventListener("submit", async (event) => {
       lineTotal: calculateItemTotal(entry),
     })),
     subtotal,
+        total,
+
   };
 
   try {
@@ -722,4 +906,4 @@ form?.addEventListener("submit", async (event) => {
   }
 });
 
-updateAddressRequirement();
+updateFulfillmentUI();
