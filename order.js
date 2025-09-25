@@ -837,34 +837,66 @@ const selectedZone = getSelectedZone();
   showStatus("Sending your order…");
 
   const createdAt = serverTimestamp();
-  const orderPayload = {
+  const baseOrderPayload = {
     userId: currentUser.uid,
     customerName: name,
     phone,
     address: address || null,
     email: currentUser.email || emailEl?.value.trim() || "",
     items,
-    instructions: instructions || null,
     fulfillment,
-paymentMethod,
-    deliveryZoneId: selectedZone?.id ?? null,
-    deliveryZone: selectedZone?.name ?? null,
-    deliveryFee,
+    paymentMethod,
+
     status: "pending",
     createdAt,
-    cart: cart.map((entry) => ({
-      itemId: entry.itemId,
+ subtotal,
+    total,
+  };
+
+  if (instructions) {
+    baseOrderPayload.instructions = instructions;
+  }
+
+  if (address) {
+    baseOrderPayload.address = address;
+  }
+
+  if (fulfillment === "delivery" && selectedZone) {
+    baseOrderPayload.deliveryZoneId = selectedZone.id;
+    baseOrderPayload.deliveryZone = selectedZone.name;
+    baseOrderPayload.deliveryFee = deliveryFee;
+  }
+
+  if (Array.isArray(cart) && cart.length) {
+    baseOrderPayload.cart = cart.map((entry) => ({      itemId: entry.itemId,
       name: entry.name,
       quantity: entry.quantity,
       price: entry.price,
       extras: entry.extras,
       lineTotal: calculateItemTotal(entry),
-    })),
-    subtotal,
-        total,
+   }));
+  }
+const orderPayload = Object.entries(baseOrderPayload).reduce((acc, [key, value]) => {
+    if (value === undefined || value === null) {
+      return acc;
+    }
 
-  };
+    if (typeof value === "string") {
+      const trimmed = value.trim();
+      if (!trimmed) {
+        // Keep required strings like email/items/customerName/phone even if empty.
+        if (["email", "items", "customerName", "phone"].includes(key)) {
+          acc[key] = value;
+        }
+        return acc;
+      }
+      acc[key] = trimmed;
+      return acc;
+    }
 
+    acc[key] = value;
+    return acc;
+  }, {});
   try {
     await setDoc(profileRef, {
       name,
