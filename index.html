@@ -1,390 +1,253 @@
-<!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<!doctype html>
+<html lang="en" dir="ltr">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>TUX — Burgers Worth The Chase</title>
-  <meta name="description" content="TUX — Smash burgers, Hawawshi, loaded fries, and the signature TUXIFY line in Zahraa El-Maadi.">
-  <link rel="icon" href="assets/img/logo.jpg">
-  <link rel="apple-touch-icon" href="assets/img/logo.jpg">
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            gold: '#d7b968',
-            ebony: '#0a0a0a',
-            coal: '#121212',
-          },
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-            brand: ['Playfair Display', 'serif'],
-          },
-        },
-      },
-    };
-  </script>
-  <style>
-    :root { color-scheme: dark; }
-    body { background: #0a0a0a; color: #f5f5f5; font-family: 'Inter', sans-serif; }
-    .hero-bg {
-      background-image: linear-gradient(to right, rgba(10,10,10,0.92), rgba(10,10,10,0.65)), url('assets/img/poster-tuxify.jpg');
-      background-size: cover;
-      background-position: center 35%;
-    }
-    .animate-on-scroll {
-      opacity: 0;
-      transform: translateY(24px);
-      transition: opacity 0.6s ease-out, transform 0.6s ease-out;
-    }
-    .animate-on-scroll.is-visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TUX — Burgers Worth The Chase …</title>
+  <meta name="description" content="TUX — Smash burgers, hawawshi, fries, and TUXIFY. El-Saada St – Zahraa El-Maadi.">
+  <link rel="icon" href="assets/img/logo.jpg">
+  <link rel="apple-touch-icon" href="assets/img/logo.jpg">
+  <link rel="stylesheet" href="style.css">
 </head>
-<body class="min-h-screen flex flex-col">
-  <header class="sticky top-0 z-50 border-b border-gray-800 bg-black/80 backdrop-blur-sm">
-    <div class="max-w-6xl mx-auto px-4">
-      <div class="flex items-center justify-between py-3">
-        <a href="#home" class="flex items-center gap-3" aria-label="TUX Home">
-          <img src="assets/img/logo.jpg" alt="TUX logo" class="h-12 w-12 rounded-lg border border-gold p-1">
-          <div>
-            <span class="block font-brand text-2xl font-semibold text-gold tracking-tight">TUX</span>
-            <span class="hidden text-xs text-gray-400 sm:block">Burgers Worth The Chase…</span>
-          </div>
-        </a>
-        <nav class="hidden items-center space-x-6 text-sm font-medium lg:flex">
-          <a href="#menu" class="text-gray-300 transition-colors hover:text-gold">Menu</a>
-          <a href="#gallery" class="text-gray-300 transition-colors hover:text-gold">Gallery</a>
-          <a href="#location" class="text-gray-300 transition-colors hover:text-gold">Location</a>
-          <a id="orderLink" href="order.html" class="rounded-full bg-green-600 px-5 py-2 font-semibold text-white transition hover:scale-105 hover:bg-green-500">Order Online</a>
-          <a id="accountLink" href="account.html" class="rounded-full bg-gold px-5 py-2 font-semibold text-black transition hover:scale-105 hover:bg-yellow-500">Login / Sign up</a>
-          <a id="logoutLink" href="#" class="hidden text-gray-300 transition-colors hover:text-gold">Log out</a>
-        </nav>
-        <button id="mobileMenuButton" class="text-gray-300 transition hover:text-gold lg:hidden" aria-label="Toggle navigation">
-          <svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
-          </svg>
-        </button>
-      </div>
-    </div>
-    <div id="mobileMenu" class="hidden border-t border-gray-800 bg-black/95 lg:hidden">
-      <nav class="flex flex-col space-y-4 px-4 pt-4 pb-6 text-sm font-medium">
-        <a href="#menu" class="text-gray-300 transition hover:text-gold">Menu</a>
-        <a href="#gallery" class="text-gray-300 transition hover:text-gold">Gallery</a>
-        <a href="#location" class="text-gray-300 transition hover:text-gold">Location</a>
-        <a id="orderLinkMobile" href="order.html" class="rounded-full bg-green-600 px-4 py-2 text-center font-semibold text-white transition hover:bg-green-500">Order Online</a>
-        <a id="accountLinkMobile" href="account.html" class="rounded-full bg-gold px-4 py-2 text-center font-semibold text-black transition hover:bg-yellow-500">Login / Sign up</a>
-        <a id="logoutLinkMobile" href="#" class="hidden rounded-full bg-gray-800 px-4 py-2 text-center font-semibold text-white transition hover:bg-gray-700">Log out</a>
-      </nav>
-    </div>
-  </header>
+<body>
+  <!-- Topbar -->
+  <header class="topbar">
+    <div class="container bar">
+      <a href="#" class="brand" aria-label="TUX Home">
+        <img src="assets/img/logo.jpg" alt="TUX logo" class="brand__logo">
+        <div class="brand__text">
+          <div class="brand__title">TUX</div>
+          <div class="brand__tag">Burgers Worth The Chase …</div>
+        </div>
+      </a>
+      <nav class="nav">
+        <a href="#menu">Menu</a>
+        <a href="#gallery">Gallery</a>
+        <a href="#location">Location</a>
+        <a href="#contact">Contact</a>
+       <a href="order.html" id="orderLink" class="cta green">Order Online</a>
+        <a href="account.html" id="accountLink" class="cta gold">Login / Sign up</a>
+        <a href="#" id="logoutLink" style="display:none">Log out</a>
+        <a class="cta blue" href="https://forms.gle/rKJoUeHkgLoqTmmXA" target="_blank" rel="noreferrer">Help Us Improve</a>
+      </nav>
+    </div>
+  </header>
 
-  <main id="home" class="flex-1">
-    <section class="hero-bg relative">
-      <div class="max-w-6xl mx-auto flex min-h-[60vh] items-center px-4 py-16 md:min-h-[80vh]">
-        <div class="max-w-2xl space-y-6">
-          <p class="inline-flex items-center gap-2 rounded-full border border-gold/40 bg-black/60 px-4 py-2 text-xs font-semibold uppercase tracking-[0.2em] text-gold">Premium Smash Burgers</p>
-          <h1 class="font-brand text-5xl font-bold text-white md:text-7xl">Elegance in Every Bite.</h1>
-          <p class="text-lg text-gray-300">Crafted with passion, served with style. From our signature Smash Burgers to the indulgent TUXIFY line, every item is fired fresh for the chase.</p>
-          <div class="flex flex-wrap gap-4">
-            <a href="order.html" class="rounded-full bg-gold px-8 py-3 text-lg font-semibold text-black shadow-lg shadow-yellow-500/10 transition hover:scale-105 hover:bg-yellow-500">Order Now</a>
-            <a href="#menu" class="rounded-full border border-gray-400 px-8 py-3 text-lg font-semibold text-white transition hover:border-white">View Menu</a>
-          </div>
-        </div>
-      </div>
-    </section>
+  <!-- Quick access for mobile -->
+  <nav class="quick-nav" aria-label="Quick access">
+  <a href="order.html" id="orderLinkMobile" class="btn red">Order Online</a>
+    <a href="account.html" id="accountLinkMobile" class="btn">Login/Sign up</a>
+    <a href="#menu">Menu</a>
+    <a href="#location">Location</a>
+    <!-- Mobile-only review link -->
+    <a href="https://maps.app.goo.gl/V8U4SKzMqHvT5o2m7" target="_blank" rel="noreferrer">Review</a>
+  </nav>
 
-    <section id="menu" class="bg-coal py-16 md:py-24">
-      <div class="max-w-6xl mx-auto px-4">
-        <div class="animate-on-scroll text-center">
-          <h2 class="font-brand text-4xl font-bold text-gold md:text-5xl">Our Menu</h2>
-          <p class="mx-auto mt-3 max-w-2xl text-gray-400">Freshly smashed patties, buttered brioche buns, and house-made sauces. Served with fries unless noted.</p>
-        </div>
+  <!-- Hero -->
+  <section class="hero" style="--hero:url('assets/img/poster-tuxify.jpg')">
+    <div class="veil"></div>
+    <div class="container hero__content">
+      <div class="hero__copy">
+        <h1>Elegance in Every Bite</h1>
+        <p>Smash burgers, golden fries, authentic hawawshi, and our signature <strong>TUXIFY</strong> line.</p>
+        <div class="actions">
+          <a class="btn red" href="https://wa.me/201151960048?text=Hi%20TUX%20I%20want%20to%20order%20" target="_blank" rel="noreferrer">Order Now</a>
+          <a class="btn outline" href="https://maps.app.goo.gl/V8U4SKzMqHvT5o2m7" target="_blank" rel="noreferrer">Find us on Maps</a>
+        </div>
+      </div>
+      <div class="hero__logo">
+        <img src="assets/img/logo.jpg" alt="TUX">
+      </div>
+    </div>
+  </section>
 
-        <div class="mt-14 space-y-16">
-          <div class="animate-on-scroll">
-            <header class="mb-8 text-center">
-              <h3 class="font-brand text-3xl font-semibold">Smashed Burgers <span class="text-base font-sans text-gray-400">(Served with fries)</span></h3>
-            </header>
-            <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-              <article class="rounded-xl border border-gray-800 bg-[#0f0f0f] p-6 text-center shadow-lg shadow-black/20">
-                <h4 class="text-xl font-semibold text-gold">Single Smashed</h4>
-                <p class="mt-2 h-16 text-sm text-gray-400">Patty, American cheese, TUX sauce, pickles, tomato, onion, lettuce.</p>
-                <p class="mt-4 text-2xl font-bold">95.00 EGP</p>
-              </article>
-              <article class="rounded-xl border border-gray-800 bg-[#0f0f0f] p-6 text-center shadow-lg shadow-black/20">
-                <h4 class="text-xl font-semibold text-gold">Double Smashed</h4>
-                <p class="mt-2 h-16 text-sm text-gray-400">Double patties, double cheese, TUX sauce, fresh toppings.</p>
-                <p class="mt-4 text-2xl font-bold">140.00 EGP</p>
-              </article>
-              <article class="rounded-xl border border-gray-800 bg-[#0f0f0f] p-6 text-center shadow-lg shadow-black/20">
-                <h4 class="text-xl font-semibold text-gold">Triple Smashed</h4>
-                <p class="mt-2 h-16 text-sm text-gray-400">Triple patties layered with American cheese and caramelized onions.</p>
-                <p class="mt-4 text-2xl font-bold">160.00 EGP</p>
-              </article>
-              <article class="rounded-xl border border-gray-800 bg-[#0f0f0f] p-6 text-center shadow-lg shadow-black/20">
-                <h4 class="text-xl font-semibold text-gold">TUX Quatro</h4>
-                <p class="mt-2 h-16 text-sm text-gray-400">Four patties, mushrooms, caramelized onions, signature sauce.</p>
-                <p class="mt-4 text-2xl font-bold">190.00 EGP</p>
-              </article>
-            </div>
-          </div>
+  <!-- Menu -->
+  <section id="menu" class="section">
+    <div class="container">
+      <header class="section__head">
+        <h2>Our Menu</h2>
+        <p class="muted">Curated from our posters and menu boards.</p>
+      </header>
 
-          <div class="animate-on-scroll">
-            <header class="mb-8 text-center">
-              <h3 class="font-brand text-3xl font-semibold">TUXIFY Series</h3>
-            </header>
-            <div class="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
-              <article class="rounded-xl border border-gray-800 bg-[#0f0f0f] p-6 text-center shadow-lg shadow-black/20">
-                <h4 class="text-xl font-semibold text-gold">Single</h4>
-                <p class="mt-2 h-16 text-sm text-gray-400">Brioche bun, seared patty, American cheese, creamy TUXIFY sauce.</p>
-                <p class="mt-4 text-2xl font-bold">120.00 EGP</p>
-              </article>
-              <article class="rounded-xl border border-gray-800 bg-[#0f0f0f] p-6 text-center shadow-lg shadow-black/20">
-                <h4 class="text-xl font-semibold text-gold">Double</h4>
-                <p class="mt-2 h-16 text-sm text-gray-400">Two patties, molten cheese, TUXIFY sauce on toasted brioche.</p>
-                <p class="mt-4 text-2xl font-bold">160.00 EGP</p>
-              </article>
-              <article class="rounded-xl border border-gray-800 bg-[#0f0f0f] p-6 text-center shadow-lg shadow-black/20">
-                <h4 class="text-xl font-semibold text-gold">Triple</h4>
-                <p class="mt-2 h-16 text-sm text-gray-400">Triple stack with extra sauce and cheese pull guaranteed.</p>
-                <p class="mt-4 text-2xl font-bold">200.00 EGP</p>
-              </article>
-              <article class="rounded-xl border border-gray-800 bg-[#0f0f0f] p-6 text-center shadow-lg shadow-black/20">
-                <h4 class="text-xl font-semibold text-gold">Quatro</h4>
-                <p class="mt-2 h-16 text-sm text-gray-400">Four patties, dripping cheese, signature TUXIFY finish.</p>
-                <p class="mt-4 text-2xl font-bold">240.00 EGP</p>
-              </article>
-            </div>
-          </div>
+      <div class="menu-grid">
+        <div class="menu-card">
+          <h3>Smash Burgers <span class="note">served with fries</span></h3>
+          <ul class="menu-list">
+            <li><span>Single Smashed Patty</span><i></i><b>95.00</b><div class="ingredients">Smashed patty, cheese, TUX sauce, pickles, tomato, onion, lettuce.</div></li>
+            <li><span>Double Smashed Patty</span><i></i><b>140.00</b><div class="ingredients">2 smashed patties, cheese, TUX sauce, pickles, tomato, onion, lettuce.</div></li>
+            <li><span>Triple Smashed Patty</span><i></i><b>160.00</b><div class="ingredients">3 smashed patties, cheese, TUX sauce, pickles, tomato, onion, lettuce.</div></li>
+            <li><span>TUX Quatro Smashed Patty</span><i></i><b>190.00</b><div class="ingredients">4 smashed patties, cheese, TUX sauce, caramelized onion, mushroom.</div></li>
+          </ul>
+        </div>
 
-          <div class="grid gap-12 lg:grid-cols-2">
-            <div class="animate-on-scroll">
-              <header class="mb-8 text-center">
-                <h3 class="font-brand text-3xl font-semibold">Hawawshi <span class="text-base font-sans text-gray-400">(with chili sauce)</span></h3>
-              </header>
-              <ul class="divide-y divide-gray-800 rounded-2xl border border-gray-800 bg-[#0f0f0f] p-6 text-sm font-medium text-gray-200">
-                <li class="flex items-center justify-between py-4">
-                  <span>Classic Hawawshi</span>
-                  <span class="font-semibold text-gold">80.00 EGP</span>
-                </li>
-                <li class="flex items-center justify-between py-4">
-                  <span>TUX Hawawshi</span>
-                  <span class="font-semibold text-gold">100.00 EGP</span>
-                </li>
-              </ul>
-            </div>
-            <div class="animate-on-scroll">
-              <header class="mb-8 text-center">
-                <h3 class="font-brand text-3xl font-semibold">Fries & Sides</h3>
-              </header>
-              <ul class="divide-y divide-gray-800 rounded-2xl border border-gray-800 bg-[#0f0f0f] p-6 text-sm font-medium text-gray-200">
-                <li class="flex items-center justify-between py-4">
-                  <span>Classic Fries S/L</span>
-                  <span class="font-semibold text-gold">25 / 30 EGP</span>
-                </li>
-                <li class="flex items-center justify-between py-4">
-                  <span>Cheese Fries</span>
-                  <span class="font-semibold text-gold">40.00 EGP</span>
-                </li>
-                <li class="flex items-center justify-between py-4">
-                  <span>Chili Fries</span>
-                  <span class="font-semibold text-gold">30.00 EGP</span>
-                </li>
-                <li class="flex items-center justify-between py-4">
-                  <span>TUX Fries</span>
-                  <span class="font-semibold text-gold">75.00 EGP</span>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+        <div class="menu-card">
+          <h3>TUXIFY</h3>
+          <ul class="menu-list">
+            <li><span>Single</span><i></i><b>120.00</b><div class="ingredients">Brioche bun, 1 beef patty, American cheese, pickles, chopped onion, ketchup, TUXIFY sauce.</div></li>
+            <li><span>Double</span><i></i><b>160.00</b><div class="ingredients">Brioche bun, 2 beef patties, American cheese, pickles, chopped onion, ketchup, TUXIFY sauce.</div></li>
+            <li><span>Triple</span><i></i><b>200.00</b><div class="ingredients">Brioche bun, 3 beef patties, American cheese, pickles, chopped onion, ketchup, TUXIFY sauce.</div></li>
+            <li><span>Quatro</span><i></i><b>240.00</b><div class="ingredients">Brioche bun, 4 beef patties, American cheese, pickles, chopped onion, ketchup, TUXIFY sauce.</div></li>
+          </ul>
+        </div>
 
-    <section id="gallery" class="py-16 md:py-24">
-      <div class="max-w-6xl mx-auto px-4">
-        <div class="animate-on-scroll text-center">
-          <h2 class="font-brand text-4xl font-bold text-gold md:text-5xl">Gallery</h2>
-          <p class="mx-auto mt-3 max-w-xl text-gray-400">A glimpse of the TUX experience — from sizzling grills to golden buns.</p>
-        </div>
-        <div class="mt-12 grid grid-cols-2 gap-4 md:grid-cols-3">
-          <figure class="animate-on-scroll col-span-2 row-span-2 overflow-hidden rounded-2xl border border-gray-800 shadow-xl shadow-black/40">
-            <img src="assets/img/poster-tuxify.jpg" alt="TUXIFY hero poster" class="h-full w-full object-cover transition duration-500 hover:scale-105">
-          </figure>
-          <figure class="animate-on-scroll overflow-hidden rounded-2xl border border-gray-800 shadow-lg shadow-black/30">
-            <img src="assets/img/menu-burger-fries.jpg" alt="Burger and fries" class="h-full w-full object-cover transition duration-500 hover:scale-105">
-          </figure>
-          <figure class="animate-on-scroll overflow-hidden rounded-2xl border border-gray-800 shadow-lg shadow-black/30">
-            <img src="assets/img/menu-hawawshi.jpg" alt="Hawawshi spread" class="h-full w-full object-cover transition duration-500 hover:scale-105">
-          </figure>
-        </div>
-      </div>
-    </section>
+        <div class="menu-card">
+          <h3>Fries</h3>
+          <ul class="menu-list">
+            <li><span>Classic Fries S / L</span><i></i><b>25.00 / 30.00</b></li>
+            <li><span>Cheese Fries</span><i></i><b>30.00</b></li>
+            <li><span>Chili Fries</span><i></i><b>40.00</b></li>
+            <li><span>TUX Fries</span><i></i><b>75.00</b><div class="ingredients">Fried, smashed patty, cheese, pickels, caramelised onion, jalapeño, TUX sauce.</div></li>
+            <li><span>Doppy Fries</span><i></i><b>95.00</b></li>
+          </ul>
+          <p class="desc">Fries, smashed p., bacon, cheese, caramelised onion, ranch sauce, nachos, chopped green onion</p>
+        </div>
 
-    <section id="location" class="bg-coal py-16 md:py-24">
-      <div class="max-w-6xl mx-auto grid gap-12 px-4 lg:grid-cols-2 lg:items-center">
-        <div class="animate-on-scroll space-y-6">
-          <h2 class="font-brand text-4xl font-bold text-gold md:text-5xl">Find Us</h2>
-          <p class="text-lg text-gray-300">Come by and say hi! We're fired up daily in Zahraa El-Maadi with dine-in, pickup, and delivery options.</p>
-          <div class="space-y-4 text-gray-200">
-            <p class="flex items-start gap-3">
-              <svg xmlns="http://www.w3.org/2000/svg" class="mt-1 h-6 w-6 flex-none text-gold" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" /></svg>
-              <span><strong>Address</strong><br>El-Saada St — Zahraa El-Maadi, next to Roma Cafe & Manhattan School.</span>
-            </p>
-            <p class="flex items-center gap-3">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 flex-none text-gold" viewBox="0 0 20 20" fill="currentColor"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" /></svg>
-              <span><strong>Phone</strong> <a class="hover:text-gold" href="tel:01151960048">011-5196-0048</a></span>
-            </p>
-          </div>
-          <a href="https://maps.app.goo.gl/V8U4SKzMqHvT5o2m7" target="_blank" rel="noreferrer" class="inline-flex items-center gap-2 rounded-full bg-gray-800 px-6 py-3 font-semibold text-white transition hover:bg-gray-700">
-            Open in Google Maps
-            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M13 5h6m0 0v6m0-6L10 14" /></svg>
-          </a>
-        </div>
-        <div class="animate-on-scroll overflow-hidden rounded-2xl border border-gray-800 shadow-2xl shadow-black/40">
-          <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3456.326694935409!2d31.27733457618999!3d29.969966822558694!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x145847938813a43b%3A0x633458480cbb710f!2sEl-Saada%2C%20Maadi%2C%2C%20Cairo%20Governorate%204211230!5e0!3m2!1sen!2seg!4v1695726881234!5m2!1sen!2seg" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade" class="h-64 w-full md:h-96" style="border:0;"></iframe>
-        </div>
-      </div>
-    </section>
-  </main>
+        <div class="menu-card">
+          <h3>Hawawshi <span class="note">served with chili sauce</span></h3>
+          <ul class="menu-list">
+            <li><span>Classic Hawawshi</span><i></i><b>80.00</b><div class="ingredients">Baladi bread, hawawshi meat, onion. Served with chili sauce.</div></li>
+            <li><span>TUX Hawawshi</span><i></i><b>100.00</b><div class="ingredients">Baladi bread, hawawshi meat, mozzarella, onion, TUX hawawshi sauce. Served with chili sauce.</div></li>
+          </ul>
+        </div>
 
-  <footer class="border-t border-gray-800 bg-black">
-    <div class="max-w-6xl mx-auto flex flex-col items-center justify-between gap-6 px-4 py-8 text-center md:flex-row md:text-left">
-      <a href="#home" class="flex items-center gap-3" aria-label="TUX Home">
-        <img src="assets/img/logo.jpg" alt="TUX logo" class="h-10 w-10 rounded-lg border border-gold p-1">
-        <span class="font-brand text-xl font-semibold text-gold">TUX</span>
-      </a>
-      <p class="text-sm text-gray-400">© 2025 TUX — Egypt. All rights reserved.</p>
-      <div class="flex gap-4">
-        <a href="https://www.facebook.com/profile.php?id=61560177995727" target="_blank" rel="noreferrer" class="text-gray-400 transition hover:text-gold" aria-label="Facebook">
-          <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clip-rule="evenodd" /></svg>
-        </a>
-        <a href="https://www.instagram.com/tux.egypt?igsh=OGR1ODh2dTVrNWlj" target="_blank" rel="noreferrer" class="text-gray-400 transition hover:text-gold" aria-label="Instagram">
-          <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M12.315 2c2.43 0 2.784.013 3.808.06 1.064.049 1.791.218 2.427.465a4.902 4.902 0 011.772 1.153 4.902 4.902 0 011.153 1.772c.247.636.416 1.363.465 2.427.048 1.024.06 1.378.06 3.808s-.012 2.784-.06 3.808c-.049 1.064-.218 1.791-.465 2.427a4.902 4.902 0 01-1.153 1.772 4.902 4.902 0 01-1.772 1.153c-.636.247-1.363.416-2.427.465-1.024.048-1.378.06-3.808.06s-2.784-.012-3.808-.06c-1.064-.049-1.791-.218-2.427-.465a4.902 4.902 0 01-1.772-1.153 4.902 4.902 0 01-1.153-1.772c-.247-.636-.416-1.363-.465-2.427-.048-1.024-.06-1.378-.06-3.808s.012-2.784.06-3.808c.049-1.064.218-1.791.465-2.427a4.902 4.902 0 011.153-1.772A4.902 4.902 0 016.345 2.525c.636-.247 1.363-.416 2.427-.465C9.792 2.013 10.146 2 12.315 2zm-1.002 6.363a4.648 4.648 0 11-3.282 3.282 4.648 4.648 0 013.282-3.282zM12 15a3 3 0 100-6 3 3 0 000 6zm5.338-9.87a1.2 1.2 0 100 2.4 1.2 1.2 0 000-2.4z" clip-rule="evenodd" /></svg>
-        </a>
-      </div>
-    </div>
-  </footer>
+        <div class="menu-card">
+          <h3>Burger Extras</h3>
+          <ul class="menu-list two">
+            <li><span>Extra Smashed Patty</span><i></i><b>40.00</b></li>
+            <li><span>Bacon</span><i></i><b>20.00</b></li>
+            <li><span>Cheese</span><i></i><b>15.00</b></li>
+            <li><span>Ranch</span><i></i><b>10.00</b></li>
+            <li><span>Mushroom</span><i></i><b>15.00</b></li>
+            <li><span>Caramelized Onion</span><i></i><b>10.00</b></li>
+            <li><span>Jalapeño</span><i></i><b>10.00</b></li>
+            <li><span>TUX Sauce</span><i></i><b>10.00</b></li>
+            <li><span>Extra Bun</span><i></i><b>10.00</b></li>
+            <li><span>Pickle</span><i></i><b>5.00</b></li>
+            <li><span>BBQ / Ketchup / Sweet Chili / Hot Sauce</span><i></i><b>5.00</b></li>
+          </ul>
+        </div>
 
-  <script type="module">
-    import { auth, db } from './firebase-init.js';
-    import { onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js';
-    import { doc, getDoc } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js';
+        <div class="menu-card">
+          <h3>Hawawshi Extras</h3>
+          <ul class="menu-list">
+            <li><span>Mozzarella Cheese</span><i></i><b>20.00</b></li>
+            <li><span>TUX Hawawshi Sauce</span><i></i><b>10.00</b></li>
+            <li><span>BBQ / Ketchup / …</span><i></i><b>5.00</b></li>
+          </ul>
+        </div>
 
-    const loginHref = 'account.html';
-    const profileHref = 'profile.html';
-    const orderHref = 'order.html';
-    const orderRedirectHref = `account.html?redirect=${encodeURIComponent(orderHref)}`;
+        <div class="menu-card">
+          <h3>Drinks</h3>
+          <ul class="menu-list">
+            <li><span>Soda</span><i></i><b>20.00</b></li>
+            <li><span>Water</span><i></i><b>10.00</b></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
 
-    const accountLink = document.getElementById('accountLink');
-    const accountLinkMobile = document.getElementById('accountLinkMobile');
-    const logoutLink = document.getElementById('logoutLink');
-    const logoutLinkMobile = document.getElementById('logoutLinkMobile');
-    const orderLink = document.getElementById('orderLink');
-    const orderLinkMobile = document.getElementById('orderLinkMobile');
+  <!-- Gallery from your posters -->
+  <section id="gallery" class="section alt">
+    <div class="container">
+      <header class="section__head">
+        <h2>Poster Gallery</h2>
+        <p class="muted">Burgers &amp; Fries • Hawawshi • TUXIFY</p>
+      </header>
+      <div class="cards">
+        <a class="card" href="assets/img/menu-burger-fries.jpg" target="_blank" rel="noreferrer">
+          <img src="assets/img/menu-burger-fries.jpg" alt="Menu — Burgers & Fries">
+        </a>
+        <a class="card" href="assets/img/menu-hawawshi.jpg" target="_blank" rel="noreferrer">
+          <img src="assets/img/menu-hawawshi.jpg" alt="Menu — Hawawshi">
+        </a>
+        <a class="card" href="assets/img/poster-tuxify.jpg" target="_blank" rel="noreferrer">
+          <img src="assets/img/poster-tuxify.jpg" alt="Poster — TUXIFY">
+        </a>
+      </div>
+    </div>
+  </section>
 
-    const applyLoggedOutState = () => {
-      if (orderLink) orderLink.href = orderRedirectHref;
-      if (orderLinkMobile) orderLinkMobile.href = orderRedirectHref;
+  <!-- Location -->
+  <section id="location" class="section">
+    <div class="container grid2">
+      <div class="panel">
+        <h2>Where to find us</h2>
+        <p class="lead"><strong>El-Saada St – Zahraa El-Maadi</strong></p>
+        <p>Next to <strong>Roma Cafe</strong> & <strong>Manhattan School</strong>.</p>
+        <div class="hr"></div>
+        <p class="lead"><strong>العنوان</strong></p>
+        <p>شارع السعادة – زهراء المعادي، بجوار كافيه روما ومدرسة مانهاتن.</p>
+        <div class="actions">
+          <a class="btn" href="https://maps.app.goo.gl/V8U4SKzMqHvT5o2m7" target="_blank" rel="noreferrer">Open in Google Maps</a>
+        </div>
+      </div>
+    </div>
+  </section>
 
-      if (accountLink) {
-        accountLink.textContent = 'Login / Sign up';
-        accountLink.href = loginHref;
-      }
-      if (accountLinkMobile) {
-        accountLinkMobile.textContent = 'Login / Sign up';
-        accountLinkMobile.href = loginHref;
-        accountLinkMobile.classList.remove('bg-gray-800', 'text-white');
-        accountLinkMobile.classList.add('bg-gold', 'text-black');
-      }
-      if (logoutLink) logoutLink.classList.add('hidden');
-      if (logoutLinkMobile) logoutLinkMobile.classList.add('hidden');
-    };
+  <!-- Contact -->
+  <section id="contact" class="section alt">
+    <div class="container grid3">
+      <div class="panel small">
+        <h3>Phone</h3>
+        <p><a class="btn red" href="tel:01151960048">Call 011-5196-0048</a></p>
+      </div>
+      <div class="panel small">
+        <h3>Follow</h3>
+        <ul class="list">
+          <li><a href="https://www.facebook.com/profile.php?id=61560177995727" target="_blank" rel="noreferrer">Facebook</a></li>
+          <li><a href="https://www.instagram.com/tux.egypt?igsh=OGR1ODh2dTVrNWlj" target="_blank" rel="noreferrer">Instagram</a></li>
+        </ul>
+      </div>
+      <div class="panel small">
+        <h3>Delivery</h3>
+        <p>Daily, 4 PM – 2 AM</p>
+      </div>
 
-    const applyLoggedInState = async (user) => {
-      if (!user) {
-        applyLoggedOutState();
-        return;
-      }
+      <!-- Mobile-only Help Us Improve after Delivery (gold outline style) -->
+      <div class="panel small mobile-only-help">
+        <a class="btn gold-outline" href="https://forms.gle/rKJoUeHkgLoqTmmXA" target="_blank" rel="noreferrer"
+           style="display:block;text-align:center;">
+          Help Us Improve
+        </a>
+      </div>
+    </div>
+  </section>
 
-      const orderTarget = user ? orderHref : orderRedirectHref;
-      if (orderLink) orderLink.href = orderTarget;
-      if (orderLinkMobile) orderLinkMobile.href = orderTarget;
+  <footer class="footer">
+    <div class="container footer__row">
+      <div class="footer__brand">
+        <img src="assets/img/logo.jpg" alt="TUX" class="footer__logo">
+        <span>© 2025 TUX — Egypt</span>
+      </div>
+      <a class="footer__link" href="https://maps.app.goo.gl/V8U4SKzMqHvT5o2m7" target="_blank" rel="noreferrer">
+        El-Saada St – Zahraa El-Maadi • Open in Maps
+      </a>
+    </div>
+  </footer>
 
-      let displayName = user.displayName || '';
-      if (!displayName) {
-        try {
-          const snap = await getDoc(doc(db, 'profiles', user.uid));
-          if (snap.exists()) {
-            displayName = snap.data().name || '';
-          }
-        } catch (error) {
-          console.error('Failed to read profile name', error);
-        }
-      }
-      const label = displayName || (user.email ? user.email.split('@')[0] : 'Account');
+  <!-- Tiny CSS: mobile-only visibility + gold outline style to match your image -->
+  <style>
+    /* keep this mobile-only */
+    @media (min-width:840px){ .mobile-only-help{ display:none; } }
 
-      if (accountLink) {
-        accountLink.textContent = label;
-        accountLink.href = profileHref;
-      }
-      if (accountLinkMobile) {
-        accountLinkMobile.textContent = label;
-        accountLinkMobile.href = profileHref;
-        accountLinkMobile.classList.remove('bg-gold', 'text-black');
-        accountLinkMobile.classList.add('bg-gray-800', 'text-white');
-      }
-      if (logoutLink) logoutLink.classList.remove('hidden');
-      if (logoutLinkMobile) logoutLinkMobile.classList.remove('hidden');
-    };
+    /* use site gold (already defined in style.css as --gold) */
+    .btn.gold-outline{
+      background:transparent;
+      color:var(--gold);
+      border:3px solid var(--gold);
+      border-radius:999px;          /* pill */
+      padding:14px 22px;
+      font-weight:800;
+    }
+    /* slightly larger & comfy on small screens */
+    @media (max-width:839px){
+      .btn.gold-outline{ font-size:18px; }
+    }
+  </style>
+  <script type="module" src="nav.js"></script>
 
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        applyLoggedInState(user);
-      } else {
-        applyLoggedOutState();
-      }
-    });
 
-    const handleLogout = async (event) => {
-      event.preventDefault();
-      try {
-        await signOut(auth);
-        window.location.href = 'index.html';
-      } catch (error) {
-        console.error('Error signing out', error);
-      }
-    };
 
-    logoutLink?.addEventListener('click', handleLogout);
-    logoutLinkMobile?.addEventListener('click', handleLogout);
-
-    const mobileMenuButton = document.getElementById('mobileMenuButton');
-    const mobileMenu = document.getElementById('mobileMenu');
-    mobileMenuButton?.addEventListener('click', () => {
-      mobileMenu?.classList.toggle('hidden');
-    });
-    mobileMenu?.querySelectorAll('a').forEach((link) => {
-      link.addEventListener('click', () => mobileMenu.classList.add('hidden'));
-    });
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-visible');
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.1 });
-
-    document.querySelectorAll('.animate-on-scroll').forEach((element) => observer.observe(element));
-  </script>
 </body>
 </html>
