@@ -1213,7 +1213,15 @@ button {
   .hero {
     padding: 110px 0 80px;
   }
+ .hero__actions {
+    width: 100%;
+  }
 
+  .hero__actions .btn {
+    flex: 1 1 140px;
+    min-width: 0;
+    text-align: center;
+  }
   .section {
     padding: 78px 0;
   }
@@ -1230,11 +1238,24 @@ button {
     top: auto;
     transform: translateX(-50%);
     flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: calc(100% - 32px);
+    max-width: 420px;
+    padding: 12px;
+    border-radius: 999px;
+    background: rgba(8, 10, 16, 0.88);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 18px 42px rgba(0, 0, 0, 0.35);
+    gap: 12px;
   }
 
   .floating-dock__button {
-    padding: 12px 14px;
-  }
+flex: 1 1 120px;
+    min-width: 0;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;  }
 
   .overlay__panel {
     padding: 28px 20px;
