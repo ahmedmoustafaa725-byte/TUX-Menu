@@ -21,6 +21,9 @@
         <a href="index.html#gallery">Gallery</a>
         <a href="index.html#location">Location</a>
         <a href="index.html#contact">Contact</a>
+          <a href="order.html" id="orderLink" class="btn small red">Order Online</a>
+        <a href="account.html" id="accountLink" class="btn small outline">Account</a>
+        <a href="#" id="logoutLink" class="btn small outline">Log out</a>
       </nav>
     </div>
   </header>
@@ -53,8 +56,9 @@
     </div>
   </main>
 
- <script type="module">
-  import { auth } from "./firebase-init.js";
+  <script type="module" src="nav.js"></script>
+
+  <script type="module">  import { auth } from "./firebase-init.js";
   import {
     signInWithEmailAndPassword,
     sendPasswordResetEmail,
