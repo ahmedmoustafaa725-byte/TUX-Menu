@@ -51,6 +51,8 @@ async function syncOrderToPOS(orderData) {
     itemsTotal: orderData.subtotal,
     deliveryFee: orderData.deliveryFee || 0,
     paymentMethod: orderData.paymentMethod,
+        paymentBreakdown: orderData.paymentBreakdown || null,
+
     orderType: orderData.fulfillment === 'delivery' ? 'Delivery' : 'Pickup',
     
     // --- Timestamps & Status ---
@@ -77,7 +79,10 @@ const submitBtn = document.getElementById("orderSubmit");
 const recentOrdersList = document.getElementById("recentOrders");
 const noOrdersEl = document.getElementById("noOrders");
 const fulfillmentInputs = Array.from(document.querySelectorAll("input[name='fulfillment']"));
-const paymentInputs = Array.from(document.querySelectorAll("input[name='payment']"));
+const paymentCashCheckbox = document.getElementById("paymentCash");
+const paymentInstapayCheckbox = document.getElementById("paymentInstapay");
+const cashAmountInput = document.getElementById("cashAmount");
+const instapayAmountInput = document.getElementById("instapayAmount");
 const menuContainer = document.getElementById("menuList");
 const cartItemsContainer = document.getElementById("cartItems");
 const emptyCartEl = document.getElementById("emptyCart");
@@ -295,9 +300,34 @@ function selectedFulfillment() {
   const selected = fulfillmentInputs.find((input) => input.checked);
   return selected ? selected.value : "pickup";
 }
-function selectedPayment() {
-  const selected = paymentInputs.find((input) => input.checked);
-  return selected ? selected.value : "cash";
+function parseAmountInput(input) {
+  if (!(input instanceof HTMLInputElement)) return 0;
+  const value = Number.parseFloat(input.value);
+  return Number.isFinite(value) ? value : 0;
+}
+
+function getPaymentSelection() {
+  const useCash = paymentCashCheckbox?.checked ?? false;
+  const useInstapay = paymentInstapayCheckbox?.checked ?? false;
+
+  const breakdown = {
+    cash: useCash ? parseAmountInput(cashAmountInput) : 0,
+    instapay: useInstapay ? parseAmountInput(instapayAmountInput) : 0,
+  };
+
+  let method = "cash";
+  if (useCash && useInstapay) {
+    method = "split";
+  } else if (useInstapay) {
+    method = "card";
+  }
+
+  return {
+    useCash,
+    useInstapay,
+    method,
+    breakdown,
+  };
 }
 
 function getSelectedZone() {
@@ -305,6 +335,91 @@ function getSelectedZone() {
   const zoneId = zoneSelect.value;
   if (!zoneId) return null;
   return deliveryZones.find((zone) => zone.id === zoneId) || null;
+}
+function getOrderTotals() {
+  const subtotal = calculateCartTotal();
+  const fulfillment = selectedFulfillment();
+  const needsDelivery = fulfillment === "delivery";
+  const zone = needsDelivery ? getSelectedZone() : null;
+  const deliveryFee = needsDelivery && zone ? zone.fee : 0;
+  return {
+    subtotal,
+    deliveryFee,
+    total: subtotal + deliveryFee,
+    zone,
+  };
+}
+
+function updatePaymentInputsState(orderTotal, { fromToggle = false } = {}) {
+  const { useCash, useInstapay } = getPaymentSelection();
+
+  if (cashAmountInput) {
+    cashAmountInput.disabled = !useCash;
+    if (!useCash) {
+      cashAmountInput.value = "";
+    } else if (!useInstapay) {
+      cashAmountInput.value = orderTotal > 0 ? orderTotal.toFixed(2) : "";
+    }
+  }
+
+  if (instapayAmountInput) {
+    instapayAmountInput.disabled = !useInstapay;
+    if (!useInstapay) {
+      instapayAmountInput.value = "";
+    } else if (!useCash) {
+      instapayAmountInput.value = orderTotal > 0 ? orderTotal.toFixed(2) : "";
+    }
+  }
+
+  if (useCash && useInstapay && fromToggle && orderTotal > 0) {
+    const hasCashValue = Boolean(cashAmountInput?.value);
+    const hasInstapayValue = Boolean(instapayAmountInput?.value);
+    if (!hasCashValue && !hasInstapayValue) {
+      const half = Math.round((orderTotal / 2) * 100) / 100;
+      if (cashAmountInput) {
+        cashAmountInput.value = half.toFixed(2);
+      }
+      if (instapayAmountInput) {
+        const remainder = Math.round((orderTotal - half) * 100) / 100;
+        instapayAmountInput.value = remainder.toFixed(2);
+      }
+    }
+  }
+}
+
+function validatePaymentBreakdown(total) {
+  const selection = getPaymentSelection();
+  if (!selection.useCash && !selection.useInstapay) {
+    return { valid: false, message: "Select at least one payment method." };
+  }
+
+  if (selection.useCash && selection.breakdown.cash <= 0) {
+    return { valid: false, message: "Enter how much you will pay in cash." };
+  }
+
+  if (selection.useInstapay && selection.breakdown.instapay <= 0) {
+    return { valid: false, message: "Enter how much you will pay via Instapay." };
+  }
+
+  const totalPaid =
+    (selection.useCash ? selection.breakdown.cash : 0) +
+    (selection.useInstapay ? selection.breakdown.instapay : 0);
+
+  const roundedPaid = Math.round(totalPaid * 100);
+  const roundedDue = Math.round((total || 0) * 100);
+
+  if (roundedPaid !== roundedDue) {
+    return {
+      valid: false,
+      message: `Your payment amounts should add up to ${formatCurrency(total)}.`,
+    };
+  }
+
+  return {
+    valid: true,
+    method: selection.method,
+    breakdown: selection.breakdown,
+  };
 }
 
 function updateFulfillmentUI() {
@@ -355,8 +470,30 @@ function formatCurrency(value) {
   }
 }
 
-function formatPayment(method) {
-  return method === "card" ? "Card on delivery" : "Cash";
+function formatPayment(method, breakdown = null) {
+  if (method === "split") {
+    const parts = [];
+    if (breakdown?.cash) {
+      parts.push(`Cash ${formatCurrency(breakdown.cash)}`);
+    }
+    if (breakdown?.instapay) {
+      parts.push(`Instapay ${formatCurrency(breakdown.instapay)}`);
+    }
+    return parts.length ? parts.join(" + ") : "Split payment";
+  }
+
+  if (method === "card" || method === "instapay") {
+    if (breakdown?.instapay) {
+      return `Instapay ${formatCurrency(breakdown.instapay)}`;
+    }
+    return "Instapay on delivery";
+  }
+
+  if (breakdown?.cash) {
+    return `Cash ${formatCurrency(breakdown.cash)}`;
+  }
+
+  return "Cash";
 }
 
 function renderMenu() {
@@ -595,19 +732,23 @@ function updateCartUI() {
       cartItemsContainer.appendChild(li);
     });
   }
-
-const subtotal = calculateCartTotal();
-  const zone = getSelectedZone();
-  const deliveryFee = zone ? zone.fee : 0;
-
+const { subtotal, deliveryFee, total, zone } = getOrderTotals();
+  const fulfillment = selectedFulfillment();
+  const needsDelivery = fulfillment === "delivery";
   cartSubtotalEl.textContent = formatCurrency(subtotal);
-  cartDeliveryEl.textContent = zone ? formatCurrency(deliveryFee) : "Select zone";
-  cartTotalEl.textContent = formatCurrency(subtotal + deliveryFee);
+ if (needsDelivery) {
+    cartDeliveryEl.textContent = zone ? formatCurrency(deliveryFee) : "Select zone";
+  } else {
+    cartDeliveryEl.textContent = formatCurrency(0);
+  }
+  cartTotalEl.textContent = formatCurrency(total);
 
   if (deliveryFeeRow) {
-    deliveryFeeRow.style.display = selectedFulfillment() === "delivery" ? "flex" : "none";
+    deliveryFeeRow.style.display = needsDelivery ? "flex" : "none";
   }
   updateItemsField();
+  updatePaymentInputsState(total);
+
 }
 
 function handleAddToCart(menuItem, cardEl) {
@@ -768,7 +909,7 @@ async function loadRecentOrders() {
       li.appendChild(statusLine);
 if (data.paymentMethod) {
         const paymentLine = document.createElement("p");
-        paymentLine.textContent = `Payment: ${formatPayment(data.paymentMethod)}`;
+        paymentLine.textContent = `Payment: ${formatPayment(data.paymentMethod, data.paymentBreakdown)}`;
         li.appendChild(paymentLine);
       }
 
@@ -863,11 +1004,10 @@ const email = emailEl.value.trim();
   }
   const instructions = notesEl.value.trim();
   const fulfillment = selectedFulfillment();
-  const paymentMethod = selectedPayment();
   const items = buildCartSummary();
-  const subtotal = calculateCartTotal();
-const selectedZone = getSelectedZone();
-  if (!cart.length || !items) {    showStatus("Cart is Empty.", true);
+ const { subtotal, deliveryFee, total, zone: selectedZone } = getOrderTotals();
+  if (!cart.length || !items) {
+    showStatus("Cart is Empty.", true);
     return;
   }
 
@@ -879,8 +1019,17 @@ const selectedZone = getSelectedZone();
     showStatus("Please choose your delivery zone.", true);
     return;
   }
-  const deliveryFee = fulfillment === "delivery" ? selectedZone?.fee ?? 0 : 0;
-  const total = subtotal + deliveryFee;
+ const paymentValidation = validatePaymentBreakdown(total);
+  if (!paymentValidation.valid) {
+    showStatus(paymentValidation.message, true);
+    return;
+  }
+
+  const paymentMethod = paymentValidation.method;
+  const paymentBreakdown = {
+    cash: Math.round((paymentValidation.breakdown.cash || 0) * 100) / 100,
+    instapay: Math.round((paymentValidation.breakdown.instapay || 0) * 100) / 100,
+  };
   updateItemsField();
 
   submitBtn.disabled = true;
@@ -896,6 +1045,7 @@ const selectedZone = getSelectedZone();
     items,
     fulfillment,
     paymentMethod,
+    paymentBreakdown,
 
     status: "pending",
     createdAt,
@@ -918,13 +1068,14 @@ const selectedZone = getSelectedZone();
   }
 
   if (Array.isArray(cart) && cart.length) {
-    baseOrderPayload.cart = cart.map((entry) => ({      itemId: entry.itemId,
+    baseOrderPayload.cart = cart.map((entry) => ({
+      itemId: entry.itemId,
       name: entry.name,
       quantity: entry.quantity,
       price: entry.price,
       extras: entry.extras,
       lineTotal: calculateItemTotal(entry),
-   }));
+     }));
   }
 const orderPayload = Object.entries(baseOrderPayload).reduce((acc, [key, value]) => {
     if (value === undefined || value === null) {
