@@ -680,6 +680,7 @@ function formatPayment(method, breakdown = null) {
   return "Cash";
 }
 
+// *** PATCHED FUNCTION (chunked rendering, aria-busy, fragments) ***
 function renderMenu() {
   if (!menuContainer) return;
 
@@ -689,123 +690,170 @@ function renderMenu() {
     return acc;
   }, {});
 
+  const entries = Object.entries(grouped);
+  if (!entries.length) {
+    menuContainer.innerHTML = "";
+    return;
+  }
+
   menuContainer.innerHTML = "";
+  menuContainer.setAttribute("aria-busy", "true");
 
-  Object.entries(grouped).forEach(([category, items]) => {
-    const groupEl = document.createElement("section");
-    groupEl.className = "menu-group";
+  const fragment = document.createDocumentFragment();
 
-    const heading = document.createElement("h4");
-    heading.textContent = category;
-    groupEl.appendChild(heading);
+  function buildMenuCard(menuItem) {
+    const card = document.createElement("article");
+    card.className = "order-menu-card";
+    card.dataset.itemId = menuItem.id;
 
-    const list = document.createElement("div");
-    list.className = "menu-items";
+    const header = document.createElement("div");
+    header.className = "order-menu-card__header";
 
-    items.forEach((menuItem) => {
-      const card = document.createElement("article");
-      card.className = "order-menu-card";
-      card.dataset.itemId = menuItem.id;
+    const name = document.createElement("h5");
+    name.className = "order-menu-card__name";
+    name.textContent = menuItem.name;
+    header.appendChild(name);
 
-      const header = document.createElement("div");
-      header.className = "order-menu-card__header";
+    if (menuItem.description) {
+      const desc = document.createElement("p");
+      desc.className = "order-menu-card__desc";
+      desc.textContent = menuItem.description;
+      header.appendChild(desc);
+    }
 
-      const name = document.createElement("h5");
-      name.className = "order-menu-card__name";
-      name.textContent = menuItem.name;
-      header.appendChild(name);
+    const price = document.createElement("span");
+    price.className = "order-menu-card__price";
+    price.textContent = formatCurrency(menuItem.price);
+    header.appendChild(price);
 
-      if (menuItem.description) {
-        const desc = document.createElement("p");
-        desc.className = "order-menu-card__desc";
-        desc.textContent = menuItem.description;
-        header.appendChild(desc);
-      }
+    card.appendChild(header);
 
-      const price = document.createElement("span");
-      price.className = "order-menu-card__price";
-      price.textContent = formatCurrency(menuItem.price);
-      header.appendChild(price);
+    if (menuItem.extras && menuItem.extras.length) {
+      const extrasToggle = document.createElement("button");
+      extrasToggle.type = "button";
+      extrasToggle.className = "btn outline small order-menu-card__extras-toggle";
+      extrasToggle.textContent = "Add extras";
+      extrasToggle.setAttribute("aria-expanded", "false");
 
-      card.appendChild(header);
+      const extrasFieldset = document.createElement("fieldset");
+      extrasFieldset.className = "order-menu-card__extras";
+      extrasFieldset.hidden = true;
+      extrasFieldset.setAttribute("aria-hidden", "true");
 
-      if (menuItem.extras && menuItem.extras.length) {
-        const extrasToggle = document.createElement("button");
-        extrasToggle.type = "button";
-        extrasToggle.className = "btn outline small order-menu-card__extras-toggle";
-        extrasToggle.textContent = "Add extras";
-        extrasToggle.setAttribute("aria-expanded", "false");
+      const legend = document.createElement("legend");
+      legend.textContent = "Extras";
+      extrasFieldset.appendChild(legend);
 
-        const extrasFieldset = document.createElement("fieldset");
-        extrasFieldset.className = "order-menu-card__extras";
-        extrasFieldset.hidden = true;
-        extrasFieldset.setAttribute("aria-hidden", "true");
-        const legend = document.createElement("legend");
-        legend.textContent = "Extras";
-        extrasFieldset.appendChild(legend);
+      const extrasFragment = document.createDocumentFragment();
+      menuItem.extras.forEach((extra) => {
+        const label = document.createElement("label");
 
-        menuItem.extras.forEach((extra) => {
-          const label = document.createElement("label");
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.dataset.extraId = extra.id;
+        checkbox.dataset.extraName = extra.name;
+        checkbox.dataset.extraPrice = String(extra.price);
+        label.appendChild(checkbox);
 
-          const checkbox = document.createElement("input");
-          checkbox.type = "checkbox";
-          checkbox.dataset.extraId = extra.id;
-          checkbox.dataset.extraName = extra.name;
-          checkbox.dataset.extraPrice = String(extra.price);
-          label.appendChild(checkbox);
+        const nameSpan = document.createElement("span");
+        nameSpan.textContent = extra.name;
+        label.appendChild(nameSpan);
 
-          const nameSpan = document.createElement("span");
-          nameSpan.textContent = extra.name;
-          label.appendChild(nameSpan);
+        const priceSpan = document.createElement("span");
+        priceSpan.textContent = formatCurrency(extra.price);
+        label.appendChild(priceSpan);
 
-          const priceSpan = document.createElement("span");
-          priceSpan.textContent = formatCurrency(extra.price);
-          label.appendChild(priceSpan);
+        extrasFragment.appendChild(label);
+      });
+      extrasFieldset.appendChild(extrasFragment);
 
-          extrasFieldset.appendChild(label);
-        });
-        extrasToggle.addEventListener("click", () => {
-          const willShow = extrasFieldset.hidden;
-          extrasFieldset.hidden = !willShow;
-          extrasFieldset.setAttribute("aria-hidden", extrasFieldset.hidden ? "true" : "false");
-          extrasToggle.setAttribute("aria-expanded", willShow ? "true" : "false");
-          extrasToggle.textContent = willShow ? "Hide extras" : "Add extras";
-        });
+      extrasToggle.addEventListener("click", () => {
+        const willShow = extrasFieldset.hidden;
+        extrasFieldset.hidden = !willShow;
+        extrasFieldset.setAttribute("aria-hidden", extrasFieldset.hidden ? "true" : "false");
+        extrasToggle.setAttribute("aria-expanded", willShow ? "true" : "false");
+        extrasToggle.textContent = willShow ? "Hide extras" : "Add extras";
+      });
 
-        card.appendChild(extrasToggle);
-        card.appendChild(extrasFieldset);
-      }
+      card.appendChild(extrasToggle);
+      card.appendChild(extrasFieldset);
+    }
 
-      const actions = document.createElement("div");
-      actions.className = "order-menu-card__actions";
+    const actions = document.createElement("div");
+    actions.className = "order-menu-card__actions";
 
-      const qtyLabel = document.createElement("label");
-      qtyLabel.className = "order-menu-card__qty";
-      qtyLabel.textContent = "Qty";
+    const qtyLabel = document.createElement("label");
+    qtyLabel.className = "order-menu-card__qty";
+    qtyLabel.textContent = "Qty";
 
-      const qtyInput = document.createElement("input");
-      qtyInput.type = "number";
-      qtyInput.min = "1";
-      qtyInput.max = "10";
-      qtyInput.value = "1";
-      qtyInput.dataset.role = "quantity";
-      qtyLabel.appendChild(qtyInput);
-      actions.appendChild(qtyLabel);
+    const qtyInput = document.createElement("input");
+    qtyInput.type = "number";
+    qtyInput.min = "1";
+    qtyInput.max = "10";
+    qtyInput.value = "1";
+    qtyInput.dataset.role = "quantity";
+    qtyLabel.appendChild(qtyInput);
+    actions.appendChild(qtyLabel);
 
-      const addBtn = document.createElement("button");
-      addBtn.type = "button";
-      addBtn.className = "btn green small";
-      addBtn.textContent = "Add to cart";
-      addBtn.addEventListener("click", () => handleAddToCart(menuItem, card));
-      actions.appendChild(addBtn);
+    const addBtn = document.createElement("button");
+    addBtn.type = "button";
+    addBtn.className = "btn green small";
+    addBtn.textContent = "Add to cart";
+    addBtn.addEventListener("click", () => handleAddToCart(menuItem, card));
+    actions.appendChild(addBtn);
 
-      card.appendChild(actions);
-      list.appendChild(card);
-    });
+    card.appendChild(actions);
+    return card;
+  }
 
-    groupEl.appendChild(list);
-    menuContainer.appendChild(groupEl);
-  });
+  let index = 0;
+
+  const schedule =
+    (typeof window !== "undefined" && window.requestAnimationFrame?.bind(window)) ||
+    ((callback) => setTimeout(callback, 16));
+
+  const now = () =>
+    (typeof performance !== "undefined" && typeof performance.now === "function"
+      ? performance.now()
+      : Date.now());
+
+  const processChunk = () => {
+    const start = now();
+    let elapsed = 0;
+    while (index < entries.length && elapsed < 16) {
+      const [category, items] = entries[index++];
+
+      const groupEl = document.createElement("section");
+      groupEl.className = "menu-group";
+
+      const heading = document.createElement("h4");
+      heading.textContent = category;
+      groupEl.appendChild(heading);
+
+      const list = document.createElement("div");
+      list.className = "menu-items";
+
+      const cardsFragment = document.createDocumentFragment();
+      items.forEach((menuItem) => {
+        cardsFragment.appendChild(buildMenuCard(menuItem));
+      });
+      list.appendChild(cardsFragment);
+
+      groupEl.appendChild(list);
+      fragment.appendChild(groupEl);
+
+      elapsed = now() - start;
+    }
+
+    if (index < entries.length) {
+      schedule(processChunk);
+    } else {
+      menuContainer.appendChild(fragment);
+      menuContainer.removeAttribute("aria-busy");
+    }
+  };
+
+  schedule(processChunk);
 }
 
 function calculateExtrasTotal(entry) {
