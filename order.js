@@ -93,7 +93,9 @@ const deliveryFeeRow = document.getElementById("deliveryFeeRow");
 const zoneSelect = document.getElementById("deliveryZone");
 const deliveryZoneField = document.getElementById("deliveryZoneField");
 const deliveryZoneNote = document.getElementById("deliveryZoneNote");
+const deliveryDetailsFieldset = document.getElementById("deliveryDetails");
 const clearCartBtn = document.getElementById("clearCart");
+const quickTransferKey = "tuxQuickCartTransfer";
 let currentUser = null;
 let profileRef = null;
 let cart = [];
@@ -289,7 +291,80 @@ const menuData = [
   },
 ];
 
+const menuIndex = new Map(menuData.map((item) => [item.id, item]));
 
+function loadQuickCartTransfer() {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = sessionStorage.getItem(quickTransferKey);
+    if (!raw) return null;
+    sessionStorage.removeItem(quickTransferKey);
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== "object") return null;
+    return parsed;
+  } catch (err) {
+    console.warn("Failed to load quick cart transfer", err);
+    return null;
+  }
+}
+
+function applyQuickCartSeed(seed) {
+  if (!seed || typeof seed !== "object") return;
+  try {
+    if (Array.isArray(seed.cart) && seed.cart.length) {
+      cart = [];
+      seed.cart.forEach((entry) => {
+        const menuItem = menuIndex.get(entry.id);
+        if (!menuItem) return;
+        const quantity = Math.max(1, Number.parseInt(entry.quantity, 10) || 1);
+        cart.push({
+          itemId: menuItem.id,
+          name: menuItem.name,
+          price: menuItem.price,
+          quantity,
+          extras: [],
+        });
+      });
+    }
+
+    const checkout = seed.checkout || {};
+    if (checkout.name && nameEl && !nameEl.value) {
+      nameEl.value = checkout.name;
+    }
+    if (checkout.phone && phoneEl && !phoneEl.value) {
+      const digits = extractPhoneDigits(checkout.phone);
+      phoneEl.value = digits || checkout.phone;
+    }
+    if (checkout.notes && notesEl && !notesEl.value) {
+      notesEl.value = checkout.notes;
+    }
+
+    if (typeof checkout.cashAmount === "number" && cashAmountInput) {
+      cashAmountInput.value = checkout.cashAmount
+        ? checkout.cashAmount.toFixed(2)
+        : "";
+    }
+    if (typeof checkout.instapayAmount === "number" && instapayAmountInput) {
+      instapayAmountInput.value = checkout.instapayAmount
+        ? checkout.instapayAmount.toFixed(2)
+        : "";
+    }
+
+    const method = checkout.paymentMethod;
+    if (method) {
+      const wantsCash = method === "cash" || method === "split";
+      const wantsInstapay = method === "instapay" || method === "split";
+      if (paymentCashCheckbox) paymentCashCheckbox.checked = wantsCash;
+      if (paymentInstapayCheckbox)
+        paymentInstapayCheckbox.checked = wantsInstapay || method === "instapay";
+      if (method === "instapay" && paymentCashCheckbox) {
+        paymentCashCheckbox.checked = false;
+      }
+    }
+  } catch (err) {
+    console.warn("Failed to apply quick cart seed", err);
+  }
+}
 function showStatus(message, isError = false) {
   if (!statusEl) return;
   statusEl.textContent = message;
@@ -424,6 +499,9 @@ function validatePaymentBreakdown(total) {
 
 function updateFulfillmentUI() {
   const needsDelivery = selectedFulfillment() === "delivery";
+    if (deliveryDetailsFieldset) {
+    deliveryDetailsFieldset.style.display = needsDelivery ? "" : "none";
+  }
 
   if (addressEl) {
     addressEl.required = needsDelivery;
@@ -837,6 +915,22 @@ cartItemsContainer?.addEventListener("change", (event) => {
   cart[index].quantity = Math.min(nextValue, 99);
   updateCartUI();
 });
+[paymentCashCheckbox, paymentInstapayCheckbox].forEach((checkbox) => {
+  checkbox?.addEventListener("change", () => {
+    const { total } = getOrderTotals();
+    updatePaymentInputsState(total, { fromToggle: true });
+  });
+});
+
+[cashAmountInput, instapayAmountInput].forEach((input) => {
+  input?.addEventListener("input", () => {
+    if (!input.value) return;
+    const numeric = Number.parseFloat(input.value);
+    if (!Number.isFinite(numeric) || numeric < 0) {
+      input.value = "";
+    }
+  });
+});
 
 clearCartBtn?.addEventListener("click", () => {
   if (!cart.length) return;
@@ -846,6 +940,10 @@ clearCartBtn?.addEventListener("click", () => {
 });
 
 renderMenu();
+const quickCartSeed = loadQuickCartTransfer();
+if (quickCartSeed) {
+  applyQuickCartSeed(quickCartSeed);
+}
 updateCartUI();
 
 function formatDate(timestamp) {
