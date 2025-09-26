@@ -1191,9 +1191,12 @@ async function loadRecentOrders() {
         li.appendChild(notes);
       }
 
-      const statusLine = document.createElement("p");
-      statusLine.textContent = `Status: ${data.status || "pending"}`;
-      li.appendChild(statusLine);
+      const status = (data.status || "").trim();
+      if (status && status.toLowerCase() !== "pending") {
+        const statusLine = document.createElement("p");
+        statusLine.textContent = `Status: ${data.status}`;
+        li.appendChild(statusLine);
+      }
 
       if (data.paymentMethod) {
         const paymentLine = document.createElement("p");
