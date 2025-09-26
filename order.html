@@ -1,142 +1,200 @@
-<!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<!doctype html>
+<html lang="en" dir="ltr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TUX — Order Online</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: { gold: '#d7b968' },
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-            brand: ['Playfair Display', 'serif'],
-          },
-        },
-      },
-    };
-  </script>
-  <style>
-    body { background: #0a0a0a; color: #f5f5f5; font-family: 'Inter', sans-serif; }
-    .menu-column::-webkit-scrollbar { width: 8px; }
-    .menu-column::-webkit-scrollbar-track { background: #121212; }
-    .menu-column::-webkit-scrollbar-thumb { background: #2e2e2e; border-radius: 4px; }
-    .menu-column::-webkit-scrollbar-thumb:hover { background: #3f3f3f; }
-  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TUX — Order Online</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="sticky top-0 z-50 border-b border-gray-800 bg-black/80 backdrop-blur-sm">
-    <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-      <a href="index.html" class="flex items-center gap-3" aria-label="TUX Home">
-        <img src="assets/img/logo.jpg" alt="TUX logo" class="h-12 w-12 rounded-lg border border-gold p-1">
-        <div>
-          <span class="font-brand text-2xl font-semibold text-gold">TUX</span>
-          <span class="hidden text-xs text-gray-400 sm:block">Order Online</span>
-        </div>
-      </a>
-      <nav class="hidden items-center space-x-6 text-sm font-medium lg:flex">
-        <a href="index.html#menu" class="text-gray-300 transition hover:text-gold">Menu</a>
-        <a id="accountLink" href="profile.html" class="rounded-full bg-gold px-5 py-2 font-semibold text-black transition hover:scale-105 hover:bg-yellow-500">My Account</a>
-        <a id="logoutLink" href="#" class="hidden text-gray-300 transition hover:text-gold">Log out</a>
-      </nav>
-      <button id="mobileMenuButton" class="text-gray-300 transition hover:text-gold lg:hidden" aria-label="Toggle navigation">
-        <svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
-        </svg>
-      </button>
-    </div>
-    <div id="mobileMenu" class="hidden border-t border-gray-800 bg-black/95 lg:hidden">
-      <nav class="flex flex-col space-y-4 px-4 pt-4 pb-6 text-sm font-medium">
-        <a href="index.html#menu" class="text-gray-300 transition hover:text-gold">Full Menu</a>
-        <a id="accountLinkMobile" href="profile.html" class="rounded-full bg-gold px-4 py-2 text-center font-semibold text-black transition hover:bg-yellow-500">My Account</a>
-        <a id="logoutLinkMobile" href="#" class="hidden rounded-full bg-gray-800 px-4 py-2 text-center font-semibold text-white transition hover:bg-gray-700">Log out</a>
-      </nav>
-    </div>
-  </header>
+  <header class="topbar">
+    <div class="container bar">
+      <a href="index.html" class="brand" aria-label="TUX Home">
+        <img src="assets/img/logo.jpg" alt="TUX logo" class="brand__logo">
+        <div class="brand__text">
+          <div class="brand__title">TUX</div>
+          <div class="brand__tag">Burgers Worth The Chase …</div>
+        </div>
+      </a>
+      <nav class="nav">
+        <a href="index.html#menu">Menu</a>
+        <a href="index.html#gallery">Gallery</a>
+        <a href="index.html#location">Location</a>
+        <a href="index.html#contact">Contact</a>
+        <a href="order.html" id="orderLink" class="cta green">Order Online</a>
+        <a href="account.html" id="accountLink" class="cta gold">Login / Sign up</a>
+        <a href="#" id="logoutLink" style="display:none">Log out</a>
+        <a class="cta blue" href="https://forms.gle/rKJoUeHkgLoqTmmXA" target="_blank" rel="noreferrer">Help Us Improve</a>
+      </nav>
+    </div>
+  </header>
 
-  <main class="mx-auto max-w-6xl px-4 py-10">
-    <div class="lg:grid lg:grid-cols-5 lg:gap-10">
-      <section class="menu-column lg:col-span-3 lg:h-[calc(100vh-140px)] lg:overflow-y-auto">
-        <header class="mb-10 text-center lg:text-left">
-          <h1 class="font-brand text-4xl font-semibold text-gold md:text-5xl">Place an Order</h1>
-          <p class="mt-2 text-gray-400">Tap an item to add it to your cart. Extras are optional and charged per item.</p>
-        </header>
-        <div id="menuList" class="space-y-10"></div>
-      </section>
+  <nav class="quick-nav" aria-label="Quick access">
+    <a href="order.html" id="orderLinkMobile" class="btn green">Order Online</a>
+    <a href="account.html" id="accountLinkMobile" class="btn">Login / Sign up</a>
+    <a href="index.html#menu">Menu</a>
+    <a href="index.html#gallery">Gallery</a>
+    <a href="index.html#location">Location</a>
+    <a href="index.html#contact">Contact</a>
+  </nav>
 
-      <aside class="lg:col-span-2 mt-10 space-y-6 lg:mt-0">
-        <section id="cartPanel" class="rounded-2xl border border-gray-800 bg-black/60 p-6 shadow-xl">
-          <h2 class="font-brand text-2xl font-semibold">Your Cart</h2>
-          <div id="cartItems" class="mt-4 max-h-60 space-y-4 overflow-y-auto pr-1">
-            <p id="emptyCart" class="text-gray-400">Your cart is empty.</p>
-          </div>
-          <div id="cartSummary" class="mt-4 hidden space-y-2 border-t border-gray-800 pt-4 text-sm">
-            <div class="flex justify-between text-gray-300"><span>Subtotal</span><span id="cartSubtotal">EGP 0.00</span></div>
-            <div id="deliveryFeeRow" class="hidden justify-between text-gray-300"><span>Delivery Fee</span><span id="cartDeliveryFee">EGP 0.00</span></div>
-            <div class="flex justify-between text-xl font-semibold text-gold"><span>Total</span><span id="cartTotal">EGP 0.00</span></div>
-          </div>
-          <button id="clearCart" class="mt-4 hidden w-full text-sm font-semibold text-red-500 transition hover:text-red-400">Clear Cart</button>
-        </section>
+  <main class="section">
+    <div class="container" style="max-width:760px">
+      <header class="section__head">
+        <h2>Order Online</h2>
+        <p class="muted">Place a pickup or delivery order in seconds. We’ll use your saved details so you can check out faster.</p>
+      </header>
 
-        <section id="checkoutPanel" class="hidden rounded-2xl border border-gray-800 bg-black/60 p-6 shadow-xl">
-          <h2 class="font-brand text-2xl font-semibold">Checkout</h2>
-          <form id="orderForm" class="mt-4 space-y-4">
-            <fieldset>
-              <legend class="sr-only">Fulfilment</legend>
-              <div class="flex gap-4">
-                <label class="flex-1 cursor-pointer rounded-xl border border-gray-700 bg-gray-900/60 px-4 py-3 text-center font-semibold transition has-[:checked]:border-green-500 has-[:checked]:bg-green-600">
-                  <input type="radio" name="fulfillment" value="pickup" class="sr-only" checked>
-                  Pickup
-                </label>
-                <label class="flex-1 cursor-pointer rounded-xl border border-gray-700 bg-gray-900/60 px-4 py-3 text-center font-semibold transition has-[:checked]:border-green-500 has-[:checked]:bg-green-600">
-                  <input type="radio" name="fulfillment" value="delivery" class="sr-only">
-                  Delivery
-                </label>
-              </div>
-            </fieldset>
-            <fieldset class="space-y-4 border-t border-gray-800 pt-4">
-              <legend class="sr-only">Your information</legend>
-              <label class="block text-sm font-medium text-gray-300">
-                Full name
-                <input id="orderName" type="text" required class="mt-1 w-full rounded-xl border border-gray-700 bg-gray-950 px-4 py-3 text-sm text-white placeholder-gray-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-gold">
-              </label>
-              <label class="block text-sm font-medium text-gray-300">
-                Phone (+20)
-                <input id="orderPhone" type="tel" required pattern="^\d{10}$" placeholder="1098765432" class="mt-1 w-full rounded-xl border border-gray-700 bg-gray-950 px-4 py-3 text-sm text-white placeholder-gray-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-gold">
-              </label>
-              <input id="orderEmail" type="email" class="hidden">
-            </fieldset>
-            <fieldset id="deliveryDetails" class="hidden space-y-4 border-t border-gray-800 pt-4">
-              <legend class="sr-only">Delivery details</legend>
-              <label class="block text-sm font-medium text-gray-300">
-                Address
-                <input id="orderAddress" type="text" class="mt-1 w-full rounded-xl border border-gray-700 bg-gray-950 px-4 py-3 text-sm text-white placeholder-gray-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-gold" placeholder="Street, Building, Apartment">
-              </label>
-              <label class="block text-sm font-medium text-gray-300">
-                Delivery zone
-                <select id="deliveryZone" class="mt-1 w-full rounded-xl border border-gray-700 bg-gray-950 px-4 py-3 text-sm text-white focus:border-transparent focus:outline-none focus:ring-2 focus:ring-gold">
-                  <option value="" disabled selected>Select your zone</option>
-                </select>
-              </label>
-            </fieldset>
-            <label class="block text-sm font-medium text-gray-300">
-              Order notes
-              <textarea id="orderNotes" rows="2" class="mt-1 w-full rounded-xl border border-gray-700 bg-gray-950 px-4 py-3 text-sm text-white placeholder-gray-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-gold" placeholder="Sauces, no pickles, etc."></textarea>
-            </label>
-            <textarea id="orderItems" class="hidden" aria-hidden="true"></textarea>
-            <button id="orderSubmit" type="submit" class="w-full rounded-full bg-gold px-4 py-3 text-lg font-semibold text-black transition hover:scale-[1.02] hover:bg-yellow-500">Place Order</button>
-            <p id="orderStatus" class="min-h-[1.5rem] text-center text-sm text-gray-400"></p>
-          </form>
-        </section>
-      </aside>
-    </div>
-  </main>
+      <div class="grid2 order-layout">
+        <div class="panel">
+          <form id="orderForm" data-sync-collection="restaurants/tux/onlineOrders" data-sync-restaurant="tux" data-sync-webhook="" data-settings-doc="config/orderForm">
 
-  <script type="module" src="order.js"></script>
+            <!-- === CORRECTED CUSTOMER DETAILS SECTION === -->
+            <div class="form-field">
+              <label for="orderName">Full Name</label>
+              <input type="text" id="orderName" class="form-field" required placeholder="Full name" />
+            </div>
+
+            <div class="order-options" role="group" aria-label="Order type">
+              <label><input type="radio" name="fulfillment" value="pickup" checked /> Pickup</label>
+              <label><input type="radio" name="fulfillment" value="delivery" /> Delivery</label>
+            </div>
+
+            <div class="form-field">
+              <label for="orderAddress">Delivery address</label>
+              <input id="orderAddress" class="form-field" type="text" placeholder="Street, City (required for delivery)" />
+            </div>
+
+            <div class="form-field" id="deliveryZoneField" style="display:none">
+              <label for="deliveryZone">Delivery zone</label>
+              <select id="deliveryZone" class="form-field">
+                <option value="" selected disabled>Select your delivery zone</option>
+                <option value="zahraa-el-maadi">Zahraa El Maadi — EGP 25</option>
+                <option value="kornish-el-maadi">Kornish El Maadi — EGP 40</option>
+              </select>
+            </div>
+            <p class="muted small" id="deliveryZoneNote" style="display:none">Delivery fees are added based on the selected zone.</p>
+
+            <div class="form-field">
+              <label for="orderPhone">Phone Number</label>
+              <div class="phone-input">
+                <span class="phone-input__prefix">+20</span>
+                <input type="tel" id="orderPhone" class="form-field phone-input__field" required pattern="^\d{10}$" inputmode="numeric" maxlength="10" title="Enter the 10 digits after +20" placeholder="Phone number (10 digits)" />
+              </div>
+            </div>
+
+            <div class="form-field">
+              <label for="orderEmail">Email Address</label>
+              <input type="email" id="orderEmail" class="form-field" placeholder="name@example.com" required />
+              <small class="muted">We'll send your order confirmation here.</small>
+            </div>
+            <!-- === END OF CORRECTED SECTION === -->
+
+
+            <fieldset class="order-fieldset" aria-labelledby="paymentLegend">
+              <legend id="paymentLegend">Payment method</legend>
+          <p class="muted small">We accept cash and Instapay for both pickup and delivery. Feel free to split your total between them.</p>
+              <div class="split-payment">
+                <div class="split-payment__option">
+                  <label class="split-payment__toggle">
+                    <input type="checkbox" id="paymentCash" checked>
+                    <span>Cash</span>
+                  </label>
+                  <label class="split-payment__amount">
+                    Cash amount
+                    <input
+                      id="cashAmount"
+                      class="form-field"
+                      type="number"
+                      min="0"
+                      step="0.5"
+                      inputmode="decimal"
+                      placeholder="0"
+                    >
+                  </label>
+                </div>
+                <div class="split-payment__option">
+                  <label class="split-payment__toggle">
+                    <input type="checkbox" id="paymentInstapay">
+                    <span>Instapay</span>
+                  </label>
+                  <label class="split-payment__amount">
+                    Instapay amount
+                    <input
+                      id="instapayAmount"
+                      class="form-field"
+                      type="number"
+                      min="0"
+                      step="0.5"
+                      inputmode="decimal"
+                      placeholder="0"
+                    >
+                  </label>
+                </div>
+                <p class="muted small split-payment__hint">Enter how much you’ll pay with each method — the amounts should add up to your order total.</p>
+              </div>
+            </fieldset>
+
+            <label class="order-notes-label">Any notes for us?
+              <textarea id="orderNotes" class="form-field order-notes" placeholder="Add sauce preferences, entrance instructions, etc."></textarea>
+            </label>
+
+            <textarea id="orderItems" class="form-field" hidden></textarea>
+
+            <button id="orderSubmit" class="btn green" type="submit">Place order</button>
+            <div id="orderStatus" class="muted"></div>
+          </form>
+        </div>
+
+        <aside class="panel panel--cart" aria-live="polite">
+          <h3>Your cart</h3>
+          <p id="emptyCart" class="muted">Pick your favorites from the menu to start an order.</p>
+          <ul id="cartItems" class="cart-list"></ul>
+          <div class="cart-summary">
+            <div class="cart-summary__row">
+              <div>Subtotal</div>
+              <div id="cartSubtotal">EGP 0.00</div>
+            </div>
+            <div class="cart-summary__row" id="deliveryFeeRow">
+              <div>Delivery fee</div>
+              <div id="cartDeliveryFee">EGP 0.00</div>
+            </div>
+            <div class="cart-summary__row cart-summary__row--total">
+              <div>Total</div>
+              <div id="cartTotal">EGP 0.00</div>
+            </div>
+          </div>
+          <button id="clearCart" class="btn outline" type="button">Clear cart</button>
+        </aside>
+      </div>
+
+      <div class="panel panel--menu">
+        <h3>Menu</h3>
+        <p class="muted">Tap an item to add it to your order. Extras are optional and priced per sandwich.</p>
+        <div id="menuList" class="menu-groups"></div>
+      </div>
+
+      <div class="panel">
+        <h3>Your recent orders</h3>
+        <p id="noOrders" class="muted">Once you place an order you’ll find it here.</p>
+        <ul id="recentOrders" class="order-history"></ul>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__row">
+      <div class="footer__brand">
+        <img src="assets/img/logo.jpg" alt="TUX" class="footer__logo">
+        <span>© 2025 TUX — Egypt</span>
+      </div>
+      <a class="footer__link" href="https://maps.app.goo.gl/V8U4SKzMqHvT5o2m7" target="_blank" rel="noreferrer">
+        El-Saada St – Zahraa El-Maadi • Open in Maps
+      </a>
+    </div>
+  </footer>
+
+  <script type="module" src="nav.js"></script>
+  <script type="module" src="order.js"></script>
 </body>
 </html>
