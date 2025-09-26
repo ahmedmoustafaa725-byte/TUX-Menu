@@ -82,9 +82,21 @@
             </label>
 
             <p class="muted small" id="deliveryZoneNote" style="display:none">Delivery fees are added based on the selected zone.</p>
-
-            <label>Phone number
-              <input id="orderPhone" class="form-field" type="tel" required pattern="^\d{10}$" inputmode="numeric" title="Enter the 10 digits after +20" placeholder="1234567890">
+ <label class="phone-field">Phone number
+              <div class="phone-input">
+                <span class="phone-input__prefix">+20</span>
+                <input
+                  id="orderPhone"
+                  class="form-field phone-input__field"
+                  type="tel"
+                  required
+                  pattern="^\d{10}$"
+                  inputmode="numeric"
+                  maxlength="10"
+                  title="Enter the 10 digits after +20"
+                  placeholder="Phone number (10 digits)"
+                >
+              </div>
             </label>
 
             <label>Email
