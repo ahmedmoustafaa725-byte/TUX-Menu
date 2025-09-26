@@ -54,7 +54,7 @@
             <input id="profileAddress" class="form-field" type="text" placeholder="Street, City">
           </label>
           <label>Phone number
-            <input id="profilePhone" class="form-field" type="tel" required placeholder="01X-XXXX-XXXX">
+            <input id="profilePhone" class="form-field" type="tel" required pattern="^\d{10}$" inputmode="numeric" title="Enter the 10 digits after +20" placeholder="1234567890">
           </label>
           <label>Email
             <input id="profileEmail" class="form-field" type="email" required readonly>
