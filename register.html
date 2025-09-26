@@ -40,9 +40,21 @@
           <label>Address
             <input id="address" type="text" required placeholder="Street, City" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:#0e0e0e;color:var(--ink)">
           </label>
-          <label>Phone
- <input id="phone" type="tel" required pattern="^\d{10}$" inputmode="numeric" title="Enter the 10 digits after +20" placeholder="1234567890" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:#0e0e0e;color:var(--ink)">
-          </label>
+          <label class="phone-field">Phone number
+            <div class="phone-input">
+              <span class="phone-input__prefix">+20</span>
+              <input
+                id="phone"
+                class="phone-input__field"
+                type="tel"
+                required
+                pattern="^\d{10}$"
+                inputmode="numeric"
+                maxlength="10"
+                title="Enter the 10 digits after +20"
+                placeholder="Phone number (10 digits)"
+              >
+            </div>
           <label>Email
             <input id="email" type="email" required placeholder="you@example.com" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:#0e0e0e;color:var(--ink)">
           </label>
