@@ -42,6 +42,7 @@ async function syncOrderToPOS(orderData) {
     // --- Customer Details ---
     customerName: orderData.customerName,
     customerPhone: orderData.phone,
+     customerEmail: orderData.email,
     deliveryAddress: orderData.address,
     deliveryZoneId: orderData.deliveryZoneId || "",
     
@@ -854,7 +855,12 @@ form?.addEventListener("submit", async (event) => {
     phoneEl.focus();
     return;
   }
-
+const email = emailEl.value.trim();
+  if (!email) {
+    showStatus("Email is required for order updates.", true);
+    emailEl.focus();
+    return;
+  }
   const instructions = notesEl.value.trim();
   const fulfillment = selectedFulfillment();
   const paymentMethod = selectedPayment();
