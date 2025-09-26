@@ -5,6 +5,7 @@ import { doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-
 const headerLink = document.getElementById("accountLink");
 const mobileLink = document.getElementById("accountLinkMobile");
 const logoutLink = document.getElementById("logoutLink");
+const accountDock = document.getElementById("accountDock");
 const orderLink = document.getElementById("orderLink");
 const orderLinkMobile = document.getElementById("orderLinkMobile");
 
@@ -22,7 +23,13 @@ onAuthStateChanged(auth, async (user) => {
   if (orderLink) orderLink.href = orderTarget;
   if (orderLinkMobile) orderLinkMobile.href = orderTarget;
 
-  if (!headerLink && !mobileLink) return;
+  let summary = null;
+
+  if (!headerLink && !mobileLink && !accountDock) {
+    summary = user
+      ? { uid: user.uid, email: user.email || "" }
+      : null;
+  }
 
   if (user) {
     let displayName = user.displayName || "";
@@ -39,6 +46,12 @@ onAuthStateChanged(auth, async (user) => {
 
     const shown = displayName || (user.email ? user.email.split("@")[0] : "Account");
 
+    summary = {
+      uid: user.uid,
+      email: user.email || "",
+      displayName: shown,
+    };
+
     if (headerLink) {
       headerLink.textContent = shown;
       headerLink.href = profileHref;
@@ -50,7 +63,15 @@ onAuthStateChanged(auth, async (user) => {
       mobileLink.href = profileHref;
       mobileLink.classList.add("is-authenticated");
     }
+
+    if (accountDock instanceof HTMLAnchorElement) {
+      accountDock.href = profileHref;
+      const label = accountDock.querySelector(".floating-dock__label");
+      if (label) label.textContent = "Profile";
+    }
   } else {
+    summary = null;
+
     if (headerLink) {
       headerLink.textContent = "Login / Sign up";
       headerLink.href = loginHref;
@@ -62,7 +83,20 @@ onAuthStateChanged(auth, async (user) => {
       mobileLink.href = loginHref;
       mobileLink.classList.remove("is-authenticated");
     }
+
+    if (accountDock instanceof HTMLAnchorElement) {
+      accountDock.href = loginHref;
+      const label = accountDock.querySelector(".floating-dock__label");
+      if (label) label.textContent = "Account";
+    }
   }
+
+  window.__tuxAuthUser = summary;
+  document.dispatchEvent(
+    new CustomEvent("tux-auth-change", {
+      detail: { user: summary },
+    })
+  );
 });
 
 logoutLink?.addEventListener("click", async (event) => {
