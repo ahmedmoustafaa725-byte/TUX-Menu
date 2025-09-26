@@ -47,56 +47,49 @@
 
       <div class="grid2 order-layout">
         <div class="panel">
-<form
-  id="orderForm"
+          <form id="orderForm" data-sync-collection="restaurants/tux/onlineOrders" data-sync-restaurant="tux" data-sync-webhook="" data-settings-doc="config/orderForm">
 
-  data-sync-collection="restaurants/tux/onlineOrders"
-  data-sync-restaurant="tux"
-  data-sync-webhook=""
-  data-settings-doc="config/orderForm"
->
-        
-        <label>Full name
-              <input id="orderName" class="form-field" type="text" required placeholder="Full name">
-            </label>
-
-            <div class="order-options" role="group" aria-label="Order type">
-              <label><input type="radio" name="fulfillment" value="pickup" checked> Pickup</label>
-              <label><input type="radio" name="fulfillment" value="delivery"> Delivery</label>
+            <!-- === CORRECTED CUSTOMER DETAILS SECTION === -->
+            <div class="form-field">
+              <label for="orderName">Full Name</label>
+              <input type="text" id="orderName" class="form-field" required placeholder="Full name" />
             </div>
 
-            <label>Delivery address
-              <input id="orderAddress" class="form-field" type="text" placeholder="Street, City (required for delivery)">
-            </label>
- <label id="deliveryZoneField" style="display:none">Delivery zone
+            <div class="order-options" role="group" aria-label="Order type">
+              <label><input type="radio" name="fulfillment" value="pickup" checked /> Pickup</label>
+              <label><input type="radio" name="fulfillment" value="delivery" /> Delivery</label>
+            </div>
+
+            <div class="form-field">
+              <label for="orderAddress">Delivery address</label>
+              <input id="orderAddress" class="form-field" type="text" placeholder="Street, City (required for delivery)" />
+            </div>
+
+            <div class="form-field" id="deliveryZoneField" style="display:none">
+              <label for="deliveryZone">Delivery zone</label>
               <select id="deliveryZone" class="form-field">
                 <option value="" selected disabled>Select your delivery zone</option>
                 <option value="zahraa-el-maadi">Zahraa El Maadi — EGP 25</option>
                 <option value="kornish-el-maadi">Kornish El Maadi — EGP 40</option>
               </select>
-            </label>
-
+            </div>
             <p class="muted small" id="deliveryZoneNote" style="display:none">Delivery fees are added based on the selected zone.</p>
- <label class="phone-field">Phone number
+
+            <div class="form-field">
+              <label for="orderPhone">Phone Number</label>
               <div class="phone-input">
                 <span class="phone-input__prefix">+20</span>
-                <input
-                  id="orderPhone"
-                  class="form-field phone-input__field"
-                  type="tel"
-                  required
-                  pattern="^\d{10}$"
-                  inputmode="numeric"
-                  maxlength="10"
-                  title="Enter the 10 digits after +20"
-                  placeholder="Phone number (10 digits)"
-                >
+                <input type="tel" id="orderPhone" class="form-field phone-input__field" required pattern="^\d{10}$" inputmode="numeric" maxlength="10" title="Enter the 10 digits after +20" placeholder="Phone number (10 digits)" />
               </div>
-            </label>
+            </div>
 
-            <label>Email
-              <input id="orderEmail" class="form-field" type="email" required readonly>
-            </label>
+            <div class="form-field">
+              <label for="orderEmail">Email Address</label>
+              <input type="email" id="orderEmail" class="form-field" placeholder="name@example.com" required />
+              <small class="muted">We'll send your order confirmation here.</small>
+            </div>
+            <!-- === END OF CORRECTED SECTION === -->
+
 
             <fieldset class="order-fieldset" aria-labelledby="paymentLegend">
               <legend id="paymentLegend">Payment method</legend>
@@ -112,7 +105,6 @@
             </label>
 
             <textarea id="orderItems" class="form-field" hidden></textarea>
-
 
             <button id="orderSubmit" class="btn green" type="submit">Place order</button>
             <div id="orderStatus" class="muted"></div>
@@ -141,7 +133,7 @@
         </aside>
       </div>
 
-         <div class="panel panel--menu">
+      <div class="panel panel--menu">
         <h3>Menu</h3>
         <p class="muted">Tap an item to add it to your order. Extras are optional and priced per sandwich.</p>
         <div id="menuList" class="menu-groups"></div>
