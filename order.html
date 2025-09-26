@@ -6,147 +6,161 @@
   <title>TUX — Order Online</title>
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
-  <header class="topbar">
-    <div class="container bar">
+<body class="order-page">
+  <input type="checkbox" id="mobileNavToggle" class="nav-toggle-input" hidden aria-hidden="true">
+  <header class="site-header">
+    <div class="shell site-header__inner">
       <a href="index.html" class="brand" aria-label="TUX Home">
         <img src="assets/img/logo.jpg" alt="TUX logo" class="brand__logo">
-        <div class="brand__text">
-          <div class="brand__title">TUX</div>
-          <div class="brand__tag">Burgers Worth The Chase …</div>
-        </div>
+        <span class="brand__text">
+          <span class="brand__title">TUX</span>
+          <span class="brand__tag">Burgers Worth The Chase …</span>
+        </span>
       </a>
-      <nav class="nav">
-        <a href="index.html#menu">Menu</a>
-        <a href="index.html#gallery">Gallery</a>
-        <a href="index.html#location">Location</a>
-        <a href="index.html#contact">Contact</a>
-        <a href="order.html" id="orderLink" class="cta green">Order Online</a>
-        <a href="account.html" id="accountLink" class="cta gold">Login / Sign up</a>
-        <a href="#" id="logoutLink" style="display:none">Log out</a>
-        <a class="cta blue" href="https://forms.gle/rKJoUeHkgLoqTmmXA" target="_blank" rel="noreferrer">Help Us Improve</a>
+      <nav class="site-nav" aria-label="Primary">
+        <div class="site-nav__header">
+          <span>Navigate</span>
+          <label for="mobileNavToggle" class="nav-close" aria-label="Close menu">
+            <span></span>
+            <span></span>
+          </label>
+        </div>
+        <ul class="site-nav__links">
+          <li><a href="index.html#menu">Menu</a></li>
+          <li><a href="index.html#experience">Experience</a></li>
+          <li><a href="index.html#gallery">Gallery</a></li>
+          <li><a href="index.html#location">Location</a></li>
+          <li><a href="index.html#contact">Contact</a></li>
+        </ul>
+        <div class="site-nav__actions">
+          <a href="order.html" id="orderLink" class="nav-action nav-action--accent">
+            <span class="nav-action__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" role="img" focusable="false"><path d="M4.5 6.75h1.14l2.4 10.16a1.5 1.5 0 0 0 1.47 1.14h7.86a1.5 1.5 0 0 0 1.47-1.14l1.74-7.4H8.32" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10.75" cy="20" r="1.4" fill="currentColor"/><circle cx="17.25" cy="20" r="1.4" fill="currentColor"/></svg>
+            </span>
+            <span>Order Now</span>
+          </a>
+          <a href="order.html#cart" class="nav-action" aria-label="View cart">
+            <span class="nav-action__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" role="img" focusable="false"><path d="M3.5 4h1.79a1 1 0 0 1 .97.757L7 8.25h12l-1.5 6h-9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10" cy="19" r="1.5" fill="currentColor"/><circle cx="17" cy="19" r="1.5" fill="currentColor"/></svg>
+            </span>
+            <span class="nav-action__label">Cart</span>
+          </a>
+          <a href="account.html" id="accountLink" class="nav-action">
+            <span class="nav-action__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" role="img" focusable="false"><path d="M12 12.5c3.038 0 5.5-2.462 5.5-5.5S15.038 1.5 12 1.5 6.5 3.962 6.5 7s2.462 5.5 5.5 5.5Zm0 3c-4.142 0-7.5 2.91-7.5 6.5h15c0-3.59-3.358-6.5-7.5-6.5Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="nav-action__label">Account</span>
+          </a>
+          <a href="#" id="logoutLink" class="nav-action nav-action--subtle" style="display:none">Sign out</a>
+        </div>
+        <div class="site-nav__mobile">
+          <a href="order.html" id="orderLinkMobile" class="btn btn--primary">Order Now</a>
+          <a href="profile.html" class="btn btn--ghost">Track orders</a>
+          <a href="account.html" id="accountLinkMobile" class="btn btn--outline">Your Account</a>
+        </div>
       </nav>
+      <label class="nav-toggle" for="mobileNavToggle" aria-label="Open menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </label>
     </div>
   </header>
+  <label for="mobileNavToggle" class="nav-overlay" aria-hidden="true"></label>
 
-  <nav class="quick-nav" aria-label="Quick access">
-    <a href="order.html" id="orderLinkMobile" class="btn green">Order Online</a>
-    <a href="account.html" id="accountLinkMobile" class="btn">Login / Sign up</a>
-    <a href="index.html#menu">Menu</a>
-    <a href="index.html#gallery">Gallery</a>
-    <a href="index.html#location">Location</a>
-    <a href="index.html#contact">Contact</a>
-  </nav>
+  <section class="order-hero">
+    <div class="shell order-hero__inner">
+      <h1>Polished ordering. Flawless fulfilment.</h1>
+      <p>Craft your meal, pick fulfillment, and split payments in one sophisticated interface.</p>
+      <ol class="order-steps">
+        <li><strong>Personalize</strong>Save your name, address, and delivery preferences securely.</li>
+        <li><strong>Optimize</strong>Smart delivery zones and transparent fees update instantly.</li>
+        <li><strong>Balance</strong>Cash + Instapay support keeps checkout flexible and fast.</li>
+        <li><strong>Review</strong>Access your recent orders and reorder in two taps.</li>
+      </ol>
+    </div>
+  </section>
 
-  <main class="section">
-    <div class="container" style="max-width:760px">
-      <header class="section__head">
-        <h2>Order Online</h2>
-        <p class="muted">Place a pickup or delivery order in seconds. We’ll use your saved details so you can check out faster.</p>
-      </header>
+  <main class="order-shell">
+    <div class="shell">
+      <div class="order-grid">
+        <form id="orderForm" class="form-card" data-sync-collection="restaurants/tux/onlineOrders" data-sync-restaurant="tux" data-sync-webhook="" data-settings-doc="config/orderForm">
+          <h2>Let’s prepare your order</h2>
+          <p class="muted">Provide your contact details, choose pickup or delivery, then split payment however you like.</p>
 
-      <div class="grid2 order-layout">
-        <div class="panel">
-          <form id="orderForm" data-sync-collection="restaurants/tux/onlineOrders" data-sync-restaurant="tux" data-sync-webhook="" data-settings-doc="config/orderForm">
-
-            <!-- === CORRECTED CUSTOMER DETAILS SECTION === -->
-            <div class="form-field">
-              <label for="orderName">Full Name</label>
-              <input type="text" id="orderName" class="form-field" required placeholder="Full name" />
-            </div>
-
-            <div class="order-options" role="group" aria-label="Order type">
-              <label><input type="radio" name="fulfillment" value="pickup" checked /> Pickup</label>
-              <label><input type="radio" name="fulfillment" value="delivery" /> Delivery</label>
-            </div>
-
-            <div class="form-field">
-              <label for="orderAddress">Delivery address</label>
-              <input id="orderAddress" class="form-field" type="text" placeholder="Street, City (required for delivery)" />
-            </div>
-
-            <div class="form-field" id="deliveryZoneField" style="display:none">
-              <label for="deliveryZone">Delivery zone</label>
-              <select id="deliveryZone" class="form-field">
-                <option value="" selected disabled>Select your delivery zone</option>
-                <option value="zahraa-el-maadi">Zahraa El Maadi — EGP 25</option>
-                <option value="kornish-el-maadi">Kornish El Maadi — EGP 40</option>
-              </select>
-            </div>
-            <p class="muted small" id="deliveryZoneNote" style="display:none">Delivery fees are added based on the selected zone.</p>
-
-            <div class="form-field">
-              <label for="orderPhone">Phone Number</label>
-              <div class="phone-input">
-                <span class="phone-input__prefix">+20</span>
-                <input type="tel" id="orderPhone" class="form-field phone-input__field" required pattern="^\d{10}$" inputmode="numeric" maxlength="10" title="Enter the 10 digits after +20" placeholder="Phone number (10 digits)" />
+          <div class="form-grid">
+            <section class="form-section">
+              <h3>1. Your information</h3>
+              <label>Full name
+                <input type="text" id="orderName" class="form-field" required placeholder="Full name">
+              </label>
+              <div class="order-options" role="group" aria-label="Order type">
+                <label><input type="radio" name="fulfillment" value="pickup" checked> Pickup</label>
+                <label><input type="radio" name="fulfillment" value="delivery"> Delivery</label>
               </div>
-            </div>
-
-            <div class="form-field">
-              <label for="orderEmail">Email Address</label>
-              <input type="email" id="orderEmail" class="form-field" placeholder="name@example.com" required />
-              <small class="muted">We'll send your order confirmation here.</small>
-            </div>
-            <!-- === END OF CORRECTED SECTION === -->
-
-
-            <fieldset class="order-fieldset" aria-labelledby="paymentLegend">
-              <legend id="paymentLegend">Payment method</legend>
-          <p class="muted small">We accept cash and Instapay for both pickup and delivery. Feel free to split your total between them.</p>
-              <div class="split-payment">
-                <div class="split-payment__option">
-                  <label class="split-payment__toggle">
-                    <input type="checkbox" id="paymentCash" checked>
-                    <span>Cash</span>
-                  </label>
-                  <label class="split-payment__amount">
-                    Cash amount
-                    <input
-                      id="cashAmount"
-                      class="form-field"
-                      type="number"
-                      min="0"
-                      step="0.5"
-                      inputmode="decimal"
-                      placeholder="0"
-                    >
-                  </label>
-                </div>
-                <div class="split-payment__option">
-                  <label class="split-payment__toggle">
-                    <input type="checkbox" id="paymentInstapay">
-                    <span>Instapay</span>
-                  </label>
-                  <label class="split-payment__amount">
-                    Instapay amount
-                    <input
-                      id="instapayAmount"
-                      class="form-field"
-                      type="number"
-                      min="0"
-                      step="0.5"
-                      inputmode="decimal"
-                      placeholder="0"
-                    >
-                  </label>
-                </div>
-                <p class="muted small split-payment__hint">Enter how much you’ll pay with each method — the amounts should add up to your order total.</p>
+              <label>Delivery address
+                <input id="orderAddress" class="form-field" type="text" placeholder="Street, City (required for delivery)">
+              </label>
+              <div class="form-section" id="deliveryZoneField" style="display:none">
+                <label for="deliveryZone">Delivery zone</label>
+                <select id="deliveryZone" class="form-field">
+                  <option value="" selected disabled>Select your delivery zone</option>
+                  <option value="zahraa-el-maadi">Zahraa El Maadi — EGP 25</option>
+                  <option value="kornish-el-maadi">Kornish El Maadi — EGP 40</option>
+                </select>
               </div>
-            </fieldset>
+              <p class="muted small" id="deliveryZoneNote" style="display:none">Delivery fees are added based on the selected zone.</p>
+              <label>Phone number
+                <div class="phone-input">
+                  <span class="phone-input__prefix">+20</span>
+                  <input type="tel" id="orderPhone" class="form-field phone-input__field" required pattern="^\d{10}$" inputmode="numeric" maxlength="10" title="Enter the 10 digits after +20" placeholder="Phone number (10 digits)">
+                </div>
+              </label>
+              <label>Email address
+                <input type="email" id="orderEmail" class="form-field" placeholder="name@example.com" required>
+                <small class="muted">We'll send your order confirmation here.</small>
+              </label>
+            </section>
 
-            <label class="order-notes-label">Any notes for us?
-              <textarea id="orderNotes" class="form-field order-notes" placeholder="Add sauce preferences, entrance instructions, etc."></textarea>
-            </label>
+            <section class="form-section">
+              <h3>2. Payment preferences</h3>
+              <fieldset class="order-fieldset" aria-labelledby="paymentLegend">
+                <legend id="paymentLegend">Payment method</legend>
+                <p class="muted small">We accept cash and Instapay for both pickup and delivery. Feel free to split your total between them.</p>
+                <div class="split-payment">
+                  <div class="split-payment__option">
+                    <label class="split-payment__toggle">
+                      <input type="checkbox" id="paymentCash" checked>
+                      <span>Cash</span>
+                    </label>
+                    <label class="split-payment__amount">Cash amount
+                      <input id="cashAmount" class="form-field" type="number" min="0" step="0.5" inputmode="decimal" placeholder="0">
+                    </label>
+                  </div>
+                  <div class="split-payment__option">
+                    <label class="split-payment__toggle">
+                      <input type="checkbox" id="paymentInstapay">
+                      <span>Instapay</span>
+                    </label>
+                    <label class="split-payment__amount">Instapay amount
+                      <input id="instapayAmount" class="form-field" type="number" min="0" step="0.5" inputmode="decimal" placeholder="0">
+                    </label>
+                  </div>
+                  <p class="muted small">Enter how much you’ll pay with each method — the amounts should add up to your order total.</p>
+                </div>
+              </fieldset>
+              <label class="form-section">Any notes for us?
+                <textarea id="orderNotes" class="form-field order-notes" placeholder="Add sauce preferences, entrance instructions, etc."></textarea>
+              </label>
+            </section>
+          </div>
 
-            <textarea id="orderItems" class="form-field" hidden></textarea>
+          <textarea id="orderItems" class="form-field" hidden></textarea>
+          <button id="orderSubmit" class="btn btn--primary" type="submit">Place order</button>
+          <div id="orderStatus" class="muted"></div>
+        </form>
 
-            <button id="orderSubmit" class="btn green" type="submit">Place order</button>
-            <div id="orderStatus" class="muted"></div>
-          </form>
-        </div>
-
-        <aside class="panel panel--cart" aria-live="polite">
+        <aside class="panel order-summary" aria-live="polite">
           <h3>Your cart</h3>
           <p id="emptyCart" class="muted">Pick your favorites from the menu to start an order.</p>
           <ul id="cartItems" class="cart-list"></ul>
@@ -164,7 +178,7 @@
               <div id="cartTotal">EGP 0.00</div>
             </div>
           </div>
-          <button id="clearCart" class="btn outline" type="button">Clear cart</button>
+          <button id="clearCart" class="btn btn--ghost" type="button">Clear cart</button>
         </aside>
       </div>
 
@@ -183,16 +197,25 @@
   </main>
 
   <footer class="footer">
-    <div class="container footer__row">
+    <div class="shell footer__inner">
       <div class="footer__brand">
         <img src="assets/img/logo.jpg" alt="TUX" class="footer__logo">
         <span>© 2025 TUX — Egypt</span>
       </div>
-      <a class="footer__link" href="https://maps.app.goo.gl/V8U4SKzMqHvT5o2m7" target="_blank" rel="noreferrer">
-        El-Saada St – Zahraa El-Maadi • Open in Maps
-      </a>
+      <div class="footer__links">
+        <a href="https://maps.app.goo.gl/V8U4SKzMqHvT5o2m7" target="_blank" rel="noreferrer">Directions</a>
+        <a href="mailto:hello@tuxtheburger.com">hello@tuxtheburger.com</a>
+        <a href="https://forms.gle/rKJoUeHkgLoqTmmXA" target="_blank" rel="noreferrer">Feedback</a>
+      </div>
     </div>
   </footer>
+
+  <nav class="quick-nav" aria-label="Quick actions">
+    <a href="order.html" id="orderLinkQuick" class="quick-nav__btn">Order</a>
+    <a href="#menuList" class="quick-nav__btn">Menu</a>
+    <a href="#recentOrders" class="quick-nav__btn">History</a>
+    <a href="account.html" id="accountLinkQuick" class="quick-nav__btn">Account</a>
+  </nav>
 
   <script type="module" src="nav.js"></script>
   <script type="module" src="order.js"></script>
