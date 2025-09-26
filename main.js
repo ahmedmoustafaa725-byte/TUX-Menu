@@ -188,7 +188,6 @@ const state = loadState();
 
 const quickNavToggle = document.getElementById("quickNavToggle");
 const quickNavPanel = document.getElementById("quickNavPanel");
-const orderPanel = document.getElementById("quickOrderPanel");
 const cartPanel = document.getElementById("quickCartPanel");
 const orderDock = document.getElementById("orderDock");
 const cartDock = document.getElementById("cartDock");
@@ -549,7 +548,12 @@ function hydrateForm() {
 function getAuthUser() {
   return window.__tuxAuthUser || null;
 }
-
+function navigateToOrderPage() {
+  const destination = getAuthUser()
+    ? "order.html"
+    : `account.html?redirect=${encodeURIComponent("order.html")}`;
+  window.location.href = destination;
+}
 function handlePlaceOrder(event) {
   event.preventDefault();
   if (!state.cart.length) {
@@ -583,17 +587,15 @@ function handlePlaceOrder(event) {
     console.warn("Could not persist transfer payload", err);
   }
 
-  const destination = getAuthUser()
-    ? "order.html"
-    : `account.html?redirect=${encodeURIComponent("order.html")}`;
-  window.location.href = destination;
+  navigateToOrderPage();
+
 }
 
 function attachEvents() {
   quickNavToggle?.addEventListener("click", () => openOverlay(quickNavPanel));
 
-  orderDock?.addEventListener("click", () => openOverlay(orderPanel));
-  heroOrderBtn?.addEventListener("click", () => openOverlay(orderPanel));
+  orderDock?.addEventListener("click", navigateToOrderPage);
+  heroOrderBtn?.addEventListener("click", navigateToOrderPage);
 
   cartDock?.addEventListener("click", () => openOverlay(cartPanel));
 
