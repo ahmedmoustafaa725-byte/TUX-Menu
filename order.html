@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
   <script>
      tailwind.config = {
         theme: {
@@ -22,106 +23,281 @@
      };
   </script>
   <style>
-     body { background: #0a0a0a; color: #f5f5f5; font-family: 'Inter', sans-serif; }
-     .menu-column::-webkit-scrollbar { width: 8px; }
-     .menu-column::-webkit-scrollbar-track { background: #121212; }
-     .menu-column::-webkit-scrollbar-thumb { background: #2e2e2e; border-radius: 4px; }
-     .menu-column::-webkit-scrollbar-thumb:hover { background: #3f3f3f; }
+     :root {
+        color-scheme: dark;
+     }
+
+     body.order-page {
+        min-height: 100vh;
+        font-family: 'Inter', sans-serif;
+        background:
+           radial-gradient(circle at top, rgba(245, 201, 106, 0.16), transparent 48%),
+           radial-gradient(circle at bottom right, rgba(56, 189, 248, 0.18), transparent 38%),
+           #05060b;
+        color: #f7f7fb;
+     }
+
+     .order-page .menu-column::-webkit-scrollbar {
+        width: 8px;
+     }
+
+     .order-page .menu-column::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.06);
+     }
+
+     .order-page .menu-column::-webkit-scrollbar-thumb {
+        background: rgba(245, 201, 106, 0.45);
+        border-radius: 999px;
+     }
+
+     .surface-card {
+        position: relative;
+        border-radius: 26px;
+        padding: 28px;
+        background: linear-gradient(145deg, rgba(13, 16, 26, 0.92), rgba(7, 9, 18, 0.85));
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 32px 72px rgba(5, 7, 12, 0.58);
+        backdrop-filter: blur(20px);
+        overflow: hidden;
+     }
+
+     .surface-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background: radial-gradient(circle at top left, rgba(245, 201, 106, 0.18), transparent 55%);
+        pointer-events: none;
+     }
+
+     .surface-card > * {
+        position: relative;
+        z-index: 1;
+     }
+
+     #cartItems {
+        display: grid;
+        gap: 18px;
+        max-height: 320px;
+        overflow-y: auto;
+        padding-right: 6px;
+     }
+
+     #cartItems::-webkit-scrollbar {
+        width: 6px;
+     }
+
+     #cartItems::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.18);
+        border-radius: 999px;
+     }
+
+     .order-page .cart-item {
+        list-style: none;
+        padding: 18px;
+        border-radius: 18px;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(6, 8, 16, 0.7));
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 18px 40px rgba(5, 7, 12, 0.45);
+     }
+
+     .order-page .cart-item__row {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: flex-start;
+     }
+
+     .order-page .cart-item__name {
+        font-weight: 600;
+        letter-spacing: 0.01em;
+     }
+
+     .order-page .cart-item__extras {
+        margin-top: 8px;
+        font-size: 0.78rem;
+        color: rgba(198, 202, 220, 0.82);
+     }
+
+     .order-page .cart-item__controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 12px;
+        align-items: center;
+     }
+
+     .order-page .cart-item__btn {
+        padding: 6px 12px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(7, 8, 14, 0.6);
+        color: inherit;
+        transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+     }
+
+     .order-page .cart-item__btn:hover {
+        border-color: rgba(245, 201, 106, 0.6);
+        color: var(--primary);
+        transform: translateY(-1px);
+     }
+
+     .order-page .cart-item__qty {
+        width: 72px;
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(6, 8, 16, 0.65);
+        color: inherit;
+        padding: 6px 10px;
+        text-align: center;
+     }
+
+     .split-fields {
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 18px;
+        padding: 18px;
+     }
+
+     .order-page .accent-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 14px;
+        border-radius: 999px;
+        background: rgba(245, 201, 106, 0.12);
+        color: rgba(245, 201, 106, 0.85);
+        font-size: 0.75rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+     }
+
+     @media (max-width: 1024px) {
+        body.order-page {
+           background:
+              radial-gradient(circle at top, rgba(245, 201, 106, 0.2), transparent 55%),
+              #05060b;
+        }
+
+        .surface-card {
+           padding: 24px;
+        }
+     }
   </style>
 </head>
-<body>
-  <header class="sticky top-0 z-50 border-b border-gray-800 bg-black/80 backdrop-blur-sm">
-     <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+<body class="order-page">
+  <header class="sticky top-0 z-50 border-b border-white/10 bg-slate-950/75 backdrop-blur-xl">
+     <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
         <a href="index.html" class="flex items-center gap-3" aria-label="TUX Home">
-           <img src="assets/img/logo.jpg" alt="TUX logo" class="h-12 w-12 rounded-lg border border-gold p-1">
-           <div>
-              <span class="font-brand text-2xl font-semibold text-gold">TUX</span>
-              <span class="hidden text-xs text-gray-400 sm:block">Order Online</span>
+           <img src="assets/img/logo.jpg" alt="TUX logo" class="h-12 w-12 rounded-2xl border border-gold/70 bg-black/60 p-1">
+           <div class="flex flex-col">
+              <span class="font-brand text-2xl font-semibold tracking-[0.08em] text-gold">TUX</span>
+              <span class="accent-pill mt-1 hidden sm:inline-flex">Order Online</span>
            </div>
         </a>
-        <nav class="hidden items-center space-x-6 text-sm font-medium lg:flex">
-           <a href="index.html#menu" class="text-gray-300 transition hover:text-gold">Menu</a>
-           <a id="accountLink" href="profile.html" class="rounded-full bg-gold px-5 py-2 font-semibold text-black transition hover:scale-105 hover:bg-yellow-500">My Account</a>
-           <a id="logoutLink" href="#" class="hidden text-gray-300 transition hover:text-gold">Log out</a>
+        <nav class="hidden items-center gap-6 text-sm font-medium lg:flex">
+           <a href="index.html#menu" class="text-gray-300 transition hover:text-gold">Back to Menu</a>
+           <a id="accountLink" href="account.html" class="rounded-full bg-gold px-5 py-2 font-semibold text-black transition hover:scale-105 hover:bg-yellow-500">My Account</a>
+           <a id="logoutLink" href="#" class="rounded-full border border-white/20 px-5 py-2 text-gray-200 transition hover:border-gold hover:text-gold">Log out</a>
         </nav>
-        <button id="mobileMenuButton" class="text-gray-300 transition hover:text-gold lg:hidden" aria-label="Toggle navigation">
+        <button id="mobileMenuButton" class="text-gray-300 transition hover:text-gold lg:hidden" aria-label="Toggle navigation" aria-expanded="false">
            <svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
            </svg>
         </button>
      </div>
-     <div id="mobileMenu" class="hidden border-t border-gray-800 bg-black/95 lg:hidden">
+     <div id="mobileMenu" class="hidden border-t border-white/10 bg-slate-950/95 lg:hidden">
         <nav class="flex flex-col space-y-4 px-4 pt-4 pb-6 text-sm font-medium">
-           <a href="index.html#menu" class="text-gray-300 transition hover:text-gold">Full Menu</a>
-           <a id="accountLinkMobile" href="profile.html" class="rounded-full bg-gold px-4 py-2 text-center font-semibold text-black transition hover:bg-yellow-500">My Account</a>
-           <a id="logoutLinkMobile" href="#" class="hidden rounded-full bg-gray-800 px-4 py-2 text-center font-semibold text-white transition hover:bg-gray-700">Log out</a>
+           <a href="index.html#menu" class="text-gray-300 transition hover:text-gold">Back to Menu</a>
+           <a id="accountLinkMobile" href="account.html" class="rounded-full bg-gold px-4 py-2 text-center font-semibold text-black transition hover:bg-yellow-500">My Account</a>
+           <a id="logoutLinkMobile" href="#" class="hidden rounded-full border border-white/15 px-4 py-2 text-center font-semibold text-white transition hover:border-gold hover:text-gold">Log out</a>
         </nav>
      </div>
   </header>
 
-  <main class="mx-auto max-w-6xl px-4 py-10">
+  <main class="relative mx-auto max-w-6xl px-4 py-12 lg:py-16">
+     <div class="pointer-events-none absolute inset-0 -z-[1] bg-[radial-gradient(circle_at_bottom_left,rgba(79,70,229,0.18),transparent_55%)]"></div>
      <div class="lg:grid lg:grid-cols-5 lg:gap-10">
-        <section class="menu-column lg:col-span-3 lg:h-[calc(100vh-140px)] lg:overflow-y-auto">
-           <header class="mb-10 text-center lg:text-left">
-              <h1 class="font-brand text-4xl font-semibold text-gold md:text-5xl">Place an Order</h1>
-              <p class="mt-2 text-gray-400">Tap an item to add it to your cart. Extras are optional and charged per item.</p>
+        <section class="menu-column lg:col-span-3 lg:h-[calc(100vh-160px)] lg:overflow-y-auto">
+           <header class="mb-12 text-center lg:text-left">
+              <p class="text-sm uppercase tracking-[0.45em] text-gray-400">Tux Burger Truck</p>
+              <h1 class="mt-3 font-brand text-4xl font-semibold text-gold md:text-5xl">Build your order</h1>
+              <p class="mt-3 text-base text-gray-300">Tap any item to add it to your cart. Extras are optional—mix, match, and customise to your taste.</p>
            </header>
            <div id="menuList" class="space-y-10"></div>
         </section>
 
-        <aside class="lg:col-span-2 mt-10 space-y-6 lg:mt-0">
-           <section id="cartPanel" class="rounded-2xl border border-gray-800 bg-black/60 p-6 shadow-xl">
-              <h2 class="font-brand text-2xl font-semibold">Your Cart</h2>
-              <div id="cartItems" class="mt-4 max-h-60 space-y-4 overflow-y-auto pr-1">
-                 <p id="emptyCart" class="text-gray-400">Your cart is empty.</p>
+        <aside class="mt-12 space-y-8 lg:col-span-2 lg:mt-0">
+           <section id="cartPanel" class="surface-card space-y-5">
+              <div class="flex items-start justify-between gap-3">
+                 <div>
+                    <h2 class="font-brand text-2xl font-semibold">Your Cart</h2>
+                    <p class="text-sm text-gray-400">Review items before checkout.</p>
+                 </div>
+                 <span class="rounded-full border border-white/15 px-3 py-1 text-xs uppercase tracking-[0.2em] text-gray-300">Live</span>
               </div>
-              <div id="cartSummary" class="mt-4 hidden space-y-2 border-t border-gray-800 pt-4 text-sm">
+              <div id="cartItems">
+                 <p id="emptyCart" class="rounded-2xl border border-dashed border-white/15 px-4 py-6 text-center text-sm text-gray-400">Your cart is empty. Start adding your favourites.</p>
+              </div>
+              <div id="cartSummary" class="hidden space-y-3 border-t border-white/10 pt-4 text-sm">
                  <div class="flex justify-between text-gray-300"><span>Subtotal</span><span id="cartSubtotal">EGP 0.00</span></div>
                  <div id="deliveryFeeRow" class="hidden justify-between text-gray-300"><span>Delivery Fee</span><span id="cartDeliveryFee">EGP 0.00</span></div>
-                 <div class="flex justify-between text-xl font-semibold text-gold"><span>Total</span><span id="cartTotal">EGP 0.00</span></div>
+                 <div class="flex justify-between text-lg font-semibold text-gold"><span>Total</span><span id="cartTotal">EGP 0.00</span></div>
+                 <div id="paymentSummary" class="hidden space-y-1 border-t border-white/10 pt-3 text-xs text-gray-300">
+                    <div id="cashSummaryRow" class="flex justify-between"><span>Cash</span><span id="cashSummaryAmount">EGP 0.00</span></div>
+                    <div id="instapaySummaryRow" class="flex justify-between"><span>Instapay</span><span id="instapaySummaryAmount">EGP 0.00</span></div>
+                 </div>
               </div>
-              <button id="clearCart" class="mt-4 hidden w-full text-sm font-semibold text-red-500 transition hover:text-red-400">Clear Cart</button>
+              <button id="clearCart" class="hidden w-full rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-red-400 transition hover:border-red-400 hover:text-red-300">Clear Cart</button>
            </section>
 
-           <section id="checkoutPanel" class="hidden rounded-2xl border border-gray-800 bg-black/60 p-6 shadow-xl">
-              <h2 class="font-brand text-2xl font-semibold">Checkout</h2>
-              <form id="orderForm" class="mt-4 space-y-4">
+           <section id="checkoutPanel" class="surface-card hidden space-y-5">
+              <div>
+                 <h2 class="font-brand text-2xl font-semibold">Checkout</h2>
+                 <p class="text-sm text-gray-400">Add your details and choose how you’ll receive your order.</p>
+              </div>
+              <form id="orderForm" class="space-y-5">
                  <fieldset>
                     <legend class="sr-only">Fulfilment</legend>
-                    <div class="flex gap-4">
-                       <label class="flex-1 cursor-pointer rounded-xl border border-gray-700 bg-gray-900/60 px-4 py-3 text-center font-semibold transition has-[:checked]:border-green-500 has-[:checked]:bg-green-600">
-                          <input type="radio" name="fulfillment" value="pickup" class="sr-only" checked>
-                          Pickup
+                    <div class="grid gap-3 sm:grid-cols-2">
+                       <label class="group relative flex cursor-pointer flex-col gap-1 rounded-2xl border border-white/15 bg-white/5 px-4 py-4 text-center text-sm font-semibold text-gray-200 transition hover:border-gold/60 hover:bg-white/10">
+                          <input type="radio" name="fulfillment" value="pickup" class="peer sr-only" checked>
+                          <span class="text-base text-white">Pickup</span>
+                          <span class="text-xs font-normal text-gray-400">Collect from the truck.</span>
+                          <span class="pointer-events-none absolute inset-0 rounded-2xl border border-transparent transition peer-checked:border-gold peer-checked:shadow-[0_18px_45px_rgba(215,185,104,0.25)]"></span>
                        </label>
-                       <label class="flex-1 cursor-pointer rounded-xl border border-gray-700 bg-gray-900/60 px-4 py-3 text-center font-semibold transition has-[:checked]:border-green-500 has-[:checked]:bg-green-600">
-                          <input type="radio" name="fulfillment" value="delivery" class="sr-only">
-                          Delivery
+                       <label class="group relative flex cursor-pointer flex-col gap-1 rounded-2xl border border-white/15 bg-white/5 px-4 py-4 text-center text-sm font-semibold text-gray-200 transition hover:border-gold/60 hover:bg-white/10">
+                          <input type="radio" name="fulfillment" value="delivery" class="peer sr-only">
+                          <span class="text-base text-white">Delivery</span>
+                          <span class="text-xs font-normal text-gray-400">Have it delivered to you.</span>
+                          <span class="pointer-events-none absolute inset-0 rounded-2xl border border-transparent transition peer-checked:border-gold peer-checked:shadow-[0_18px_45px_rgba(215,185,104,0.25)]"></span>
                        </label>
                     </div>
                  </fieldset>
-                 <fieldset class="space-y-4 border-t border-gray-800 pt-4">
+
+                 <fieldset class="space-y-4 border-t border-white/10 pt-4">
                     <legend class="sr-only">Your information</legend>
-                    <label class="block text-sm font-medium text-gray-300">
+                    <label class="block text-sm font-medium text-gray-200">
                       Full name
-                      <input id="orderName" type="text" required class="mt-1 w-full rounded-xl border border-gray-700 bg-gray-950 px-4 py-3 text-sm text-white placeholder-gray-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-gold">
+                      <input id="orderName" type="text" required class="mt-2 w-full rounded-2xl border border-white/15 bg-black/40 px-4 py-3 text-sm text-white placeholder-gray-500 transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-gold">
                     </label>
-                    <label class="block text-sm font-medium text-gray-300">
+                    <label class="block text-sm font-medium text-gray-200">
                       Phone (+20)
-                      <input id="orderPhone" type="tel" required pattern="^\d{10}$" placeholder="1098765432" class="mt-1 w-full rounded-xl border border-gray-700 bg-gray-950 px-4 py-3 text-sm text-white placeholder-gray-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-gold">
+                      <input id="orderPhone" type="tel" required pattern="^\d{10}$" placeholder="1098765432" class="mt-2 w-full rounded-2xl border border-white/15 bg-black/40 px-4 py-3 text-sm text-white placeholder-gray-500 transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-gold">
                     </label>
                     <input id="orderEmail" type="email" class="hidden">
                  </fieldset>
 
-                 <fieldset id="deliveryDetails" class="space-y-4 border-t border-gray-800 pt-4">
+                 <fieldset id="deliveryDetails" class="space-y-4 border-t border-white/10 pt-4">
                    <legend class="sr-only">Delivery details</legend>
-                   <label class="block text-sm font-medium text-gray-300">
+                   <label class="block text-sm font-medium text-gray-200">
                      Address
-                     <input id="orderAddress" type="text" class="mt-1 w-full rounded-xl border border-gray-700 bg-gray-950 px-4 py-3 text-sm text-white placeholder-gray-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-gold" placeholder="Street, Building, Apartment">
+                     <input id="orderAddress" type="text" class="mt-2 w-full rounded-2xl border border-white/15 bg-black/40 px-4 py-3 text-sm text-white placeholder-gray-500 transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-gold" placeholder="Street, Building, Apartment">
                    </label>
                    <div id="deliveryZoneField" class="space-y-2" style="display:none">
-                     <label class="block text-sm font-medium text-gray-300">
+                     <label class="block text-sm font-medium text-gray-200">
                        Delivery zone
-                       <select id="deliveryZone" class="mt-1 w-full rounded-xl border border-gray-700 bg-gray-950 px-4 py-3 text-sm text-white focus:border-transparent focus:outline-none focus:ring-2 focus:ring-gold">
+                       <select id="deliveryZone" class="mt-2 w-full rounded-2xl border border-white/15 bg-black/40 px-4 py-3 text-sm text-white transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-gold">
                          <option value="" disabled selected>Select your zone</option>
                        </select>
                      </label>
@@ -129,38 +305,48 @@
                    </div>
                  </fieldset>
 
-                 <label class="block text-sm font-medium text-gray-300">
+                 <label class="block text-sm font-medium text-gray-200">
                    Order notes
-                   <textarea id="orderNotes" rows="2" class="mt-1 w-full rounded-xl border border-gray-700 bg-gray-950 px-4 py-3 text-sm text-white placeholder-gray-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-gold" placeholder="Sauces, no pickles, etc."></textarea>
+                   <textarea id="orderNotes" rows="2" class="mt-2 w-full rounded-2xl border border-white/15 bg-black/40 px-4 py-3 text-sm text-white placeholder-gray-500 transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-gold" placeholder="Sauces, no pickles, etc."></textarea>
                  </label>
 
-                 <fieldset class="space-y-3 border-t border-gray-800 pt-4">
+                 <fieldset class="space-y-4 border-t border-white/10 pt-4">
                    <legend class="text-sm font-semibold text-gray-200">Payment</legend>
-                   <p class="text-xs text-gray-400">Pay in cash, Instapay, or split between both on delivery.</p>
-                   <div class="flex flex-wrap gap-4">
-                     <label class="flex items-center gap-3 text-sm text-gray-200">
-                       <input id="paymentCash" type="checkbox" class="h-5 w-5 rounded border-gray-600 bg-gray-900 text-gold focus:ring-gold" checked>
-                       Cash
+                   <p class="text-xs text-gray-400">Choose how you want to pay when your order is ready.</p>
+                   <div class="grid gap-3 sm:grid-cols-3" id="paymentMethodGrid">
+                     <label class="relative flex cursor-pointer flex-col gap-1 rounded-2xl border border-white/15 bg-white/5 px-4 py-4 text-sm text-gray-200 transition hover:border-gold/60 hover:bg-white/10">
+                       <input type="radio" name="paymentMethod" value="cash" class="peer sr-only" checked>
+                       <span class="text-base font-semibold text-white">Cash</span>
+                       <span class="text-xs text-gray-400">Pay the full total in cash.</span>
+                       <span class="pointer-events-none absolute inset-0 rounded-2xl border border-transparent transition peer-checked:border-gold peer-checked:shadow-[0_18px_45px_rgba(215,185,104,0.25)]"></span>
                      </label>
-                     <label class="flex items-center gap-3 text-sm text-gray-200">
-                       <input id="paymentInstapay" type="checkbox" class="h-5 w-5 rounded border-gray-600 bg-gray-900 text-gold focus:ring-gold">
-                       Instapay
+                     <label class="relative flex cursor-pointer flex-col gap-1 rounded-2xl border border-white/15 bg-white/5 px-4 py-4 text-sm text-gray-200 transition hover:border-gold/60 hover:bg-white/10">
+                       <input type="radio" name="paymentMethod" value="instapay" class="peer sr-only">
+                       <span class="text-base font-semibold text-white">Instapay</span>
+                       <span class="text-xs text-gray-400">Transfer the full total digitally.</span>
+                       <span class="pointer-events-none absolute inset-0 rounded-2xl border border-transparent transition peer-checked:border-gold peer-checked:shadow-[0_18px_45px_rgba(56,189,248,0.35)]"></span>
+                     </label>
+                     <label class="relative flex cursor-pointer flex-col gap-1 rounded-2xl border border-white/15 bg-white/5 px-4 py-4 text-sm text-gray-200 transition hover:border-gold/60 hover:bg-white/10">
+                       <input type="radio" name="paymentMethod" value="split" class="peer sr-only">
+                       <span class="text-base font-semibold text-white">Split</span>
+                       <span class="text-xs text-gray-400">Split between cash and Instapay.</span>
+                       <span class="pointer-events-none absolute inset-0 rounded-2xl border border-transparent transition peer-checked:border-gold peer-checked:shadow-[0_18px_45px_rgba(16,185,129,0.35)]"></span>
                      </label>
                    </div>
-                   <div class="grid gap-4 sm:grid-cols-2">
-                     <label class="text-sm font-medium text-gray-300">
+                   <div id="splitFields" class="split-fields hidden grid gap-4 sm:grid-cols-2">
+                     <label class="text-sm font-medium text-gray-200">
                        Cash amount
-                       <input id="cashAmount" type="number" min="0" step="0.5" placeholder="0.00" class="mt-1 w-full rounded-xl border border-gray-700 bg-gray-950 px-4 py-3 text-sm text-white placeholder-gray-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-gold">
+                       <input id="cashAmount" type="number" min="0" step="0.5" placeholder="0.00" class="mt-2 w-full rounded-2xl border border-white/15 bg-black/40 px-4 py-3 text-sm text-white placeholder-gray-500 transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-gold">
                      </label>
-                     <label class="text-sm font-medium text-gray-300">
+                     <label class="text-sm font-medium text-gray-200">
                        Instapay amount
-                       <input id="instapayAmount" type="number" min="0" step="0.5" placeholder="0.00" class="mt-1 w-full rounded-xl border border-gray-700 bg-gray-950 px-4 py-3 text-sm text-white placeholder-gray-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-gold">
+                       <input id="instapayAmount" type="number" min="0" step="0.5" placeholder="0.00" class="mt-2 w-full rounded-2xl border border-white/15 bg-black/40 px-4 py-3 text-sm text-white placeholder-gray-500 transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-sky-400">
                      </label>
                    </div>
                  </fieldset>
 
                  <textarea id="orderItems" class="hidden" aria-hidden="true"></textarea>
-                 <button id="orderSubmit" type="submit" class="w-full rounded-full bg-gold px-4 py-3 text-lg font-semibold text-black transition hover:scale-[1.02] hover:bg-yellow-500">Place Order</button>
+                 <button id="orderSubmit" type="submit" class="w-full rounded-full bg-gradient-to-r from-gold via-amber-400 to-orange-400 px-4 py-3 text-lg font-semibold text-black transition hover:scale-[1.02] hover:shadow-[0_20px_45px_rgba(215,185,104,0.35)]">Place Order</button>
                  <p id="orderStatus" class="min-h-[1.5rem] text-center text-sm text-gray-400"></p>
               </form>
            </section>
@@ -168,6 +354,7 @@
      </div>
   </main>
 
+  <script type="module" src="nav.js"></script>
   <script type="module" src="order.js"></script>
 </body>
 </html>
