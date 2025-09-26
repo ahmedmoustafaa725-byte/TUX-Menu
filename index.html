@@ -9,245 +9,345 @@
   <link rel="apple-touch-icon" href="assets/img/logo.jpg">
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
-  <!-- Topbar -->
-  <header class="topbar">
-    <div class="container bar">
+<body class="home">
+  <input type="checkbox" id="mobileNavToggle" class="nav-toggle-input" hidden aria-hidden="true">
+  <header class="site-header">
+    <div class="shell site-header__inner">
       <a href="#" class="brand" aria-label="TUX Home">
         <img src="assets/img/logo.jpg" alt="TUX logo" class="brand__logo">
-        <div class="brand__text">
-          <div class="brand__title">TUX</div>
-          <div class="brand__tag">Burgers Worth The Chase …</div>
-        </div>
+        <span class="brand__text">
+          <span class="brand__title">TUX</span>
+          <span class="brand__tag">Burgers Worth The Chase …</span>
+        </span>
       </a>
-      <nav class="nav">
-        <a href="#menu">Menu</a>
-        <a href="#gallery">Gallery</a>
-        <a href="#location">Location</a>
-        <a href="#contact">Contact</a>
-       <a href="order.html" id="orderLink" class="cta green">Order Online</a>
-        <a href="account.html" id="accountLink" class="cta gold">Login / Sign up</a>
-        <a href="#" id="logoutLink" style="display:none">Log out</a>
-        <a class="cta blue" href="https://forms.gle/rKJoUeHkgLoqTmmXA" target="_blank" rel="noreferrer">Help Us Improve</a>
+      <nav class="site-nav" aria-label="Primary">
+        <div class="site-nav__header">
+          <span>Navigate</span>
+          <label for="mobileNavToggle" class="nav-close" aria-label="Close menu">
+            <span></span>
+            <span></span>
+          </label>
+        </div>
+        <ul class="site-nav__links">
+          <li><a href="#menu">Menu</a></li>
+          <li><a href="#experience">Experience</a></li>
+          <li><a href="#gallery">Gallery</a></li>
+          <li><a href="#location">Location</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+        <div class="site-nav__actions">
+          <a href="order.html" id="orderLink" class="nav-action nav-action--accent">
+            <span class="nav-action__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" role="img" focusable="false"><path d="M4.5 6.75h1.14l2.4 10.16a1.5 1.5 0 0 0 1.47 1.14h7.86a1.5 1.5 0 0 0 1.47-1.14l1.74-7.4H8.32" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10.75" cy="20" r="1.4" fill="currentColor"/><circle cx="17.25" cy="20" r="1.4" fill="currentColor"/></svg>
+            </span>
+            <span>Order Now</span>
+          </a>
+          <a href="order.html#cart" class="nav-action" aria-label="View cart">
+            <span class="nav-action__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" role="img" focusable="false"><path d="M3.5 4h1.79a1 1 0 0 1 .97.757L7 8.25h12l-1.5 6h-9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10" cy="19" r="1.5" fill="currentColor"/><circle cx="17" cy="19" r="1.5" fill="currentColor"/></svg>
+            </span>
+            <span class="nav-action__label">Cart</span>
+          </a>
+          <a href="account.html" id="accountLink" class="nav-action">
+            <span class="nav-action__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" role="img" focusable="false"><path d="M12 12.5c3.038 0 5.5-2.462 5.5-5.5S15.038 1.5 12 1.5 6.5 3.962 6.5 7s2.462 5.5 5.5 5.5Zm0 3c-4.142 0-7.5 2.91-7.5 6.5h15c0-3.59-3.358-6.5-7.5-6.5Z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            <span class="nav-action__label">Account</span>
+          </a>
+          <a href="#" id="logoutLink" class="nav-action nav-action--subtle" style="display:none">Sign out</a>
+        </div>
+        <div class="site-nav__mobile">
+          <a href="order.html" id="orderLinkMobile" class="btn btn--primary">
+            <span class="btn__icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" role="img" focusable="false"><path d="M4.5 6.75h1.14l2.4 10.16a1.5 1.5 0 0 0 1.47 1.14h7.86a1.5 1.5 0 0 0 1.47-1.14l1.74-7.4H8.32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            Order Now
+          </a>
+          <a href="account.html" id="accountLinkMobile" class="btn btn--outline">Your Account</a>
+        </div>
       </nav>
+      <label class="nav-toggle" for="mobileNavToggle" aria-label="Open menu">
+        <span></span>
+        <span></span>
+        <span></span>
+      </label>
     </div>
   </header>
+  <label for="mobileNavToggle" class="nav-overlay" aria-hidden="true"></label>
 
-  <!-- Quick access for mobile -->
-  <nav class="quick-nav" aria-label="Quick access">
-  <a href="order.html" id="orderLinkMobile" class="btn red">Order Online</a>
-    <a href="account.html" id="accountLinkMobile" class="btn">Login/Sign up</a>
-    <a href="#menu">Menu</a>
-    <a href="#location">Location</a>
-    <!-- Mobile-only review link -->
-    <a href="https://maps.app.goo.gl/V8U4SKzMqHvT5o2m7" target="_blank" rel="noreferrer">Review</a>
-  </nav>
-
-  <!-- Hero -->
-  <section class="hero" style="--hero:url('assets/img/poster-tuxify.jpg')">
-    <div class="veil"></div>
-    <div class="container hero__content">
-      <div class="hero__copy">
-        <h1>Elegance in Every Bite</h1>
-        <p>Smash burgers, golden fries, authentic hawawshi, and our signature <strong>TUXIFY</strong> line.</p>
-        <div class="actions">
-          <a class="btn red" href="https://wa.me/201151960048?text=Hi%20TUX%20I%20want%20to%20order%20" target="_blank" rel="noreferrer">Order Now</a>
-          <a class="btn outline" href="https://maps.app.goo.gl/V8U4SKzMqHvT5o2m7" target="_blank" rel="noreferrer">Find us on Maps</a>
+  <main>
+    <section class="hero" style="--hero:url('assets/img/poster-tuxify.jpg')">
+      <div class="shell hero__inner">
+        <div class="hero__content">
+          <p class="eyebrow">Modern Egyptian comfort food</p>
+          <h1>Elegance in Every Bite</h1>
+          <p>From indulgent smash burgers to wood-fired hawawshi and signature <strong>TUXIFY</strong> creations, every plate is choreographed to impress.</p>
+          <div class="hero__actions">
+            <a class="btn btn--primary" href="order.html">
+              <span class="btn__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M4.5 6.75h1.14l2.4 10.16a1.5 1.5 0 0 0 1.47 1.14h7.86a1.5 1.5 0 0 0 1.47-1.14l1.74-7.4H8.32" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </span>
+              Reserve your cravings
+            </a>
+            <a class="btn btn--ghost" href="#menu">Explore the menu</a>
+          </div>
+          <dl class="hero__stats">
+            <div>
+              <dt>Signature stacks</dt>
+              <dd>TUXIFY Double • Quatro Smash • Chili Fries</dd>
+            </div>
+            <div>
+              <dt>Service hours</dt>
+              <dd>Daily 1:00 PM – 3:00 AM</dd>
+            </div>
+          </dl>
+        </div>
+        <div class="hero__media" aria-hidden="true">
+          <div class="hero__card">
+            <img src="assets/img/menu-burger-fries.jpg" alt="TUX Burgers" loading="lazy">
+            <div class="hero__card-caption">
+              <span>Chef’s table</span>
+              <strong>Smash artistry &amp; elevated sides</strong>
+            </div>
+          </div>
+          <div class="hero__badge">
+            <span>Order ready in</span>
+            <strong>15 min</strong>
+          </div>
         </div>
       </div>
-      <div class="hero__logo">
-        <img src="assets/img/logo.jpg" alt="TUX">
+    </section>
+
+    <section class="section highlights" aria-label="TUX highlights">
+      <div class="shell">
+        <header class="section__head">
+          <h2>Designed for food lovers</h2>
+          <p class="muted">Each experience blends vibrant flavours with a refined atmosphere.</p>
+        </header>
+        <div class="highlight-grid">
+          <article class="highlight-card">
+            <span class="highlight-card__icon" aria-hidden="true">🔥</span>
+            <h3>Flame-kissed craftsmanship</h3>
+            <p>Bespoke patties seared to perfection, layered with caramelized onions, house sauces, and buttery brioche.</p>
+          </article>
+          <article class="highlight-card">
+            <span class="highlight-card__icon" aria-hidden="true">🥂</span>
+            <h3>Immersive dining ambience</h3>
+            <p>Low-light interiors, curated playlists, and velvet seating complement every bite with sophistication.</p>
+          </article>
+          <article class="highlight-card">
+            <span class="highlight-card__icon" aria-hidden="true">🚚</span>
+            <h3>Polished pickup &amp; delivery</h3>
+            <p>Intuitive ordering, live updates, and precision packaging keep the experience elevated wherever you dine.</p>
+          </article>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Menu -->
-  <section id="menu" class="section">
-    <div class="container">
-      <header class="section__head">
-        <h2>Our Menu</h2>
-        <p class="muted">Curated from our posters and menu boards.</p>
-      </header>
+    <section id="menu" class="section menu-showcase">
+      <div class="shell">
+        <header class="section__head">
+          <h2>A menu with swagger</h2>
+          <p class="muted">Signature burgers, hawawshi and sides engineered for indulgence.</p>
+        </header>
+        <div class="menu-panels">
+          <article class="menu-panel">
+            <header class="menu-panel__header">
+              <span class="menu-panel__tag">Smash Burgers</span>
+              <h3>Stacked to thrill</h3>
+            </header>
+            <ul class="menu-panel__list">
+              <li><span>Single Smashed Patty</span><span>95</span></li>
+              <li><span>Double Smashed Patty</span><span>140</span></li>
+              <li><span>Triple Smashed Patty</span><span>160</span></li>
+              <li><span>TUX Quatro Smashed</span><span>190</span></li>
+            </ul>
+            <p class="menu-panel__foot">Served with golden fries and signature TUX sauce.</p>
+          </article>
+          <article class="menu-panel">
+            <header class="menu-panel__header">
+              <span class="menu-panel__tag">TUXIFY</span>
+              <h3>Iconic originals</h3>
+            </header>
+            <ul class="menu-panel__list">
+              <li><span>Single</span><span>120</span></li>
+              <li><span>Double</span><span>160</span></li>
+              <li><span>Triple</span><span>200</span></li>
+              <li><span>Quatro</span><span>240</span></li>
+            </ul>
+            <p class="menu-panel__foot">A symphony of brioche, beef, American cheese, pickles, and TUXIFY glaze.</p>
+          </article>
+          <article class="menu-panel">
+            <header class="menu-panel__header">
+              <span class="menu-panel__tag">Hawawshi</span>
+              <h3>Cairo comfort reimagined</h3>
+            </header>
+            <ul class="menu-panel__list">
+              <li><span>Classic Hawawshi</span><span>80</span></li>
+              <li><span>TUX Hawawshi</span><span>100</span></li>
+              <li><span>Mozzarella add-on</span><span>20</span></li>
+              <li><span>Signature sauce</span><span>10</span></li>
+            </ul>
+            <p class="menu-panel__foot">Baladi bread toasted with our spice blend and molten mozzarella option.</p>
+          </article>
+        </div>
+        <div class="menu-details">
+          <div class="menu-details__card">
+            <h4>Sides &amp; fries</h4>
+            <p>Classic, cheese, chili, TUX fries, and Doppy fries layered with bacon, ranch, and jalapeños.</p>
+          </div>
+          <div class="menu-details__card">
+            <h4>Liquid refreshments</h4>
+            <p>Soft drinks, artisanal sodas, and crisp bottled water to balance the heat.</p>
+          </div>
+          <div class="menu-details__card">
+            <h4>Extras on demand</h4>
+            <p>Elevate every bite with extra patties, premium cheeses, ranch, jalapeños, or TUX sauce.</p>
+          </div>
+        </div>
+      </div>
+    </section>
 
-      <div class="menu-grid">
-        <div class="menu-card">
-          <h3>Smash Burgers <span class="note">served with fries</span></h3>
-          <ul class="menu-list">
-            <li><span>Single Smashed Patty</span><i></i><b>95.00</b><div class="ingredients">Smashed patty, cheese, TUX sauce, pickles, tomato, onion, lettuce.</div></li>
-            <li><span>Double Smashed Patty</span><i></i><b>140.00</b><div class="ingredients">2 smashed patties, cheese, TUX sauce, pickles, tomato, onion, lettuce.</div></li>
-            <li><span>Triple Smashed Patty</span><i></i><b>160.00</b><div class="ingredients">3 smashed patties, cheese, TUX sauce, pickles, tomato, onion, lettuce.</div></li>
-            <li><span>TUX Quatro Smashed Patty</span><i></i><b>190.00</b><div class="ingredients">4 smashed patties, cheese, TUX sauce, caramelized onion, mushroom.</div></li>
+    <section id="experience" class="section section--alt experience">
+      <div class="shell">
+        <header class="section__head">
+          <h2>The TUX order experience</h2>
+          <p class="muted">Refined logic, zero guesswork—whether you dine in, pick up, or go luxe delivery.</p>
+        </header>
+        <ol class="experience-steps">
+          <li>
+            <span class="experience-step__badge">01</span>
+            <h3>Design your plate</h3>
+            <p>Browse live menu cards, customize extras, and preview totals before checkout.</p>
+          </li>
+          <li>
+            <span class="experience-step__badge">02</span>
+            <h3>Choose fulfillment</h3>
+            <p>Pickup for a quick escape or delivery with intelligent zone-based fees.</p>
+          </li>
+          <li>
+            <span class="experience-step__badge">03</span>
+            <h3>Split payments with ease</h3>
+            <p>Allocate cash and Instapay in a single flow—our system balances totals automatically.</p>
+          </li>
+          <li>
+            <span class="experience-step__badge">04</span>
+            <h3>Track and relax</h3>
+            <p>Receive confirmations instantly and revisit previous orders straight from your profile.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="gallery" class="section gallery">
+      <div class="shell">
+        <header class="section__head">
+          <h2>Plate-worthy moments</h2>
+          <p class="muted">Preview the textures, colours, and energy that define TUX.</p>
+        </header>
+        <div class="gallery-grid">
+          <a class="gallery-card" href="assets/img/menu-burger-fries.jpg" target="_blank" rel="noreferrer">
+            <img src="assets/img/menu-burger-fries.jpg" alt="Signature burgers &amp; fries" loading="lazy">
+            <span>Burgers &amp; fries</span>
+          </a>
+          <a class="gallery-card" href="assets/img/menu-hawawshi.jpg" target="_blank" rel="noreferrer">
+            <img src="assets/img/menu-hawawshi.jpg" alt="Hawawshi selection" loading="lazy">
+            <span>Hawawshi</span>
+          </a>
+          <a class="gallery-card" href="assets/img/poster-tuxify.jpg" target="_blank" rel="noreferrer">
+            <img src="assets/img/poster-tuxify.jpg" alt="TUXIFY lineup" loading="lazy">
+            <span>TUXIFY</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section id="location" class="section location">
+      <div class="shell location__inner">
+        <div class="location__content">
+          <header class="section__head">
+            <h2>Visit our home</h2>
+            <p class="muted">El-Saada St – Zahraa El-Maadi, Egypt</p>
+          </header>
+          <ul class="info-list">
+            <li>
+              <span>Hours</span>
+              <strong>Daily 1:00 PM – 3:00 AM</strong>
+            </li>
+            <li>
+              <span>Call us</span>
+              <a href="tel:+201151960048">+20 115 196 0048</a>
+            </li>
+            <li>
+              <span>Google Maps</span>
+              <a href="https://maps.app.goo.gl/V8U4SKzMqHvT5o2m7" target="_blank" rel="noreferrer">Open directions</a>
+            </li>
           </ul>
         </div>
-
-        <div class="menu-card">
-          <h3>TUXIFY</h3>
-          <ul class="menu-list">
-            <li><span>Single</span><i></i><b>120.00</b><div class="ingredients">Brioche bun, 1 beef patty, American cheese, pickles, chopped onion, ketchup, TUXIFY sauce.</div></li>
-            <li><span>Double</span><i></i><b>160.00</b><div class="ingredients">Brioche bun, 2 beef patties, American cheese, pickles, chopped onion, ketchup, TUXIFY sauce.</div></li>
-            <li><span>Triple</span><i></i><b>200.00</b><div class="ingredients">Brioche bun, 3 beef patties, American cheese, pickles, chopped onion, ketchup, TUXIFY sauce.</div></li>
-            <li><span>Quatro</span><i></i><b>240.00</b><div class="ingredients">Brioche bun, 4 beef patties, American cheese, pickles, chopped onion, ketchup, TUXIFY sauce.</div></li>
-          </ul>
-        </div>
-
-        <div class="menu-card">
-          <h3>Fries</h3>
-          <ul class="menu-list">
-            <li><span>Classic Fries S / L</span><i></i><b>25.00 / 30.00</b></li>
-            <li><span>Cheese Fries</span><i></i><b>30.00</b></li>
-            <li><span>Chili Fries</span><i></i><b>40.00</b></li>
-            <li><span>TUX Fries</span><i></i><b>75.00</b><div class="ingredients">Fried, smashed patty, cheese, pickels, caramelised onion, jalapeño, TUX sauce.</div></li>
-            <li><span>Doppy Fries</span><i></i><b>95.00</b></li>
-          </ul>
-          <p class="desc">Fries, smashed p., bacon, cheese, caramelised onion, ranch sauce, nachos, chopped green onion</p>
-        </div>
-
-        <div class="menu-card">
-          <h3>Hawawshi <span class="note">served with chili sauce</span></h3>
-          <ul class="menu-list">
-            <li><span>Classic Hawawshi</span><i></i><b>80.00</b><div class="ingredients">Baladi bread, hawawshi meat, onion. Served with chili sauce.</div></li>
-            <li><span>TUX Hawawshi</span><i></i><b>100.00</b><div class="ingredients">Baladi bread, hawawshi meat, mozzarella, onion, TUX hawawshi sauce. Served with chili sauce.</div></li>
-          </ul>
-        </div>
-
-        <div class="menu-card">
-          <h3>Burger Extras</h3>
-          <ul class="menu-list two">
-            <li><span>Extra Smashed Patty</span><i></i><b>40.00</b></li>
-            <li><span>Bacon</span><i></i><b>20.00</b></li>
-            <li><span>Cheese</span><i></i><b>15.00</b></li>
-            <li><span>Ranch</span><i></i><b>10.00</b></li>
-            <li><span>Mushroom</span><i></i><b>15.00</b></li>
-            <li><span>Caramelized Onion</span><i></i><b>10.00</b></li>
-            <li><span>Jalapeño</span><i></i><b>10.00</b></li>
-            <li><span>TUX Sauce</span><i></i><b>10.00</b></li>
-            <li><span>Extra Bun</span><i></i><b>10.00</b></li>
-            <li><span>Pickle</span><i></i><b>5.00</b></li>
-            <li><span>BBQ / Ketchup / Sweet Chili / Hot Sauce</span><i></i><b>5.00</b></li>
-          </ul>
-        </div>
-
-        <div class="menu-card">
-          <h3>Hawawshi Extras</h3>
-          <ul class="menu-list">
-            <li><span>Mozzarella Cheese</span><i></i><b>20.00</b></li>
-            <li><span>TUX Hawawshi Sauce</span><i></i><b>10.00</b></li>
-            <li><span>BBQ / Ketchup / …</span><i></i><b>5.00</b></li>
-          </ul>
-        </div>
-
-        <div class="menu-card">
-          <h3>Drinks</h3>
-          <ul class="menu-list">
-            <li><span>Soda</span><i></i><b>20.00</b></li>
-            <li><span>Water</span><i></i><b>10.00</b></li>
-          </ul>
+        <div class="location__card">
+          <h3>Ready for late-night cravings</h3>
+          <p>We engineered our kitchen to handle post-midnight rushes while keeping every sandwich photo-ready.</p>
+          <a class="btn btn--outline" href="https://maps.app.goo.gl/V8U4SKzMqHvT5o2m7" target="_blank" rel="noreferrer">Plan your visit</a>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- Gallery from your posters -->
-  <section id="gallery" class="section alt">
-    <div class="container">
-      <header class="section__head">
-        <h2>Poster Gallery</h2>
-        <p class="muted">Burgers &amp; Fries • Hawawshi • TUXIFY</p>
-      </header>
-      <div class="cards">
-        <a class="card" href="assets/img/menu-burger-fries.jpg" target="_blank" rel="noreferrer">
-          <img src="assets/img/menu-burger-fries.jpg" alt="Menu — Burgers & Fries">
-        </a>
-        <a class="card" href="assets/img/menu-hawawshi.jpg" target="_blank" rel="noreferrer">
-          <img src="assets/img/menu-hawawshi.jpg" alt="Menu — Hawawshi">
-        </a>
-        <a class="card" href="assets/img/poster-tuxify.jpg" target="_blank" rel="noreferrer">
-          <img src="assets/img/poster-tuxify.jpg" alt="Poster — TUXIFY">
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- Location -->
-  <section id="location" class="section">
-    <div class="container grid2">
-      <div class="panel">
-        <h2>Where to find us</h2>
-        <p class="lead"><strong>El-Saada St – Zahraa El-Maadi</strong></p>
-        <p>Next to <strong>Roma Cafe</strong> & <strong>Manhattan School</strong>.</p>
-        <div class="hr"></div>
-        <p class="lead"><strong>العنوان</strong></p>
-        <p>شارع السعادة – زهراء المعادي، بجوار كافيه روما ومدرسة مانهاتن.</p>
-        <div class="actions">
-          <a class="btn" href="https://maps.app.goo.gl/V8U4SKzMqHvT5o2m7" target="_blank" rel="noreferrer">Open in Google Maps</a>
+    <section id="contact" class="section contact">
+      <div class="shell contact__inner">
+        <div class="contact__card">
+          <h2>Connect with TUX</h2>
+          <p class="muted">For collaborations, events, and bespoke catering, our team responds within one business day.</p>
+          <a class="btn btn--ghost" href="mailto:hello@tuxtheburger.com">hello@tuxtheburger.com</a>
+        </div>
+        <div class="contact__grid">
+          <div class="contact__info">
+            <span class="contact__label">WhatsApp</span>
+            <a href="https://wa.me/201151960048?text=Hi%20TUX%20I%20want%20to%20order%20" target="_blank" rel="noreferrer">Send us a message</a>
+          </div>
+          <div class="contact__info">
+            <span class="contact__label">Instagram</span>
+            <a href="https://www.instagram.com" target="_blank" rel="noreferrer">@tux.burgers</a>
+          </div>
+          <div class="contact__info">
+            <span class="contact__label">Feedback</span>
+            <a href="https://forms.gle/rKJoUeHkgLoqTmmXA" target="_blank" rel="noreferrer">Help us improve</a>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
-
-  <!-- Contact -->
-  <section id="contact" class="section alt">
-    <div class="container grid3">
-      <div class="panel small">
-        <h3>Phone</h3>
-        <p><a class="btn red" href="tel:01151960048">Call 011-5196-0048</a></p>
-      </div>
-      <div class="panel small">
-        <h3>Follow</h3>
-        <ul class="list">
-          <li><a href="https://www.facebook.com/profile.php?id=61560177995727" target="_blank" rel="noreferrer">Facebook</a></li>
-          <li><a href="https://www.instagram.com/tux.egypt?igsh=OGR1ODh2dTVrNWlj" target="_blank" rel="noreferrer">Instagram</a></li>
-        </ul>
-      </div>
-      <div class="panel small">
-        <h3>Delivery</h3>
-        <p>Daily, 4 PM – 2 AM</p>
-      </div>
-
-      <!-- Mobile-only Help Us Improve after Delivery (gold outline style) -->
-      <div class="panel small mobile-only-help">
-        <a class="btn gold-outline" href="https://forms.gle/rKJoUeHkgLoqTmmXA" target="_blank" rel="noreferrer"
-           style="display:block;text-align:center;">
-          Help Us Improve
-        </a>
-      </div>
-    </div>
-  </section>
+    </section>
+  </main>
 
   <footer class="footer">
-    <div class="container footer__row">
+    <div class="shell footer__inner">
       <div class="footer__brand">
         <img src="assets/img/logo.jpg" alt="TUX" class="footer__logo">
         <span>© 2025 TUX — Egypt</span>
       </div>
-      <a class="footer__link" href="https://maps.app.goo.gl/V8U4SKzMqHvT5o2m7" target="_blank" rel="noreferrer">
-        El-Saada St – Zahraa El-Maadi • Open in Maps
-      </a>
+      <div class="footer__links">
+        <a href="https://maps.app.goo.gl/V8U4SKzMqHvT5o2m7" target="_blank" rel="noreferrer">Directions</a>
+        <a href="mailto:hello@tuxtheburger.com">hello@tuxtheburger.com</a>
+        <a href="https://forms.gle/rKJoUeHkgLoqTmmXA" target="_blank" rel="noreferrer">Feedback</a>
+      </div>
     </div>
   </footer>
 
-  <!-- Tiny CSS: mobile-only visibility + gold outline style to match your image -->
-  <style>
-    /* keep this mobile-only */
-    @media (min-width:840px){ .mobile-only-help{ display:none; } }
+  <nav class="quick-nav" aria-label="Quick actions">
+    <a href="order.html" id="orderLinkQuick" class="quick-nav__btn">
+      <span aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M4.5 6.75h1.14l2.4 10.16a1.5 1.5 0 0 0 1.47 1.14h7.86a1.5 1.5 0 0 0 1.47-1.14l1.74-7.4H8.32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+      Order
+    </a>
+    <a href="order.html#cart" class="quick-nav__btn" aria-label="Cart">
+      <span aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M3.5 4h1.79a1 1 0 0 1 .97.757L7 8.25h12l-1.5 6h-9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><circle cx="10" cy="19" r="1.5" fill="currentColor"/><circle cx="17" cy="19" r="1.5" fill="currentColor"/></svg>
+      </span>
+      Cart
+    </a>
+    <a href="account.html" id="accountLinkQuick" class="quick-nav__btn">Account</a>
+    <a href="#menu" class="quick-nav__btn">Menu</a>
+  </nav>
 
-    /* use site gold (already defined in style.css as --gold) */
-    .btn.gold-outline{
-      background:transparent;
-      color:var(--gold);
-      border:3px solid var(--gold);
-      border-radius:999px;          /* pill */
-      padding:14px 22px;
-      font-weight:800;
-    }
-    /* slightly larger & comfy on small screens */
-    @media (max-width:839px){
-      .btn.gold-outline{ font-size:18px; }
-    }
-  </style>
   <script type="module" src="nav.js"></script>
-
-
-
 </body>
 </html>
