@@ -12,6 +12,7 @@ import {
   limit,
   getDocs,
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+
 // Add this new function to your order.js file
 async function syncOrderToPOS(orderData) {
   if (!db) return;
@@ -42,7 +43,7 @@ async function syncOrderToPOS(orderData) {
     // --- Customer Details ---
     customerName: orderData.customerName,
     customerPhone: orderData.phone,
-     customerEmail: orderData.email,
+    customerEmail: orderData.email,
     deliveryAddress: orderData.address,
     deliveryZoneId: orderData.deliveryZoneId || "",
     
@@ -51,7 +52,7 @@ async function syncOrderToPOS(orderData) {
     itemsTotal: orderData.subtotal,
     deliveryFee: orderData.deliveryFee || 0,
     paymentMethod: orderData.paymentMethod,
-        paymentBreakdown: orderData.paymentBreakdown || null,
+    paymentBreakdown: orderData.paymentBreakdown || null,
 
     orderType: orderData.fulfillment === 'delivery' ? 'Delivery' : 'Pickup',
     
@@ -67,6 +68,7 @@ async function syncOrderToPOS(orderData) {
     console.error("Error syncing order to POS:", error);
   }
 }
+
 const form = document.getElementById("orderForm");
 const statusEl = document.getElementById("orderStatus");
 const nameEl = document.getElementById("orderName");
@@ -79,8 +81,8 @@ const submitBtn = document.getElementById("orderSubmit");
 const recentOrdersList = document.getElementById("recentOrders");
 const noOrdersEl = document.getElementById("noOrders");
 const fulfillmentInputs = Array.from(document.querySelectorAll("input[name='fulfillment']"));
-const paymentCashCheckbox = document.getElementById("paymentCash");
-const paymentInstapayCheckbox = document.getElementById("paymentInstapay");
+const paymentMethodInputs = Array.from(document.querySelectorAll("input[name='paymentMethod']"));
+const splitFields = document.getElementById("splitFields");
 const cashAmountInput = document.getElementById("cashAmount");
 const instapayAmountInput = document.getElementById("instapayAmount");
 const menuContainer = document.getElementById("menuList");
@@ -97,10 +99,32 @@ const deliveryZoneField = document.getElementById("deliveryZoneField");
 const deliveryZoneNote = document.getElementById("deliveryZoneNote");
 const deliveryDetailsFieldset = document.getElementById("deliveryDetails");
 const clearCartBtn = document.getElementById("clearCart");
+const paymentSummaryEl = document.getElementById("paymentSummary");
+const cashSummaryRow = document.getElementById("cashSummaryRow");
+const instapaySummaryRow = document.getElementById("instapaySummaryRow");
+const cashSummaryAmount = document.getElementById("cashSummaryAmount");
+const instapaySummaryAmount = document.getElementById("instapaySummaryAmount");
+const mobileMenuButton = document.getElementById("mobileMenuButton");
+const mobileMenu = document.getElementById("mobileMenu");
+
 const quickTransferKey = "tuxQuickCartTransfer";
 let currentUser = null;
 let profileRef = null;
 let cart = [];
+
+// Mobile menu
+mobileMenuButton?.addEventListener("click", () => {
+  if (!mobileMenu) return;
+  const isExpanded = mobileMenuButton.getAttribute("aria-expanded") === "true";
+  mobileMenuButton.setAttribute("aria-expanded", String(!isExpanded));
+  mobileMenu.classList.toggle("hidden");
+});
+mobileMenu?.querySelectorAll("a").forEach((link) => {
+  link.addEventListener("click", () => {
+    mobileMenu.classList.add("hidden");
+    mobileMenuButton?.setAttribute("aria-expanded", "false");
+  });
+});
 
 const currencyFormatter = new Intl.NumberFormat("en-EG", {
   style: "currency",
@@ -128,6 +152,7 @@ function formatPhoneForStorage(input) {
   }
   return `${COUNTRY_CODE}${digits}`;
 }
+
 const deliveryZones = [
   { id: "zahraa-el-maadi", name: "Zahraa El Maadi", fee: 25 },
   { id: "kornish-el-maadi", name: "Kornish El Maadi", fee: 40 },
@@ -152,6 +177,7 @@ const hawawshiExtras = [
   { id: "tux-hawawshi-sauce", name: "TUX Hawawshi Sauce", price: 10 },
   { id: "hawawshi-condiments", name: "BBQ / Ketchup / Sweet Chili / Hot Sauce", price: 5 },
 ];
+
 function populateDeliveryZones() {
   if (!zoneSelect) return;
 
@@ -184,6 +210,7 @@ function populateDeliveryZones() {
 
   zoneSelect.selectedIndex = 0;
 }
+
 const menuData = [
   {
     id: "single-smashed-patty",
@@ -242,7 +269,7 @@ const menuData = [
     extras: burgerExtras,
   },
   {
-  id: "tuxify-quatro",
+    id: "tuxify-quatro",
     name: "TUXIFY Quatro",
     description: "Four beef patties, American cheese, pickles, chopped onion, ketchup, TUXIFY sauce.",
     price: 240,
@@ -250,7 +277,7 @@ const menuData = [
     extras: burgerExtras,
   },
   {
-   id: "classic-fries-small",
+    id: "classic-fries-small",
     name: "Classic Fries (Small)",
     price: 25,
     category: "Fries",
@@ -289,7 +316,7 @@ const menuData = [
     id: "doppy-fries",
     name: "Doppy Fries",
     price: 95,
-   category: "Fries",
+    category: "Fries",
     extras: [],
   },
   {
@@ -301,7 +328,7 @@ const menuData = [
     extras: hawawshiExtras,
   },
   {
-  id: "tux-hawawshi",
+    id: "tux-hawawshi",
     name: "TUX Hawawshi",
     description: "Baladi bread, hawawshi meat, mozzarella, onion, TUX hawawshi sauce.",
     price: 100,
@@ -316,11 +343,10 @@ const menuData = [
     extras: [],
   },
   {
-     id: "water",
+    id: "water",
     name: "Water",
     price: 10,
     category: "Drinks",
-    
   },
 ];
 
@@ -383,21 +409,18 @@ function applyQuickCartSeed(seed) {
         : "";
     }
 
-    const method = checkout.paymentMethod;
+    const method = checkout.paymentMethod === "card" ? "instapay" : checkout.paymentMethod;
     if (method) {
-      const wantsCash = method === "cash" || method === "split";
-      const wantsInstapay = method === "instapay" || method === "split";
-      if (paymentCashCheckbox) paymentCashCheckbox.checked = wantsCash;
-      if (paymentInstapayCheckbox)
-        paymentInstapayCheckbox.checked = wantsInstapay || method === "instapay";
-      if (method === "instapay" && paymentCashCheckbox) {
-        paymentCashCheckbox.checked = false;
+      const matchingRadio = paymentMethodInputs.find((input) => input.value === method);
+      if (matchingRadio) {
+        matchingRadio.checked = true;
       }
     }
   } catch (err) {
     console.warn("Failed to apply quick cart seed", err);
   }
 }
+
 function showStatus(message, isError = false) {
   if (!statusEl) return;
   statusEl.textContent = message;
@@ -408,6 +431,7 @@ function selectedFulfillment() {
   const selected = fulfillmentInputs.find((input) => input.checked);
   return selected ? selected.value : "pickup";
 }
+
 function parseAmountInput(input) {
   if (!(input instanceof HTMLInputElement)) return 0;
   const value = Number.parseFloat(input.value);
@@ -415,25 +439,19 @@ function parseAmountInput(input) {
 }
 
 function getPaymentSelection() {
-  const useCash = paymentCashCheckbox?.checked ?? false;
-  const useInstapay = paymentInstapayCheckbox?.checked ?? false;
+  const selectedMethod = paymentMethodInputs.find((input) => input.checked)?.value ?? "cash";
+  const useCash = selectedMethod === "cash" || selectedMethod === "split";
+  const useInstapay = selectedMethod === "instapay" || selectedMethod === "split";
 
   const breakdown = {
     cash: useCash ? parseAmountInput(cashAmountInput) : 0,
     instapay: useInstapay ? parseAmountInput(instapayAmountInput) : 0,
   };
 
-  let method = "cash";
-  if (useCash && useInstapay) {
-    method = "split";
-  } else if (useInstapay) {
-    method = "card";
-  }
-
   return {
     useCash,
     useInstapay,
-    method,
+    method: selectedMethod,
     breakdown,
   };
 }
@@ -444,6 +462,7 @@ function getSelectedZone() {
   if (!zoneId) return null;
   return deliveryZones.find((zone) => zone.id === zoneId) || null;
 }
+
 function getOrderTotals() {
   const subtotal = calculateCartTotal();
   const fulfillment = selectedFulfillment();
@@ -459,27 +478,31 @@ function getOrderTotals() {
 }
 
 function updatePaymentInputsState(orderTotal, { fromToggle = false } = {}) {
-  const { useCash, useInstapay } = getPaymentSelection();
+  const { method, useCash, useInstapay } = getPaymentSelection();
+
+  if (splitFields) {
+    splitFields.classList.toggle("hidden", method !== "split");
+  }
 
   if (cashAmountInput) {
-    cashAmountInput.disabled = !useCash;
-    if (!useCash) {
-      cashAmountInput.value = "";
-    } else if (!useInstapay) {
+    cashAmountInput.disabled = method !== "split" && method !== "cash";
+    if (method === "cash") {
       cashAmountInput.value = orderTotal > 0 ? orderTotal.toFixed(2) : "";
+    } else if (method !== "split") {
+      cashAmountInput.value = "";
     }
   }
 
   if (instapayAmountInput) {
-    instapayAmountInput.disabled = !useInstapay;
-    if (!useInstapay) {
-      instapayAmountInput.value = "";
-    } else if (!useCash) {
+    instapayAmountInput.disabled = method !== "split" && method !== "instapay";
+    if (method === "instapay") {
       instapayAmountInput.value = orderTotal > 0 ? orderTotal.toFixed(2) : "";
+    } else if (method !== "split") {
+      instapayAmountInput.value = "";
     }
   }
 
-  if (useCash && useInstapay && fromToggle && orderTotal > 0) {
+  if (method === "split" && fromToggle && orderTotal > 0 && useCash && useInstapay) {
     const hasCashValue = Boolean(cashAmountInput?.value);
     const hasInstapayValue = Boolean(instapayAmountInput?.value);
     if (!hasCashValue && !hasInstapayValue) {
@@ -497,24 +520,41 @@ function updatePaymentInputsState(orderTotal, { fromToggle = false } = {}) {
 
 function validatePaymentBreakdown(total) {
   const selection = getPaymentSelection();
-  if (!selection.useCash && !selection.useInstapay) {
-    return { valid: false, message: "Select at least one payment method." };
+  const amountDue = Math.max(total || 0, 0);
+
+  if (selection.method === "cash") {
+    return {
+      valid: true,
+      method: "cash",
+      breakdown: { cash: amountDue, instapay: 0 },
+    };
   }
 
-  if (selection.useCash && selection.breakdown.cash <= 0) {
-    return { valid: false, message: "Enter how much you will pay in cash." };
+  if (selection.method === "instapay") {
+    return {
+      valid: true,
+      method: "instapay",
+      breakdown: { cash: 0, instapay: amountDue },
+    };
   }
 
-  if (selection.useInstapay && selection.breakdown.instapay <= 0) {
-    return { valid: false, message: "Enter how much you will pay via Instapay." };
+  if (selection.method !== "split") {
+    return {
+      valid: false,
+      message: "Choose how you want to pay.",
+    };
   }
 
-  const totalPaid =
-    (selection.useCash ? selection.breakdown.cash : 0) +
-    (selection.useInstapay ? selection.breakdown.instapay : 0);
+  if (selection.breakdown.cash <= 0 || selection.breakdown.instapay <= 0) {
+    return {
+      valid: false,
+      message: "Enter both the cash and Instapay amounts for your split payment.",
+    };
+  }
 
+  const totalPaid = selection.breakdown.cash + selection.breakdown.instapay;
   const roundedPaid = Math.round(totalPaid * 100);
-  const roundedDue = Math.round((total || 0) * 100);
+  const roundedDue = Math.round(amountDue * 100);
 
   if (roundedPaid !== roundedDue) {
     return {
@@ -525,14 +565,49 @@ function validatePaymentBreakdown(total) {
 
   return {
     valid: true,
-    method: selection.method,
+    method: "split",
     breakdown: selection.breakdown,
   };
 }
 
+function updatePaymentSummary(orderTotal) {
+  if (!paymentSummaryEl) return;
+
+  const selection = getPaymentSelection();
+  const hasTotal = orderTotal > 0;
+
+  if (!hasTotal) {
+    paymentSummaryEl.classList.add("hidden");
+    return;
+  }
+
+  const method = selection.method;
+  const showSummary = method === "cash" || method === "instapay" || method === "split";
+  paymentSummaryEl.classList.toggle("hidden", !showSummary);
+  if (!showSummary) return;
+
+  if (cashSummaryRow && cashSummaryAmount) {
+    const cashValue = method === "cash" ? orderTotal : selection.breakdown.cash;
+    const showCash = method === "cash" || (method === "split" && cashValue > 0);
+    cashSummaryRow.classList.toggle("hidden", !showCash);
+    if (showCash) {
+      cashSummaryAmount.textContent = formatCurrency(cashValue);
+    }
+  }
+
+  if (instapaySummaryRow && instapaySummaryAmount) {
+    const instapayValue = method === "instapay" ? orderTotal : selection.breakdown.instapay;
+    const showInstapay = method === "instapay" || (method === "split" && instapayValue > 0);
+    instapaySummaryRow.classList.toggle("hidden", !showInstapay);
+    if (showInstapay) {
+      instapaySummaryAmount.textContent = formatCurrency(instapayValue);
+    }
+  }
+}
+
 function updateFulfillmentUI() {
   const needsDelivery = selectedFulfillment() === "delivery";
-    if (deliveryDetailsFieldset) {
+  if (deliveryDetailsFieldset) {
     deliveryDetailsFieldset.style.display = needsDelivery ? "" : "none";
   }
 
@@ -546,7 +621,6 @@ function updateFulfillmentUI() {
   if (zoneSelect) {
     zoneSelect.required = needsDelivery;
     zoneSelect.disabled = !needsDelivery;
-   
   }
   if (deliveryZoneField) {
     deliveryZoneField.style.display = needsDelivery ? "" : "none";
@@ -571,6 +645,7 @@ fulfillmentInputs.forEach((input) => {
 zoneSelect?.addEventListener("change", () => {
   updateCartUI();
 });
+
 function formatCurrency(value) {
   try {
     return currencyFormatter.format(value);
@@ -591,11 +666,11 @@ function formatPayment(method, breakdown = null) {
     return parts.length ? parts.join(" + ") : "Split payment";
   }
 
-  if (method === "card" || method === "instapay") {
+  if (method === "instapay" || method === "card") {
     if (breakdown?.instapay) {
       return `Instapay ${formatCurrency(breakdown.instapay)}`;
     }
-    return "Instapay on delivery";
+    return "Instapay";
   }
 
   if (breakdown?.cash) {
@@ -655,7 +730,7 @@ function renderMenu() {
       card.appendChild(header);
 
       if (menuItem.extras && menuItem.extras.length) {
-         const extrasToggle = document.createElement("button");
+        const extrasToggle = document.createElement("button");
         extrasToggle.type = "button";
         extrasToggle.className = "btn outline small order-menu-card__extras-toggle";
         extrasToggle.textContent = "Add extras";
@@ -663,7 +738,7 @@ function renderMenu() {
 
         const extrasFieldset = document.createElement("fieldset");
         extrasFieldset.className = "order-menu-card__extras";
- extrasFieldset.hidden = true;
+        extrasFieldset.hidden = true;
         extrasFieldset.setAttribute("aria-hidden", "true");
         const legend = document.createElement("legend");
         legend.textContent = "Extras";
@@ -689,7 +764,7 @@ function renderMenu() {
 
           extrasFieldset.appendChild(label);
         });
-extrasToggle.addEventListener("click", () => {
+        extrasToggle.addEventListener("click", () => {
           const willShow = extrasFieldset.hidden;
           extrasFieldset.hidden = !willShow;
           extrasFieldset.setAttribute("aria-hidden", extrasFieldset.hidden ? "true" : "false");
@@ -770,7 +845,10 @@ function updateCartUI() {
   cartItemsContainer.innerHTML = "";
 
   if (!hasItems) {
-    if (emptyCartEl) emptyCartEl.style.display = "block";
+    if (emptyCartEl) {
+      emptyCartEl.style.display = "block";
+      cartItemsContainer.appendChild(emptyCartEl);
+    }
   } else {
     if (emptyCartEl) emptyCartEl.style.display = "none";
 
@@ -846,7 +924,7 @@ function updateCartUI() {
   const fulfillment = selectedFulfillment();
   const needsDelivery = fulfillment === "delivery";
   cartSubtotalEl.textContent = formatCurrency(subtotal);
- if (needsDelivery) {
+  if (needsDelivery) {
     cartDeliveryEl.textContent = zone ? formatCurrency(deliveryFee) : "Select zone";
   } else {
     cartDeliveryEl.textContent = formatCurrency(0);
@@ -854,7 +932,7 @@ function updateCartUI() {
   cartTotalEl.textContent = formatCurrency(total);
 
   if (deliveryFeeRow) {
-  deliveryFeeRow.style.display = needsDelivery && hasItems ? "flex" : "none";
+    deliveryFeeRow.style.display = needsDelivery && hasItems ? "flex" : "none";
   }
 
   if (deliveryZoneNote) {
@@ -868,9 +946,9 @@ function updateCartUI() {
   }
 
   if (cartSummarySection) {
-    cartSummarySection.classList.toggle("hidden", !hasItems);    
+    cartSummarySection.classList.toggle("hidden", !hasItems);
   }
-   if (checkoutPanelEl) {
+  if (checkoutPanelEl) {
     checkoutPanelEl.classList.toggle("hidden", !hasItems);
   }
 
@@ -879,7 +957,7 @@ function updateCartUI() {
   }
   updateItemsField();
   updatePaymentInputsState(total);
-
+  updatePaymentSummary(total);
 }
 
 function handleAddToCart(menuItem, cardEl) {
@@ -907,7 +985,7 @@ function handleAddToCart(menuItem, cardEl) {
   cardEl.querySelectorAll("input[data-extra-id]").forEach((checkbox) => {
     checkbox.checked = false;
   });
-const extrasFieldset = cardEl.querySelector(".order-menu-card__extras");
+  const extrasFieldset = cardEl.querySelector(".order-menu-card__extras");
   const extrasToggleBtn = cardEl.querySelector(".order-menu-card__extras-toggle");
 
   if (extrasFieldset instanceof HTMLElement) {
@@ -968,20 +1046,28 @@ cartItemsContainer?.addEventListener("change", (event) => {
   cart[index].quantity = Math.min(nextValue, 99);
   updateCartUI();
 });
-[paymentCashCheckbox, paymentInstapayCheckbox].forEach((checkbox) => {
-  checkbox?.addEventListener("change", () => {
+
+paymentMethodInputs.forEach((radio) => {
+  radio.addEventListener("change", () => {
     const { total } = getOrderTotals();
     updatePaymentInputsState(total, { fromToggle: true });
+    updatePaymentSummary(total);
   });
 });
 
 [cashAmountInput, instapayAmountInput].forEach((input) => {
   input?.addEventListener("input", () => {
-    if (!input.value) return;
+    if (!input.value) {
+      const { total } = getOrderTotals();
+      updatePaymentSummary(total);
+      return;
+    }
     const numeric = Number.parseFloat(input.value);
     if (!Number.isFinite(numeric) || numeric < 0) {
       input.value = "";
     }
+    const { total } = getOrderTotals();
+    updatePaymentSummary(total);
   });
 });
 
@@ -991,9 +1077,10 @@ clearCartBtn?.addEventListener("click", () => {
   updateCartUI();
   showStatus("Cart cleared. Add items again when you're ready.");
 });
-populateDeliveryZones();
 
+populateDeliveryZones();
 renderMenu();
+
 const quickCartSeed = loadQuickCartTransfer();
 if (quickCartSeed) {
   applyQuickCartSeed(quickCartSeed);
@@ -1059,7 +1146,8 @@ async function loadRecentOrders() {
       const statusLine = document.createElement("p");
       statusLine.textContent = `Status: ${data.status || "pending"}`;
       li.appendChild(statusLine);
-if (data.paymentMethod) {
+
+      if (data.paymentMethod) {
         const paymentLine = document.createElement("p");
         paymentLine.textContent = `Payment: ${formatPayment(data.paymentMethod, data.paymentBreakdown)}`;
         li.appendChild(paymentLine);
@@ -1067,13 +1155,13 @@ if (data.paymentMethod) {
 
       if (typeof data.total === "number") {
         const totalLine = document.createElement("p");
-const deliveryNote =
+        const deliveryNote =
           data.fulfillment === "delivery" && typeof data.deliveryFee === "number"
             ? ` (includes ${formatCurrency(data.deliveryFee)} delivery fee)`
             : "";
         totalLine.textContent = `Total: ${formatCurrency(data.total)}${deliveryNote}`;
         li.appendChild(totalLine);
-              } else if (typeof data.subtotal === "number") {
+      } else if (typeof data.subtotal === "number") {
         const subtotalLine = document.createElement("p");
         subtotalLine.textContent = `Subtotal: ${formatCurrency(data.subtotal)}`;
         li.appendChild(subtotalLine);
@@ -1083,7 +1171,7 @@ const deliveryNote =
         address.textContent = `Deliver to: ${data.address}`;
         li.appendChild(address);
       }
-  if (data.fulfillment === "delivery" && data.deliveryZone) {
+      if (data.fulfillment === "delivery" && data.deliveryZone) {
         const zoneLine = document.createElement("p");
         zoneLine.textContent = `Zone: ${data.deliveryZone}`;
         li.appendChild(zoneLine);
@@ -1094,7 +1182,6 @@ const deliveryNote =
     console.error("Failed to load recent orders", err);
   }
 }
-
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
@@ -1112,7 +1199,7 @@ onAuthStateChanged(auth, async (user) => {
       if (data.name && nameEl) nameEl.value = data.name;
       if (data.address && addressEl) addressEl.value = data.address;
       if (data.phone && phoneEl) phoneEl.value = extractPhoneDigits(data.phone);
-            if (data.fulfillmentPreference && fulfillmentInputs.length) {
+      if (data.fulfillmentPreference && fulfillmentInputs.length) {
         fulfillmentInputs.forEach((input) => {
           input.checked = input.value === data.fulfillmentPreference;
         });
@@ -1143,7 +1230,7 @@ form?.addEventListener("submit", async (event) => {
 
   const name = nameEl.value.trim();
   const address = addressEl.value.trim();
-   const phoneDigits = phoneEl.value.replace(/\D/g, "");
+  const phoneDigits = phoneEl.value.replace(/\D/g, "");
   if (!phonePattern.test(phoneDigits)) {
     showStatus("Enter a 10-digit phone number. We'll add +20 for you.", true);
     phoneEl.focus();
@@ -1156,16 +1243,18 @@ form?.addEventListener("submit", async (event) => {
     phoneEl.focus();
     return;
   }
-const email = emailEl.value.trim();
+
+  const email = emailEl.value.trim();
   if (!email) {
     showStatus("Email is required for order updates.", true);
     emailEl.focus();
     return;
   }
+
   const instructions = notesEl.value.trim();
   const fulfillment = selectedFulfillment();
   const items = buildCartSummary();
- const { subtotal, deliveryFee, total, zone: selectedZone } = getOrderTotals();
+  const { subtotal, deliveryFee, total, zone: selectedZone } = getOrderTotals();
   if (!cart.length || !items) {
     showStatus("Cart is Empty.", true);
     return;
@@ -1179,7 +1268,8 @@ const email = emailEl.value.trim();
     showStatus("Please choose your delivery zone.", true);
     return;
   }
- const paymentValidation = validatePaymentBreakdown(total);
+
+  const paymentValidation = validatePaymentBreakdown(total);
   if (!paymentValidation.valid) {
     showStatus(paymentValidation.message, true);
     return;
@@ -1209,7 +1299,7 @@ const email = emailEl.value.trim();
 
     status: "pending",
     createdAt,
- subtotal,
+    subtotal,
     total,
   };
 
@@ -1235,9 +1325,10 @@ const email = emailEl.value.trim();
       price: entry.price,
       extras: entry.extras,
       lineTotal: calculateItemTotal(entry),
-     }));
+    }));
   }
-const orderPayload = Object.entries(baseOrderPayload).reduce((acc, [key, value]) => {
+
+  const orderPayload = Object.entries(baseOrderPayload).reduce((acc, [key, value]) => {
     if (value === undefined || value === null) {
       return acc;
     }
@@ -1261,10 +1352,9 @@ const orderPayload = Object.entries(baseOrderPayload).reduce((acc, [key, value])
   try {
     const profileUpdate = {
       name,
-      
       phone: phoneForStorage,
       updatedAt: serverTimestamp(),
-fulfillmentPreference: fulfillment,
+      fulfillmentPreference: fulfillment,
     };
 
     if (address) {
@@ -1279,7 +1369,7 @@ fulfillmentPreference: fulfillment,
     await setDoc(profileRef, profileUpdate, { merge: true });
     const ordersCol = collection(profileRef, "orders");
     const orderDocRef = await addDoc(ordersCol, orderPayload);
-await syncOrderToPOS({ ...orderPayload, id: orderDocRef.id });
+    await syncOrderToPOS({ ...orderPayload, id: orderDocRef.id });
 
     try {
       await setDoc(doc(db, "orders", orderDocRef.id), {
@@ -1306,4 +1396,3 @@ await syncOrderToPOS({ ...orderPayload, id: orderDocRef.id });
 });
 
 updateFulfillmentUI();
-
