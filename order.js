@@ -1,40 +1,22 @@
-let auth;
-let db;
-let onAuthStateChanged;
-let doc;
-let getDoc;
-let setDoc;
-let serverTimestamp;
-let collection;
-let addDoc;
-let query;
-let orderBy;
-let limit;
-let getDocs;
-
-const firebaseReady = (async () => {
-  try {
-    const [{ auth: baseAuth, db: baseDb }, authModule, firestoreModule] = await Promise.all([
-      import("./firebase-init.js"),
-      import("https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js"),
-      import("https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js"),
-    ]);
-
-    auth = baseAuth;
-    db = baseDb;
-    ({ onAuthStateChanged } = authModule);
-    ({ doc, getDoc, setDoc, serverTimestamp, collection, addDoc, query, orderBy, limit, getDocs } = firestoreModule);
-    return true;
-  } catch (error) {
-    console.error("Failed to load Firebase modules", error);
-    return false;
-  }
-})();
+import { auth, db } from "./firebase-init.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+import {
+  doc,
+  getDoc,
+  setDoc,
+  serverTimestamp,
+  collection,
+  addDoc,
+  query,
+  orderBy,
+  limit,
+  getDocs,
+} from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
 // Add this new function to your order.js file
 async function syncOrderToPOS(orderData) {
- await firebaseReady;
-  if (!db || !doc || !setDoc) return;  
+  if (!db) return;
+  
   // This is the path your POS app will be listening to
   const posOrderRef = doc(db, `shops/tux/onlineOrders/${orderData.id}`);
 
@@ -126,8 +108,6 @@ const mobileMenuButton = document.getElementById("mobileMenuButton");
 const mobileMenu = document.getElementById("mobileMenu");
 
 const quickTransferKey = "tuxQuickCartTransfer";
-const quickTransferMaxAgeMs = 5 * 60 * 1000;
-
 let currentUser = null;
 let profileRef = null;
 let cart = [];
@@ -380,11 +360,6 @@ function loadQuickCartTransfer() {
     sessionStorage.removeItem(quickTransferKey);
     const parsed = JSON.parse(raw);
     if (!parsed || typeof parsed !== "object") return null;
-     const createdAt = Number(parsed.createdAt);
-    if (Number.isFinite(createdAt) && Date.now() - createdAt > quickTransferMaxAgeMs) {
-      console.info("Ignoring stale quick cart transfer payload.");
-      return null;
-    }
     return parsed;
   } catch (err) {
     console.warn("Failed to load quick cart transfer", err);
@@ -918,9 +893,8 @@ function updateCartUI() {
   if (!cartItemsContainer || !cartTotalEl || !cartSubtotalEl || !cartDeliveryEl) return;
   const hasItems = cart.length > 0;
 
- cartItemsContainer.textContent = "";
+  cartItemsContainer.innerHTML = "";
 
-  const fragment = document.createDocumentFragment();
   if (!hasItems) {
     if (emptyCartEl) {
       emptyCartEl.style.display = "block";
@@ -994,11 +968,9 @@ function updateCartUI() {
 
       li.appendChild(controls);
 
-      fragment.appendChild(li);
+      cartItemsContainer.appendChild(li);
     });
   }
-    cartItemsContainer.appendChild(fragment);
-
   const { subtotal, deliveryFee, total, zone } = getOrderTotals();
   const fulfillment = selectedFulfillment();
   const needsDelivery = fulfillment === "delivery";
@@ -1185,8 +1157,8 @@ function formatDate(timestamp) {
 }
 
 async function loadRecentOrders() {
-  await firebaseReady;
-  if (!profileRef || !recentOrdersList || !collection || !query || !orderBy || !limit || !getDocs) return;  try {
+  if (!profileRef || !recentOrdersList) return;
+  try {
     const ordersQuery = query(collection(profileRef, "orders"), orderBy("createdAt", "desc"), limit(5));
     const snapshot = await getDocs(ordersQuery);
 
@@ -1265,45 +1237,29 @@ async function loadRecentOrders() {
   }
 }
 
-firebaseReady.then((ready) => {
-  if (!ready || !auth || !onAuthStateChanged) {
-    console.error("Firebase not ready; cannot monitor auth state");
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    window.location.href = `account.html?redirect=${encodeURIComponent("order.html")}`;
     return;
   }
 
-  onAuthStateChanged(auth, async (user) => {
-    if (!user) {
-      window.location.href = `account.html?redirect=${encodeURIComponent("order.html")}`;
-      return;
-    }
+  currentUser = user;
+  profileRef = doc(db, "profiles", user.uid);
 
- currentUser = user;
-    if (!db || !doc) {
-      console.error("Firestore not ready; cannot load profile");
-      return;
-    }
-    profileRef = doc(db, "profiles", user.uid);
-
-    try {
-      if (!getDoc || !setDoc || !serverTimestamp) {
-        throw new Error("Firestore helpers unavailable");
+  try {
+    const snap = await getDoc(profileRef);
+    if (snap.exists()) {
+      const data = snap.data();
+      if (data.name && nameEl) nameEl.value = data.name;
+      if (data.address && addressEl) addressEl.value = data.address;
+      if (data.phone && phoneEl) phoneEl.value = extractPhoneDigits(data.phone);
+      if (data.fulfillmentPreference && fulfillmentInputs.length) {
+        fulfillmentInputs.forEach((input) => {
+          input.checked = input.value === data.fulfillmentPreference;
+        });
       }
-     const snap = await getDoc(profileRef);
-      if (snap.exists()) {
-        const data = snap.data();
-        if (data.name && nameEl) nameEl.value = data.name;
-        if (data.address && addressEl) addressEl.value = data.address;
-        if (data.phone && phoneEl) phoneEl.value = extractPhoneDigits(data.phone);
-        if (data.fulfillmentPreference && fulfillmentInputs.length) {
-          fulfillmentInputs.forEach((input) => {
-            input.checked = input.value === data.fulfillmentPreference;
-          });
-        }
-        if (data.deliveryZoneId && zoneSelect) {
-          zoneSelect.value = data.deliveryZoneId;
-        }
-       } catch (err) {
-      console.error("Failed to load profile", err);
+      if (data.deliveryZoneId && zoneSelect) {
+        zoneSelect.value = data.deliveryZoneId;
       }
     } else {
       await setDoc(profileRef, { createdAt: serverTimestamp() }, { merge: true });
@@ -1315,9 +1271,8 @@ firebaseReady.then((ready) => {
   if (emailEl) emailEl.value = user.email || "";
   if (nameEl && !nameEl.value) nameEl.value = user.displayName || "";
 
-    updateFulfillmentUI();
-    loadRecentOrders();
-  });
+  updateFulfillmentUI();
+  loadRecentOrders();
 });
 
 form?.addEventListener("submit", async (event) => {
@@ -1326,11 +1281,7 @@ form?.addEventListener("submit", async (event) => {
     showStatus("Please log in again to place an order.", true);
     return;
   }
-  await firebaseReady;
-  if (!db || !doc || !setDoc || !collection || !addDoc || !serverTimestamp) {
-    showStatus("Orders are temporarily unavailable. Please try again shortly.", true);
-    return;
-  }
+
   const name = nameEl.value.trim();
   const address = addressEl.value.trim();
   const phoneDigits = phoneEl.value.replace(/\D/g, "");
