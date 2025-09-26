@@ -97,6 +97,28 @@ const currencyFormatter = new Intl.NumberFormat("en-EG", {
   style: "currency",
   currency: "EGP",
 });
+const COUNTRY_CODE = "+20";
+const phonePattern = /^\d{10}$/;
+
+function extractPhoneDigits(value) {
+  if (typeof value !== "string") return "";
+  const digits = value.replace(/\D/g, "");
+  if (digits.length === 12 && digits.startsWith("20")) {
+    return digits.slice(2);
+  }
+  if (digits.length === 10) {
+    return digits;
+  }
+  return "";
+}
+
+function formatPhoneForStorage(input) {
+  const digits = (input || "").replace(/\D/g, "");
+  if (!phonePattern.test(digits)) {
+    return null;
+  }
+  return `${COUNTRY_CODE}${digits}`;
+}
 const deliveryZones = [
   { id: "zahraa-el-maadi", name: "Zahraa El Maadi", fee: 25 },
   { id: "kornish-el-maadi", name: "Kornish El Maadi", fee: 40 },
@@ -837,7 +859,7 @@ onAuthStateChanged(auth, async (user) => {
       const data = snap.data();
       if (data.name && nameEl) nameEl.value = data.name;
       if (data.address && addressEl) addressEl.value = data.address;
-      if (data.phone && phoneEl) phoneEl.value = data.phone;
+      if (data.phone && phoneEl) phoneEl.value = extractPhoneDigits(data.phone);
     } else {
       await setDoc(profileRef, { createdAt: serverTimestamp() }, { merge: true });
     }
@@ -861,7 +883,20 @@ form?.addEventListener("submit", async (event) => {
 
   const name = nameEl.value.trim();
   const address = addressEl.value.trim();
-  const phone = phoneEl.value.trim();
+   const phoneDigits = phoneEl.value.replace(/\D/g, "");
+  if (!phonePattern.test(phoneDigits)) {
+    showStatus("Enter a 10-digit phone number. We'll add +20 for you.", true);
+    phoneEl.focus();
+    return;
+  }
+
+  const phoneForStorage = formatPhoneForStorage(phoneDigits);
+  if (!phoneForStorage) {
+    showStatus("Enter a 10-digit phone number. We'll add +20 for you.", true);
+    phoneEl.focus();
+    return;
+  }
+
   const instructions = notesEl.value.trim();
   const fulfillment = selectedFulfillment();
   const paymentMethod = selectedPayment();
@@ -891,7 +926,7 @@ const selectedZone = getSelectedZone();
   const baseOrderPayload = {
     userId: currentUser.uid,
     customerName: name,
-    phone,
+    phone: phoneForStorage,
     address: address || null,
     email: currentUser.email || emailEl?.value.trim() || "",
     items,
@@ -952,7 +987,7 @@ const orderPayload = Object.entries(baseOrderPayload).reduce((acc, [key, value])
     await setDoc(profileRef, {
       name,
       address,
-      phone,
+      phone: phoneForStorage,
       updatedAt: serverTimestamp(),
     }, { merge: true });
 
