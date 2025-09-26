@@ -5,6 +5,8 @@ import { doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-
 const headerLink = document.getElementById("accountLink");
 const mobileLink = document.getElementById("accountLinkMobile");
 const logoutLink = document.getElementById("logoutLink");
+const logoutLinkMobile = document.getElementById("logoutLinkMobile");
+
 const accountDock = document.getElementById("accountDock");
 const orderLink = document.getElementById("orderLink");
 const orderLinkMobile = document.getElementById("orderLinkMobile");
@@ -18,7 +20,9 @@ onAuthStateChanged(auth, async (user) => {
   if (logoutLink) {
     logoutLink.style.display = user ? "inline-block" : "none";
   }
-
+ if (logoutLinkMobile) {
+    logoutLinkMobile.classList.toggle("hidden", !user);
+  }
   const orderTarget = user ? orderHref : orderRedirectHref;
   if (orderLink) orderLink.href = orderTarget;
   if (orderLinkMobile) orderLinkMobile.href = orderTarget;
@@ -100,6 +104,15 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 logoutLink?.addEventListener("click", async (event) => {
+  event.preventDefault();
+  try {
+    await signOut(auth);
+    window.location.href = "index.html";
+  } catch (err) {
+    console.error("Error signing out", err);
+  }
+});
+logoutLinkMobile?.addEventListener("click", async (event) => {
   event.preventDefault();
   try {
     await signOut(auth);
