@@ -782,24 +782,36 @@ function initRevealAnimations() {
     prefersReducedMotion ||
     typeof window === "undefined" ||
     !("IntersectionObserver" in window)
-  ) {    revealEls.forEach((el) => el.classList.add("is-visible"));
+ ) {
+    revealEls.forEach((el) => el.classList.add("is-visible"));
     return;
   }
-
+  const makeVisible = (el) => {
+    el.classList.add("is-visible");
+  };
   const observer = new IntersectionObserver(
     (entries, obs) => {
       entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("is-visible");
+   if (entry.isIntersecting || entry.intersectionRatio > 0) {
+          makeVisible(entry.target);
           obs.unobserve(entry.target);
         }
       });
     },
-    { threshold: 0.18 }
-  );
+{
+      root: null,
+      rootMargin: "0px 0px -10%",
+      threshold: 0,
+    }  );
 
-  revealEls.forEach((el) => observer.observe(el));
-}
+ revealEls.forEach((el) => {
+    const rect = el.getBoundingClientRect();
+    if (rect.top <= window.innerHeight * 0.9) {
+      makeVisible(el);
+    } else {
+      observer.observe(el);
+    }
+  });}
 
 renderQuickMenu();
 renderCart({ persist: false });
