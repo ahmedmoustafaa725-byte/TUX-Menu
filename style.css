@@ -82,6 +82,13 @@ body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,'Helvet
 .order-notes{min-height:120px;resize:vertical}
 .form-field{width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:#0e0e0e;color:var(--ink)}
 .form-field:focus{outline:2px solid var(--gold);border-color:var(--gold)}
+.phone-field{display:flex;flex-direction:column;gap:6px}
+.phone-input{display:flex;align-items:stretch;width:100%;border:1px solid var(--border);border-radius:10px;background:#0e0e0e;overflow:hidden;transition:border-color .2s ease,box-shadow .2s ease}
+.phone-input__prefix{display:flex;align-items:center;padding:0 12px;font-weight:600;color:var(--muted);background:#111;border-right:1px solid var(--border)}
+.phone-input__field{flex:1;padding:10px 12px;border:0;background:transparent;color:var(--ink)}
+.phone-input__field::placeholder{color:var(--muted)}
+.phone-input__field:focus{outline:none}
+.phone-input:focus-within{border-color:var(--gold);box-shadow:0 0 0 2px rgba(215,185,104,.15)}
 .order-fieldset{border:1px solid var(--border);border-radius:12px;padding:12px 14px}
 .order-fieldset legend{font-weight:700;padding:0 6px}
 .order-notes-label{display:flex;flex-direction:column;gap:6px}
