@@ -53,8 +53,21 @@
           <label>Delivery address
             <input id="profileAddress" class="form-field" type="text" placeholder="Street, City">
           </label>
-          <label>Phone number
-            <input id="profilePhone" class="form-field" type="tel" required pattern="^\d{10}$" inputmode="numeric" title="Enter the 10 digits after +20" placeholder="1234567890">
+         <label class="phone-field">Phone number
+            <div class="phone-input">
+              <span class="phone-input__prefix">+20</span>
+              <input
+                id="profilePhone"
+                class="form-field phone-input__field"
+                type="tel"
+                required
+                pattern="^\d{10}$"
+                inputmode="numeric"
+                maxlength="10"
+                title="Enter the 10 digits after +20"
+                placeholder="Phone number (10 digits)"
+              >
+            </div>
           </label>
           <label>Email
             <input id="profileEmail" class="form-field" type="email" required readonly>
