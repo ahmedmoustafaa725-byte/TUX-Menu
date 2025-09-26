@@ -526,7 +526,7 @@ function validatePaymentBreakdown(total) {
     return {
       valid: true,
       method: "cash",
-      breakdown: { cash: amountDue, instapay: 0 },
+      breakdown: { cash: amountDue},
     };
   }
 
@@ -534,7 +534,7 @@ function validatePaymentBreakdown(total) {
     return {
       valid: true,
       method: "instapay",
-      breakdown: { cash: 0, instapay: amountDue },
+      breakdown: { instapay: amountDue },
     };
   }
 
@@ -566,7 +566,10 @@ function validatePaymentBreakdown(total) {
   return {
     valid: true,
     method: "split",
-    breakdown: selection.breakdown,
+    breakdown: {
+      cash: selection.breakdown.cash,
+      instapay: selection.breakdown.instapay,
+    },
   };
 }
 
@@ -1327,10 +1330,25 @@ form?.addEventListener("submit", async (event) => {
   }
 
   const paymentMethod = paymentValidation.method;
-  const paymentBreakdown = {
-    cash: Math.round((paymentValidation.breakdown.cash || 0) * 100) / 100,
-    instapay: Math.round((paymentValidation.breakdown.instapay || 0) * 100) / 100,
-  };
+   const paymentBreakdown = {};
+  const rawBreakdown = paymentValidation.breakdown || {};
+
+  if (typeof rawBreakdown.cash === "number") {
+    const amount = Math.round(rawBreakdown.cash * 100) / 100;
+    if (amount > 0 || paymentMethod === "cash" || paymentMethod === "split") {
+      paymentBreakdown.cash = amount;
+    }
+  }
+
+  if (typeof rawBreakdown.instapay === "number") {
+    const amount = Math.round(rawBreakdown.instapay * 100) / 100;
+    if (amount > 0 || paymentMethod === "instapay" || paymentMethod === "split") {
+      paymentBreakdown.instapay = amount;
+    }
+  }
+
+  const hasBreakdown = Object.keys(paymentBreakdown).length > 0;
+  const paymentBreakdownForStorage = hasBreakdown ? paymentBreakdown : null;
   updateItemsField();
 
   submitBtn.disabled = true;
@@ -1346,7 +1364,7 @@ form?.addEventListener("submit", async (event) => {
     items,
     fulfillment,
     paymentMethod,
-    paymentBreakdown,
+    paymentBreakdown: paymentBreakdownForStorage,
 
     status: "pending",
     createdAt,
