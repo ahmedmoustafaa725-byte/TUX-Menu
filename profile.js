@@ -19,6 +19,28 @@ const phoneEl = document.getElementById("profilePhone");
 const emailEl = document.getElementById("profileEmail");
 const ordersList = document.getElementById("profileOrders");
 const emptyOrders = document.getElementById("profileOrdersEmpty");
+const COUNTRY_CODE = "+20";
+const phonePattern = /^\d{10}$/;
+
+function extractPhoneDigits(value) {
+  if (typeof value !== "string") return "";
+  const digits = value.replace(/\D/g, "");
+  if (digits.length === 12 && digits.startsWith("20")) {
+    return digits.slice(2);
+  }
+  if (digits.length === 10) {
+    return digits;
+  }
+  return "";
+}
+
+function formatPhoneForStorage(input) {
+  const digits = (input || "").replace(/\D/g, "");
+  if (!phonePattern.test(digits)) {
+    return null;
+  }
+  return `${COUNTRY_CODE}${digits}`;
+}
 
 let profileRef = null;
 let currentUser = null;
@@ -123,7 +145,7 @@ onAuthStateChanged(auth, async (user) => {
       const data = snap.data();
       if (data.name && nameEl) nameEl.value = data.name;
       if (data.address && addressEl) addressEl.value = data.address;
-      if (data.phone && phoneEl) phoneEl.value = data.phone;
+      if (data.phone && phoneEl) phoneEl.value = extractPhoneDigits(data.phone);
     } else {
       await setDoc(profileRef, { createdAt: serverTimestamp() }, { merge: true });
     }
@@ -146,10 +168,22 @@ form?.addEventListener("submit", async (event) => {
 
   const name = nameEl.value.trim();
   const address = addressEl.value.trim();
-  const phone = phoneEl.value.trim();
+  const phoneDigits = phoneEl.value.replace(/\D/g, "");
 
-  if (!name || !phone) {
+  if (!name || !phoneDigits) {
     showStatus("Name and phone are required.", true);
+    return;
+  }
+if (!phonePattern.test(phoneDigits)) {
+    showStatus("Enter a 10-digit phone number. We'll add +20 for you.", true);
+    phoneEl.focus();
+    return;
+  }
+
+  const phoneForStorage = formatPhoneForStorage(phoneDigits);
+  if (!phoneForStorage) {
+    showStatus("Enter a 10-digit phone number. We'll add +20 for you.", true);
+    phoneEl.focus();
     return;
   }
 
@@ -159,7 +193,7 @@ form?.addEventListener("submit", async (event) => {
     await setDoc(profileRef, {
       name,
       address,
-      phone,
+      phone: phoneForStorage,
       updatedAt: serverTimestamp(),
     }, { merge: true });
 
