@@ -89,6 +89,8 @@ const emptyCartEl = document.getElementById("emptyCart");
 const cartSubtotalEl = document.getElementById("cartSubtotal");
 const cartDeliveryEl = document.getElementById("cartDeliveryFee");
 const cartTotalEl = document.getElementById("cartTotal");
+const cartSummarySection = document.getElementById("cartSummary");
+const checkoutPanelEl = document.getElementById("checkoutPanel");
 const deliveryFeeRow = document.getElementById("deliveryFeeRow");
 const zoneSelect = document.getElementById("deliveryZone");
 const deliveryZoneField = document.getElementById("deliveryZoneField");
@@ -150,7 +152,38 @@ const hawawshiExtras = [
   { id: "tux-hawawshi-sauce", name: "TUX Hawawshi Sauce", price: 10 },
   { id: "hawawshi-condiments", name: "BBQ / Ketchup / Sweet Chili / Hot Sauce", price: 5 },
 ];
+function populateDeliveryZones() {
+  if (!zoneSelect) return;
 
+  const previousValue = zoneSelect.value;
+  zoneSelect.innerHTML = "";
+
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.disabled = true;
+  placeholder.textContent = "Select your zone";
+  if (!previousValue) {
+    placeholder.selected = true;
+  }
+  zoneSelect.appendChild(placeholder);
+
+  deliveryZones.forEach((zone) => {
+    const option = document.createElement("option");
+    option.value = zone.id;
+    option.textContent = `${zone.name} — ${formatCurrency(zone.fee)}`;
+    zoneSelect.appendChild(option);
+  });
+
+  if (previousValue) {
+    const match = deliveryZones.find((zone) => zone.id === previousValue);
+    if (match) {
+      zoneSelect.value = match.id;
+      return;
+    }
+  }
+
+  zoneSelect.selectedIndex = 0;
+}
 const menuData = [
   {
     id: "single-smashed-patty",
@@ -513,9 +546,7 @@ function updateFulfillmentUI() {
   if (zoneSelect) {
     zoneSelect.required = needsDelivery;
     zoneSelect.disabled = !needsDelivery;
-    if (!needsDelivery) {
-      zoneSelect.value = "";
-    }
+   
   }
   if (deliveryZoneField) {
     deliveryZoneField.style.display = needsDelivery ? "" : "none";
@@ -734,10 +765,11 @@ function updateItemsField() {
 
 function updateCartUI() {
   if (!cartItemsContainer || !cartTotalEl || !cartSubtotalEl || !cartDeliveryEl) return;
+  const hasItems = cart.length > 0;
 
   cartItemsContainer.innerHTML = "";
 
-  if (!cart.length) {
+  if (!hasItems) {
     if (emptyCartEl) emptyCartEl.style.display = "block";
   } else {
     if (emptyCartEl) emptyCartEl.style.display = "none";
@@ -810,7 +842,7 @@ function updateCartUI() {
       cartItemsContainer.appendChild(li);
     });
   }
-const { subtotal, deliveryFee, total, zone } = getOrderTotals();
+  const { subtotal, deliveryFee, total, zone } = getOrderTotals();
   const fulfillment = selectedFulfillment();
   const needsDelivery = fulfillment === "delivery";
   cartSubtotalEl.textContent = formatCurrency(subtotal);
@@ -822,7 +854,28 @@ const { subtotal, deliveryFee, total, zone } = getOrderTotals();
   cartTotalEl.textContent = formatCurrency(total);
 
   if (deliveryFeeRow) {
-    deliveryFeeRow.style.display = needsDelivery ? "flex" : "none";
+  deliveryFeeRow.style.display = needsDelivery && hasItems ? "flex" : "none";
+  }
+
+  if (deliveryZoneNote) {
+    if (!needsDelivery) {
+      deliveryZoneNote.textContent = "Delivery fee appears after choosing your zone.";
+    } else if (zone) {
+      deliveryZoneNote.textContent = `${zone.name} delivery fee: ${formatCurrency(deliveryFee)}.`;
+    } else {
+      deliveryZoneNote.textContent = "Delivery fee appears after choosing your zone.";
+    }
+  }
+
+  if (cartSummarySection) {
+    cartSummarySection.classList.toggle("hidden", !hasItems);    
+  }
+   if (checkoutPanelEl) {
+    checkoutPanelEl.classList.toggle("hidden", !hasItems);
+  }
+
+  if (clearCartBtn) {
+    clearCartBtn.classList.toggle("hidden", !hasItems);
   }
   updateItemsField();
   updatePaymentInputsState(total);
@@ -938,6 +991,7 @@ clearCartBtn?.addEventListener("click", () => {
   updateCartUI();
   showStatus("Cart cleared. Add items again when you're ready.");
 });
+populateDeliveryZones();
 
 renderMenu();
 const quickCartSeed = loadQuickCartTransfer();
@@ -1058,6 +1112,14 @@ onAuthStateChanged(auth, async (user) => {
       if (data.name && nameEl) nameEl.value = data.name;
       if (data.address && addressEl) addressEl.value = data.address;
       if (data.phone && phoneEl) phoneEl.value = extractPhoneDigits(data.phone);
+            if (data.fulfillmentPreference && fulfillmentInputs.length) {
+        fulfillmentInputs.forEach((input) => {
+          input.checked = input.value === data.fulfillmentPreference;
+        });
+      }
+      if (data.deliveryZoneId && zoneSelect) {
+        zoneSelect.value = data.deliveryZoneId;
+      }
     } else {
       await setDoc(profileRef, { createdAt: serverTimestamp() }, { merge: true });
     }
@@ -1197,13 +1259,24 @@ const orderPayload = Object.entries(baseOrderPayload).reduce((acc, [key, value])
     return acc;
   }, {});
   try {
-    await setDoc(profileRef, {
+    const profileUpdate = {
       name,
-      address,
+      
       phone: phoneForStorage,
       updatedAt: serverTimestamp(),
-    }, { merge: true });
+fulfillmentPreference: fulfillment,
+    };
 
+    if (address) {
+      profileUpdate.address = address;
+    }
+
+    if (fulfillment === "delivery" && selectedZone) {
+      profileUpdate.deliveryZoneId = selectedZone.id;
+      profileUpdate.deliveryZoneName = selectedZone.name;
+    }
+
+    await setDoc(profileRef, profileUpdate, { merge: true });
     const ordersCol = collection(profileRef, "orders");
     const orderDocRef = await addDoc(ordersCol, orderPayload);
 await syncOrderToPOS({ ...orderPayload, id: orderDocRef.id });
