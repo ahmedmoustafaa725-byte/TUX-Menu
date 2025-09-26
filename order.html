@@ -93,10 +93,45 @@
 
             <fieldset class="order-fieldset" aria-labelledby="paymentLegend">
               <legend id="paymentLegend">Payment method</legend>
-              <p class="muted small">Weaccept cash for both pickup and delivery.</p>
-              <div class="order-options">
-                <label><input type="radio" name="payment" value="cash" checked> Cash</label>
-                <label><input type="radio" name="payment" value="card"> Instapay on delivery</label>
+          <p class="muted small">We accept cash and Instapay for both pickup and delivery. Feel free to split your total between them.</p>
+              <div class="split-payment">
+                <div class="split-payment__option">
+                  <label class="split-payment__toggle">
+                    <input type="checkbox" id="paymentCash" checked>
+                    <span>Cash</span>
+                  </label>
+                  <label class="split-payment__amount">
+                    Cash amount
+                    <input
+                      id="cashAmount"
+                      class="form-field"
+                      type="number"
+                      min="0"
+                      step="0.5"
+                      inputmode="decimal"
+                      placeholder="0"
+                    >
+                  </label>
+                </div>
+                <div class="split-payment__option">
+                  <label class="split-payment__toggle">
+                    <input type="checkbox" id="paymentInstapay">
+                    <span>Instapay</span>
+                  </label>
+                  <label class="split-payment__amount">
+                    Instapay amount
+                    <input
+                      id="instapayAmount"
+                      class="form-field"
+                      type="number"
+                      min="0"
+                      step="0.5"
+                      inputmode="decimal"
+                      placeholder="0"
+                    >
+                  </label>
+                </div>
+                <p class="muted small split-payment__hint">Enter how much you’ll pay with each method — the amounts should add up to your order total.</p>
               </div>
             </fieldset>
 
