@@ -19,20 +19,16 @@
           <div class="brand__tag">Burgers Worth The Chase …</div>
         </div>
       </a>
-      <nav class="nav" aria-label="Primary">
+      <nav class="nav" id="primaryNav" aria-label="Primary">
         <a href="#menu">Menu</a>
         <a href="#gallery">Gallery</a>
         <a href="#location">Location</a>
         <a href="#contact">Contact</a>
         <a href="order.html" id="orderLink" class="btn small red">Order Online</a>
         <a href="account.html" id="accountLink" class="btn small outline">Login / Sign up</a>
-        <a href="#" id="logoutLink" class="btn small outline" style="display:none">Log out</a>
+        <a href="#" id="logoutLink" class="btn small outline">Log out</a>
       </nav>
-      <button id="quickNavToggle" class="menu-toggle" type="button" aria-haspopup="dialog" aria-expanded="false" aria-controls="quickNavPanel">
-        <svg width="22" height="16" viewBox="0 0 22 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <path d="M1 1h20M1 8h20M1 15h20" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
-        </svg>
-      </button>
+
     </div>
   </header>
 
@@ -152,8 +148,8 @@
           <a class="card" href="assets/img/menu-hawawshi.jpg" target="_blank" rel="noreferrer">
             <img src="assets/img/menu-hawawshi.jpg" alt="Menu — Hawawshi">
           </a>
-          <a class="card" href="assets/img/menu-tuxify.jpg" target="_blank" rel="noreferrer">
-            <img src="assets/img/menu-tuxify.jpg" alt="Menu — TUXIFY">
+          <a class="card" href="assets/img/poster-tuxify.jpg" target="_blank" rel="noreferrer">
+            <img src="assets/img/poster-tuxify.jpg" alt="Menu — TUXIFY">
           </a>
         </div>
       </div>
@@ -233,35 +229,7 @@
       </span>
       <span class="floating-dock__label">Order Now</span>
     </button>
-    <button id="cartDock" class="floating-dock__button" type="button" aria-haspopup="dialog">
-      <span class="floating-dock__icon" aria-hidden="true">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M2 3h2l1.6 9.2a2 2 0 0 0 2 1.7h6.9a2 2 0 0 0 1.96-1.6L17 6H5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
-          <circle cx="8" cy="17" r="1.5" stroke="currentColor" stroke-width="1.6" />
-          <circle cx="14" cy="17" r="1.5" stroke="currentColor" stroke-width="1.6" />
-        </svg>
-      </span>
-      <span class="floating-dock__label">Cart</span>
-    </button>
-  </div>
 
-  <div class="overlay overlay--nav" id="quickNavPanel" role="dialog" aria-modal="true" aria-label="Quick navigation">
-    <div class="overlay__panel">
-      <div class="overlay__header">
-        <h3 class="overlay__title">Navigate</h3>
-        <button class="overlay__close" type="button" data-close>
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <ul class="quick-nav__links">
-        <li><a href="#menu" data-close-panel>Menu <span>Explore the full lineup</span></a></li>
-        <li><a href="#gallery" data-close-panel>Gallery <span>Poster collection</span></a></li>
-        <li><a href="#location" data-close-panel>Location <span>Find the truck</span></a></li>
-        <li><a href="#contact" data-close-panel>Contact <span>Stay connected</span></a></li>
-        <li><a href="order.html" id="orderLinkMobile" data-close-panel>Order Online <span>Full experience</span></a></li>
-        <li><a href="account.html" id="accountLinkMobile" data-close-panel>Login / Sign up <span>Access your profile</span></a></li>
-      </ul>
-    </div>
   </div>
 
   <div class="overlay" id="quickOrderPanel" role="dialog" aria-modal="true" aria-label="Order menu">
