@@ -1,130 +1,132 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="en" dir="ltr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>TUX — Login</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: { gold: '#d7b968' },
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-            brand: ['Playfair Display', 'serif'],
-          },
-        },
-      },
-    };
-  </script>
-  <style>
-    body { background: #0a0a0a; color: #f5f5f5; font-family: 'Inter', sans-serif; }
-  </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>TUX — Account</title>
+  <link rel="stylesheet" href="style.css">
 </head>
-<body class="flex min-h-screen flex-col">
-  <header class="py-6">
-    <div class="mx-auto max-w-md px-4 text-center">
-      <a href="index.html" class="inline-flex items-center gap-3" aria-label="Back to home">
-        <img src="assets/img/logo.jpg" alt="TUX logo" class="h-14 w-14 rounded-xl border border-gold p-1">
-        <span class="font-brand text-3xl font-semibold text-gold">TUX</span>
-       </a>
+<body>
+  <header class="topbar">
+    <div class="container bar">
+      <a href="index.html" class="brand" aria-label="TUX Home">
+        <img src="assets/img/logo.jpg" alt="TUX logo" class="brand__logo">
+        <div class="brand__text">
+          <div class="brand__title">TUX</div>
+          <div class="brand__tag">Burgers Worth The Chase …</div>
+        </div>
+      </a>
+      <nav class="nav">
+        <a href="index.html#menu">Menu</a>
+        <a href="index.html#gallery">Gallery</a>
+        <a href="index.html#location">Location</a>
+        <a href="index.html#contact">Contact</a>
+      </nav>
     </div>
   </header>
 
-  <main class="flex flex-1 items-center justify-center px-4 py-12">
-    <div class="w-full max-w-md">
-      <div class="rounded-3xl border border-gray-800 bg-black/60 p-8 shadow-2xl shadow-black/40">
-        <div class="text-center">
-          <h1 class="font-brand text-3xl font-semibold text-gold">Welcome back</h1>
-          <p class="mt-2 text-sm text-gray-400">Sign in to keep your favourites at your fingertips.</p>
-        </div>
-        <form id="loginForm" class="mt-8 space-y-5">
-          <label class="block text-left text-sm font-medium text-gray-300">
-            Email
-            <input id="loginEmail" type="email" autocomplete="email" required placeholder="you@example.com" class="mt-1 w-full rounded-xl border border-gray-700 bg-gray-950 px-4 py-3 text-sm text-white placeholder-gray-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-gold">
+  <main class="section">
+    <div class="container" style="max-width:520px">
+      <header class="section__head">
+        <h2>Log in</h2>
+        <p class="muted">Welcome back 👋</p>
+      </header>
+
+      <div class="panel">
+        <form id="loginForm" style="display:grid;gap:12px">
+          <label>Email
+            <input id="loginEmail" type="email" required placeholder="you@example.com" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:#0e0e0e;color:var(--ink)">
           </label>
-          <label class="block text-left text-sm font-medium text-gray-300">
-            Password
-            <input id="loginPassword" type="password" autocomplete="current-password" required placeholder="••••••••" class="mt-1 w-full rounded-xl border border-gray-700 bg-gray-950 px-4 py-3 text-sm text-white placeholder-gray-500 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-gold">
+          <label>Password
+            <input id="loginPassword" type="password" required placeholder="••••••••" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:#0e0e0e;color:var(--ink)">
           </label>
-          <button type="submit" class="w-full rounded-full bg-gold px-4 py-3 text-lg font-semibold text-black transition hover:scale-[1.02] hover:bg-yellow-500">Log In</button>
-          <button id="forgotBtn" type="button" class="w-full text-sm font-medium text-gray-400 transition hover:text-gold">Forgot password?</button>
-          <p id="loginMsg" class="min-h-[1.5rem] text-center text-sm text-red-400"></p>
+          <button class="btn red" type="submit">Log in</button>
+          <button class="btn outline" id="forgotBtn" type="button">Forgot password?</button>
+          <div id="loginMsg" class="muted"></div>
         </form>
-        <p class="mt-6 border-t border-gray-800 pt-6 text-center text-sm text-gray-400">
-          Don&apos;t have an account?
-          <a id="createAccountLink" href="register.html" class="font-semibold text-gold hover:underline">Create one now</a>
-        </p>
       </div>
+
+      <p style="margin-top:16px">
+        Don’t have an account?
+        <a class="btn" id="createAccountLink" href="register.html">Create an account</a>
+      </p>
     </div>
   </main>
 
-  <script type="module">
-    import { auth } from './firebase-init.js';
-    import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js';
+ <script type="module">
+  import { auth } from "./firebase-init.js";
+  import {
+    signInWithEmailAndPassword,
+    sendPasswordResetEmail,
+  } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
-    const form = document.getElementById('loginForm');
-    const emailEl = document.getElementById('loginEmail');
-    const passEl = document.getElementById('loginPassword');
-    const msgEl = document.getElementById('loginMsg');
-    const forgotBtn = document.getElementById('forgotBtn');
-    const registerLink = document.getElementById('createAccountLink');
-
-    const params = new URLSearchParams(window.location.search);
-    const redirectParam = params.get('redirect');
-    const safeRedirect = redirectParam && !/^https?:/i.test(redirectParam) ? redirectParam : 'profile.html';
-
-    if (registerLink && safeRedirect) {
-      registerLink.href = `register.html?redirect=${encodeURIComponent(safeRedirect)}`;
+  // Map Firebase auth error codes to friendly messages
+  function mapAuthError(err) {
+    const code = (err && err.code) || "";
+    switch (code) {
+      case "auth/invalid-credential":
+      case "auth/wrong-password":
+      case "auth/user-not-found":
+        return "Email or password is incorrect.";
+      case "auth/invalid-email":
+        return "Please enter a valid email address.";
+      case "auth/user-disabled":
+        return "This account has been disabled. Contact support.";
+      case "auth/too-many-requests":
+        return "Too many attempts. Please try again later.";
+      case "auth/network-request-failed":
+        return "Network error. Check your connection and try again.";
+      default:
+        return "Something went wrong. Please try again.";
     }
+  }
 
-    const setMessage = (message, tone = 'error') => {
-      msgEl.textContent = message || '';
-      msgEl.style.color = tone === 'error' ? '#f87171' : '#9ca3af';
-    };
+  const $ = (id) => document.getElementById(id);
+  const loginForm = $("loginForm");
+  const emailEl   = $("loginEmail");
+  const passEl    = $("loginPassword");
+  const msg       = $("loginMsg");
+  const forgot    = $("forgotBtn");
+  const registerLink = $("createAccountLink");
 
-    const mapAuthError = (error) => {
-      const map = {
-        'auth/invalid-email': 'Please enter a valid email address.',
-        'auth/user-not-found': 'Email or password is incorrect.',
-        'auth/wrong-password': 'Email or password is incorrect.',
-        'auth/invalid-credential': 'Email or password is incorrect.',
-        'auth/user-disabled': 'This account has been disabled.',
-        'auth/too-many-requests': 'Too many attempts. Try again later.',
-      };
-      return map[error.code] || 'Something went wrong. Please try again.';
-    };
+  const params = new URLSearchParams(window.location.search);
+  const redirectParam = params.get("redirect");
+  const safeRedirect =
+    redirectParam && !/^https?:/i.test(redirectParam) ? redirectParam : "";
 
-    form.addEventListener('submit', async (event) => {
-      event.preventDefault();
-      setMessage('Signing you in…', 'info');
-      try {
-        await signInWithEmailAndPassword(auth, emailEl.value.trim(), passEl.value);
-        window.location.href = safeRedirect;
-      } catch (error) {
-        setMessage(mapAuthError(error));
-      }
-    });
+  if (registerLink && safeRedirect) {
+    registerLink.href = `register.html?redirect=${encodeURIComponent(safeRedirect)}`;
+  }
 
-    forgotBtn.addEventListener('click', async () => {
-      const email = emailEl.value.trim();
-      if (!email) {
-        setMessage('Enter your email first.');
-        emailEl.focus();
-        return;
-      }
-      setMessage('Sending reset link…', 'info');
-      try {
-        await sendPasswordResetEmail(auth, email);
-        setMessage('Password reset email sent!', 'info');
-      } catch (error) {
-        setMessage(mapAuthError(error));
-      }
-    });
-  </script>
+  // Helper to show status text
+  function setMsg(text) {
+    msg.textContent = text || "";
+  }
+
+  loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    setMsg("Logging in…");
+    try {
+      await signInWithEmailAndPassword(auth, emailEl.value.trim(), passEl.value);
+      const destination = safeRedirect || "index.html";
+      window.location.href = destination;
+    } catch (err) {
+      setMsg(mapAuthError(err)); // <-- friendly message here
+    }
+  });
+
+  forgot.addEventListener("click", async () => {
+    const email = emailEl.value.trim();
+    if (!email) { setMsg("Enter your email above first."); return; }
+    setMsg("Sending reset email…");
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setMsg("Password reset email sent. Check your inbox.");
+    } catch (err) {
+      setMsg(mapAuthError(err)); // <-- friendly message here too
+    }
+  });
+</script>
+
 </body>
 </html>
