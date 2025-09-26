@@ -6,152 +6,127 @@
   <title>TUX — Account</title>
   <link rel="stylesheet" href="style.css">
 </head>
-<body class="auth-page">
-  <input type="checkbox" id="mobileNavToggle" class="nav-toggle-input" hidden aria-hidden="true">
-  <header class="site-header">
-    <div class="shell site-header__inner">
+<body>
+  <header class="topbar">
+    <div class="container bar">
       <a href="index.html" class="brand" aria-label="TUX Home">
         <img src="assets/img/logo.jpg" alt="TUX logo" class="brand__logo">
-        <span class="brand__text">
-          <span class="brand__title">TUX</span>
-          <span class="brand__tag">Burgers Worth The Chase …</span>
-        </span>
+        <div class="brand__text">
+          <div class="brand__title">TUX</div>
+          <div class="brand__tag">Burgers Worth The Chase …</div>
+        </div>
       </a>
-      <nav class="site-nav" aria-label="Primary">
-        <div class="site-nav__header">
-          <span>Navigate</span>
-          <label for="mobileNavToggle" class="nav-close" aria-label="Close menu">
-            <span></span>
-            <span></span>
-          </label>
-        </div>
-        <ul class="site-nav__links">
-          <li><a href="index.html#menu">Menu</a></li>
-          <li><a href="index.html#experience">Experience</a></li>
-          <li><a href="index.html#gallery">Gallery</a></li>
-          <li><a href="index.html#location">Location</a></li>
-          <li><a href="index.html#contact">Contact</a></li>
-        </ul>
-        <div class="site-nav__actions">
-          <a href="order.html" class="nav-action nav-action--accent">
-            <span class="nav-action__icon" aria-hidden="true">
-              <svg viewBox="0 0 24 24" role="img" focusable="false">
-                <path d="M4.5 6.75h1.14l2.4 10.16a1.5 1.5 0 0 0 1.47 1.14h7.86a1.5 1.5 0 0 0 1.47-1.14l1.74-7.4H8.32" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                <circle cx="10.75" cy="20" r="1.4" fill="currentColor"/>
-                <circle cx="17.25" cy="20" r="1.4" fill="currentColor"/>
-              </svg>
-            </span>
-            <span>Order Now</span>
-          </a>
-          <a href="account.html" id="accountLink" class="nav-action">Account</a>
-        </div>
-        <div class="site-nav__mobile">
-          <a href="order.html" class="btn btn--primary">Order Now</a>
-        </div>
+      <nav class="nav">
+        <a href="index.html#menu">Menu</a>
+        <a href="index.html#gallery">Gallery</a>
+        <a href="index.html#location">Location</a>
+        <a href="index.html#contact">Contact</a>
       </nav>
-      <label class="nav-toggle" for="mobileNavToggle" aria-label="Open menu">
-        <span></span>
-        <span></span>
-        <span></span>
-      </label>
     </div>
   </header>
-  <label for="mobileNavToggle" class="nav-overlay" aria-hidden="true"></label>
 
-  <main class="auth-wrapper">
-    <div class="shell">
-      <div class="auth-card">
-        <div>
-          <h1>Welcome back</h1>
-          <p class="muted">Log in to access your profile, saved delivery details, and order history.</p>
-        </div>
-        <form id="loginForm">
+  <main class="section">
+    <div class="container" style="max-width:520px">
+      <header class="section__head">
+        <h2>Log in</h2>
+        <p class="muted">Welcome back 👋</p>
+      </header>
+
+      <div class="panel">
+        <form id="loginForm" style="display:grid;gap:12px">
           <label>Email
-            <input id="loginEmail" type="email" required placeholder="you@example.com">
+            <input id="loginEmail" type="email" required placeholder="you@example.com" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:#0e0e0e;color:var(--ink)">
           </label>
           <label>Password
-            <input id="loginPassword" type="password" required placeholder="••••••••">
+            <input id="loginPassword" type="password" required placeholder="••••••••" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:#0e0e0e;color:var(--ink)">
           </label>
-          <button class="btn btn--primary" type="submit">Log in</button>
-          <button class="btn btn--ghost" id="forgotBtn" type="button">Forgot password?</button>
-          <div id="loginMsg" class="small"></div>
+          <button class="btn red" type="submit">Log in</button>
+          <button class="btn outline" id="forgotBtn" type="button">Forgot password?</button>
+          <div id="loginMsg" class="muted"></div>
         </form>
-        <p class="muted">Don’t have an account? <a id="createAccountLink" href="register.html">Create one in seconds.</a></p>
       </div>
+
+      <p style="margin-top:16px">
+        Don’t have an account?
+        <a class="btn" id="createAccountLink" href="register.html">Create an account</a>
+      </p>
     </div>
   </main>
 
-  <script type="module">
-    import { auth } from "./firebase-init.js";
-    import {
-      signInWithEmailAndPassword,
-      sendPasswordResetEmail,
-    } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+ <script type="module">
+  import { auth } from "./firebase-init.js";
+  import {
+    signInWithEmailAndPassword,
+    sendPasswordResetEmail,
+  } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
-    function mapAuthError(err) {
-      const code = (err && err.code) || "";
-      switch (code) {
-        case "auth/invalid-credential":
-        case "auth/wrong-password":
-        case "auth/user-not-found":
-          return "Email or password is incorrect.";
-        case "auth/invalid-email":
-          return "Please enter a valid email address.";
-        case "auth/user-disabled":
-          return "This account has been disabled. Contact support.";
-        case "auth/too-many-requests":
-          return "Too many attempts. Please try again later.";
-        case "auth/network-request-failed":
-          return "Network error. Check your connection and try again.";
-        default:
-          return "Something went wrong. Please try again.";
-      }
+  // Map Firebase auth error codes to friendly messages
+  function mapAuthError(err) {
+    const code = (err && err.code) || "";
+    switch (code) {
+      case "auth/invalid-credential":
+      case "auth/wrong-password":
+      case "auth/user-not-found":
+        return "Email or password is incorrect.";
+      case "auth/invalid-email":
+        return "Please enter a valid email address.";
+      case "auth/user-disabled":
+        return "This account has been disabled. Contact support.";
+      case "auth/too-many-requests":
+        return "Too many attempts. Please try again later.";
+      case "auth/network-request-failed":
+        return "Network error. Check your connection and try again.";
+      default:
+        return "Something went wrong. Please try again.";
     }
+  }
 
-    const $ = (id) => document.getElementById(id);
-    const loginForm = $("loginForm");
-    const emailEl   = $("loginEmail");
-    const passEl    = $("loginPassword");
-    const msg       = $("loginMsg");
-    const forgot    = $("forgotBtn");
-    const registerLink = $("createAccountLink");
+  const $ = (id) => document.getElementById(id);
+  const loginForm = $("loginForm");
+  const emailEl   = $("loginEmail");
+  const passEl    = $("loginPassword");
+  const msg       = $("loginMsg");
+  const forgot    = $("forgotBtn");
+  const registerLink = $("createAccountLink");
 
-    const params = new URLSearchParams(window.location.search);
-    const redirectParam = params.get("redirect");
-    const safeRedirect =
-      redirectParam && !/^https?:/i.test(redirectParam) ? redirectParam : "";
+  const params = new URLSearchParams(window.location.search);
+  const redirectParam = params.get("redirect");
+  const safeRedirect =
+    redirectParam && !/^https?:/i.test(redirectParam) ? redirectParam : "";
 
-    if (registerLink && safeRedirect) {
-      registerLink.href = `register.html?redirect=${encodeURIComponent(safeRedirect)}`;
+  if (registerLink && safeRedirect) {
+    registerLink.href = `register.html?redirect=${encodeURIComponent(safeRedirect)}`;
+  }
+
+  // Helper to show status text
+  function setMsg(text) {
+    msg.textContent = text || "";
+  }
+
+  loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    setMsg("Logging in…");
+    try {
+      await signInWithEmailAndPassword(auth, emailEl.value.trim(), passEl.value);
+      const destination = safeRedirect || "index.html";
+      window.location.href = destination;
+    } catch (err) {
+      setMsg(mapAuthError(err)); // <-- friendly message here
     }
+  });
 
-    function setMsg(text) {
-      msg.textContent = text || "";
+  forgot.addEventListener("click", async () => {
+    const email = emailEl.value.trim();
+    if (!email) { setMsg("Enter your email above first."); return; }
+    setMsg("Sending reset email…");
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setMsg("Password reset email sent. Check your inbox.");
+    } catch (err) {
+      setMsg(mapAuthError(err)); // <-- friendly message here too
     }
+  });
+</script>
 
-    loginForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      setMsg("Logging in…");
-      try {
-        await signInWithEmailAndPassword(auth, emailEl.value.trim(), passEl.value);
-        const destination = safeRedirect || "index.html";
-        window.location.href = destination;
-      } catch (err) {
-        setMsg(mapAuthError(err));
-      }
-    });
-
-    forgot.addEventListener("click", async () => {
-      const email = emailEl.value.trim();
-      if (!email) { setMsg("Enter your email above first."); return; }
-      setMsg("Sending reset email…");
-      try {
-        await sendPasswordResetEmail(auth, email);
-        setMsg("Password reset email sent. Check your inbox.");
-      } catch (err) {
-        setMsg(mapAuthError(err));
-      }
-    });
-  </script>
 </body>
 </html>
