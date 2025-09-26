@@ -79,12 +79,17 @@ button {
 }
 
 .reveal {
+  opacity: 1;
+  transform: none;
+}
+
+.js .reveal {
   opacity: 0;
   transform: translateY(42px) scale(0.97);
   transition: opacity 0.8s var(--transition), transform 0.8s var(--transition);
 }
 
-.reveal.is-visible {
+.js .reveal.is-visible {
   opacity: 1;
   transform: none;
 }
