@@ -113,9 +113,12 @@ async function loadOrders() {
         li.appendChild(instructions);
       }
 
-      const statusLine = document.createElement("p");
-      statusLine.textContent = `Status: ${data.status || "pending"}`;
-      li.appendChild(statusLine);
+    const status = (data.status || "").trim();
+      if (status && status.toLowerCase() !== "pending") {
+        const statusLine = document.createElement("p");
+        statusLine.textContent = `Status: ${data.status}`;
+        li.appendChild(statusLine);
+      }
 
       if (data.fulfillment === "delivery" && data.address) {
         const addressLine = document.createElement("p");
