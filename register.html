@@ -41,7 +41,7 @@
             <input id="address" type="text" required placeholder="Street, City" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:#0e0e0e;color:var(--ink)">
           </label>
           <label>Phone
-            <input id="phone" type="tel" required placeholder="01X-XXXX-XXXX" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:#0e0e0e;color:var(--ink)">
+ <input id="phone" type="tel" required pattern="^\d{10}$" inputmode="numeric" title="Enter the 10 digits after +20" placeholder="1234567890" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:#0e0e0e;color:var(--ink)">
           </label>
           <label>Email
             <input id="email" type="email" required placeholder="you@example.com" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:#0e0e0e;color:var(--ink)">
@@ -68,8 +68,9 @@
     const $ = (id) => document.getElementById(id);
     const form = $("regForm");
     const msg  = $("regMsg");
- const loginLink = $("backToLogin");
-
+ const phoneInput = $("phone");
+    const phonePattern = /^\d{10}$/;
+    const loginLink = $("backToLogin");
     const params = new URLSearchParams(window.location.search);
     const redirectParam = params.get("redirect");
     const safeRedirect = redirectParam && !/^https?:/i.test(redirectParam) ? redirectParam : "";
@@ -84,17 +85,24 @@
 
       const name    = $("name").value.trim();
       const address = $("address").value.trim();
-      const phone   = $("phone").value.trim();
+      const phoneDigits = phoneInput.value.replace(/\D/g, "");
       const email   = $("email").value.trim();
       const pass    = $("password").value;
+  if (!phonePattern.test(phoneDigits)) {
+        msg.textContent = "Enter a 10-digit phone number. We'll add +20 for you.";
+        phoneInput.focus();
+        return;
+      }
 
+      const phoneForStorage = `+20${phoneDigits}`;
       try {
         const cred = await createUserWithEmailAndPassword(auth, email, pass);
 
         // Save profile in Firestore (/profiles/{uid})
         await setDoc(doc(db, "profiles", cred.user.uid), {
-          name, address, phone,
-          email,
+ name,
+          address,
+          phone: phoneForStorage,          email,
           createdAt: serverTimestamp()
         });
 
@@ -102,8 +110,9 @@
         await updateProfile(cred.user, { displayName: name });
 
         // Done → Back to main site; header will show the name
-const destination = safeRedirect || "index.html";
-        window.location.href = destination;      } catch (err) {
+   const destination = safeRedirect || "index.html";
+        window.location.href = destination;
+      } catch (err) {
         msg.textContent = err.message;
       }
     });
