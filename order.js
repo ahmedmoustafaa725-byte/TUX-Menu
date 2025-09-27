@@ -507,6 +507,8 @@ function updatePaymentInputsState(orderTotal, { fromToggle = false } = {}) {
     cashAmountInput.disabled = method !== "split" && method !== "cash";
     if (method === "cash") {
       cashAmountInput.value = orderTotal > 0 ? orderTotal.toFixed(2) : "";
+       } else if (method === "split" && fromToggle) {
+      cashAmountInput.value = "";
     } else if (method !== "split") {
       cashAmountInput.value = "";
     }
@@ -516,6 +518,8 @@ function updatePaymentInputsState(orderTotal, { fromToggle = false } = {}) {
     instapayAmountInput.disabled = method !== "split" && method !== "instapay";
     if (method === "instapay") {
       instapayAmountInput.value = orderTotal > 0 ? orderTotal.toFixed(2) : "";
+        } else if (method === "split" && fromToggle) {
+      instapayAmountInput.value = "";
     } else if (method !== "split") {
       instapayAmountInput.value = "";
     }
