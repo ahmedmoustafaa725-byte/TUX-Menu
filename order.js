@@ -108,8 +108,6 @@ const mobileMenuButton = document.getElementById("mobileMenuButton");
 const mobileMenu = document.getElementById("mobileMenu");
 
 const quickTransferKey = "tuxQuickCartTransfer";
-const quickTransferMaxAgeMs = 5 * 60 * 1000;
-
 let currentUser = null;
 let profileRef = null;
 let cart = [];
@@ -362,11 +360,6 @@ function loadQuickCartTransfer() {
     sessionStorage.removeItem(quickTransferKey);
     const parsed = JSON.parse(raw);
     if (!parsed || typeof parsed !== "object") return null;
-     const createdAt = Number(parsed.createdAt);
-    if (Number.isFinite(createdAt) && Date.now() - createdAt > quickTransferMaxAgeMs) {
-      console.info("Ignoring stale quick cart transfer payload.");
-      return null;
-    }
     return parsed;
   } catch (err) {
     console.warn("Failed to load quick cart transfer", err);
@@ -900,9 +893,8 @@ function updateCartUI() {
   if (!cartItemsContainer || !cartTotalEl || !cartSubtotalEl || !cartDeliveryEl) return;
   const hasItems = cart.length > 0;
 
- cartItemsContainer.textContent = "";
+  cartItemsContainer.innerHTML = "";
 
-  const fragment = document.createDocumentFragment();
   if (!hasItems) {
     if (emptyCartEl) {
       emptyCartEl.style.display = "block";
@@ -976,11 +968,9 @@ function updateCartUI() {
 
       li.appendChild(controls);
 
-      fragment.appendChild(li);
+      cartItemsContainer.appendChild(li);
     });
   }
-    cartItemsContainer.appendChild(fragment);
-
   const { subtotal, deliveryFee, total, zone } = getOrderTotals();
   const fulfillment = selectedFulfillment();
   const needsDelivery = fulfillment === "delivery";

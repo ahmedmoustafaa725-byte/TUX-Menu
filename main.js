@@ -218,10 +218,8 @@ function formatCurrency(value) {
   }
 }
 
-let persistHandle = null;
-let persistHandleUsesIdle = false;
-
-function writeStateToStorage() {  try {
+function persistState() {
+  try {
     const payload = {
       cart: state.cart.map((entry) => ({ id: entry.id, quantity: entry.quantity })),
       checkout: { ...state.checkout },
@@ -231,48 +229,7 @@ function writeStateToStorage() {  try {
     console.warn("Failed to store cart", err);
   }
 }
-function cancelScheduledPersist() {
-  if (persistHandle === null) return;
-  if (
-    persistHandleUsesIdle &&
-    typeof window !== "undefined" &&
-    typeof window.cancelIdleCallback === "function"
-  ) {
-    window.cancelIdleCallback(persistHandle);
-  } else {
-    clearTimeout(persistHandle);
-  }
-  persistHandle = null;
-}
 
-function persistState(options = {}) {
-  const immediate = options.immediate === true;
-  if (immediate) {
-    cancelScheduledPersist();
-    writeStateToStorage();
-    return;
-  }
-
-  if (persistHandle !== null) {
-    return;
-  }
-
-  const flush = () => {
-    persistHandle = null;
-    writeStateToStorage();
-  };
-
-  if (
-    typeof window !== "undefined" &&
-    typeof window.requestIdleCallback === "function"
-  ) {
-    persistHandleUsesIdle = true;
-    persistHandle = window.requestIdleCallback(flush, { timeout: 250 });
-  } else {
-    persistHandleUsesIdle = false;
-    persistHandle = window.setTimeout(flush, 120);
-  }
-}
 function calculateSubtotal() {
   return state.cart.reduce((total, entry) => {
     const menuItem = menuIndex.get(entry.id);
@@ -318,18 +275,18 @@ function closeOverlay() {
 
 function renderQuickMenu() {
   if (!quickOrderList) return;
-  const fragment = document.createDocumentFragment();
+  quickOrderList.innerHTML = "";
   quickMenu.forEach((group) => {
     const category = document.createElement("div");
     category.className = "quick-order__category";
     category.textContent = group.title;
-    fragment.appendChild(category);
+    quickOrderList.appendChild(category);
 
     if (group.note) {
       const note = document.createElement("div");
       note.className = "quick-order__note";
       note.textContent = group.note;
-      fragment.appendChild(note);
+      quickOrderList.appendChild(note);
     }
 
     group.items.forEach((item) => {
@@ -383,11 +340,9 @@ function renderQuickMenu() {
       actions.appendChild(addBtn);
 
       card.appendChild(actions);
-      fragment.appendChild(card);
+      quickOrderList.appendChild(card);
     });
   });
-  quickOrderList.textContent = "";
-  quickOrderList.appendChild(fragment);
 }
 
 function updateSplitVisibility() {
@@ -445,15 +400,13 @@ function updateCartSummary({ persist = true } = {}) {
 
 function renderCart({ persist = true } = {}) {
   if (!quickCartItems) return;
- quickCartItems.textContent = "";
+  quickCartItems.innerHTML = "";
 
-  const fragment = document.createDocumentFragment();
   if (!state.cart.length) {
     const empty = document.createElement("div");
     empty.className = "quick-cart__empty";
     empty.textContent = "Your cart is empty.";
-  fragment.appendChild(empty);
-    quickCartItems.appendChild(fragment);
+    quickCartItems.appendChild(empty);
     updateCartSummary({ persist });
     updateCartBadge();
     return;
@@ -515,9 +468,8 @@ function renderCart({ persist = true } = {}) {
     controls.appendChild(remove);
 
     itemEl.appendChild(controls);
-    fragment.appendChild(itemEl);
+    quickCartItems.appendChild(itemEl);
   });
-  quickCartItems.appendChild(fragment);
 
   updateCartSummary({ persist });
   updateCartBadge();
@@ -621,7 +573,7 @@ function handlePlaceOrder(event) {
   state.checkout.phone = quickPhone?.value.trim() || "";
   state.checkout.notes = quickNotes?.value.trim() || "";
 
-  persistState({ immediate: true });
+  persistState();
 
   const transferPayload = {
     cart: state.cart.map((entry) => ({ id: entry.id, quantity: entry.quantity })),
@@ -722,7 +674,7 @@ function attachEvents() {
 
   quickCartClear?.addEventListener("click", () => {
     state.cart = [];
-  persistState({ immediate: true });
+    persistState();
     renderCart({ persist: false });
     updateCartSummary({ persist: true });
     updateCartBadge();
@@ -771,18 +723,8 @@ function attachEvents() {
 
 function initRevealAnimations() {
   const revealEls = document.querySelectorAll(".reveal");
- if (!revealEls.length) return;
-
-  const prefersReducedMotion =
-    typeof window !== "undefined" &&
-    typeof window.matchMedia === "function" &&
-    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-
-  if (
-    prefersReducedMotion ||
-    typeof window === "undefined" ||
-    !("IntersectionObserver" in window)
-  ) {    revealEls.forEach((el) => el.classList.add("is-visible"));
+  if (!("IntersectionObserver" in window)) {
+    revealEls.forEach((el) => el.classList.add("is-visible"));
     return;
   }
 
@@ -808,6 +750,3 @@ attachEvents();
 initRevealAnimations();
 updateCartSummary({ persist: false });
 updateCartBadge();
-if (typeof window !== "undefined") {
-  window.addEventListener("pagehide", () => persistState({ immediate: true }));
-}
