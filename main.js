@@ -546,14 +546,31 @@ function hydrateForm() {
 }
 
 function getAuthUser() {
-  return window.__tuxAuthUser || null;
-}
+ if (typeof globalThis === "undefined") {
+    return null;
+  }
+
+  return typeof globalThis.__tuxAuthUser !== "undefined" ? globalThis.__tuxAuthUser : null;}
 function navigateToOrderPage() {
   const destination = getAuthUser()
     ? "order.html"
     : `account.html?redirect=${encodeURIComponent("order.html")}`;
-  window.location.href = destination;
-}
+ const locationObj = typeof globalThis !== "undefined" ? globalThis.location : undefined;
+  if (!locationObj) {
+    console.warn("Unable to navigate to destination without a global location.", { destination });
+    return;
+  }
+
+  if (typeof locationObj.assign === "function") {
+    locationObj.assign(destination);
+    return;
+  }
+
+  try {
+    locationObj.href = destination;
+  } catch (err) {
+    console.warn("Failed to update global location href.", err);
+  }}
 function handlePlaceOrder(event) {
   event.preventDefault();
   if (!state.cart.length) {
@@ -723,7 +740,7 @@ function attachEvents() {
 
 function initRevealAnimations() {
   const revealEls = document.querySelectorAll(".reveal");
-  if (!("IntersectionObserver" in window)) {
+  if (typeof window === "undefined" || !("IntersectionObserver" in window)) {
     revealEls.forEach((el) => el.classList.add("is-visible"));
     return;
   }
