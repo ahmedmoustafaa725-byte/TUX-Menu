@@ -113,7 +113,24 @@ const quickTransferKey = "tuxQuickCartTransfer";
 let currentUser = null;
 let profileRef = null;
 let cart = [];
+function navigateTo(url) {
+  const locationObj = typeof globalThis !== "undefined" ? globalThis.location : undefined;
+  if (!locationObj) {
+    console.warn("Attempted to navigate without a global location object.", { url });
+    return;
+  }
 
+  if (typeof locationObj.assign === "function") {
+    locationObj.assign(url);
+    return;
+  }
+
+  try {
+    locationObj.href = url;
+  } catch (err) {
+    console.warn("Failed to update global location href.", err);
+  }
+}
 // Mobile menu
 mobileMenuButton?.addEventListener("click", () => {
   if (!mobileMenu) return;
@@ -1241,7 +1258,7 @@ async function loadRecentOrders() {
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
-    window.location.href = `account.html?redirect=${encodeURIComponent("order.html")}`;
+    navigateTo(`account.html?redirect=${encodeURIComponent("order.html")}`);
     return;
   }
 
