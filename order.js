@@ -545,11 +545,13 @@ function validatePaymentBreakdown(total) {
   const selection = getPaymentSelection();
   const amountDue = Math.max(total || 0, 0);
 
+  // For 'cash' and 'instapay', the breakdown should come directly
+  // from the parsed input values in 'selection', not be recalculated here.
   if (selection.method === "cash") {
     return {
       valid: true,
       method: "cash",
-      breakdown: { cash: amountDue},
+      breakdown: selection.breakdown, // FIX: Use the breakdown from getPaymentSelection
     };
   }
 
@@ -557,10 +559,11 @@ function validatePaymentBreakdown(total) {
     return {
       valid: true,
       method: "instapay",
-      breakdown: { instapay: amountDue },
+      breakdown: selection.breakdown, // FIX: Use the breakdown from getPaymentSelection
     };
   }
 
+  // The 'split' logic is already correct as it validates the inputs.
   if (selection.method !== "split") {
     return {
       valid: false,
