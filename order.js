@@ -16,29 +16,44 @@ import {
 // Add this new function to your order.js file
 async function syncOrderToPOS(orderData) {
   if (!db) return;
-  
+   const profileOrderId = orderData.id;
+  if (!profileOrderId) {
+    console.error("Cannot sync order to POS without an order id", orderData);
+    return;
+  }
   // This is the path your POS app will be listening to
-  const posOrderRef = doc(db, `shops/tux/onlineOrders/${orderData.id}`);
+  const posOrderRef = doc(db, `shops/tux/onlineOrders/${profileOrderId}`);
+
+  // We re-format the website order to match what the POS expects
+const cartItems = (orderData.cart || []).map((item) => {
+    const quantity = Number(item.quantity ?? item.qty ?? 0) || 0;
+
+    return {
+      id: item.itemId || item.id,
+      name: item.name,
+ quantity,
+      qty: quantity,      price: item.price,
+      extras: (item.extras || []).map((extra) => ({
+        id: extra.id,
+        name: extra.name,
+        price: extra.price,
+      })),
+   };
+  });
 
   // We re-format the website order to match what the POS expects
   const posPayload = {
     // --- Key identifiers ---
     shopId: "tux",
-    idemKey: `website-order-${orderData.id}`, // Idempotency key
-    
+    idemKey: `website-order-${profileOrderId}`, // Idempotency key
+    profileOrderId,
+    userId: orderData.userId || null,
+
     // --- Order Details ---
-    orderNo: "Pending...", // The Cloud Function will assign the real number.
-    cart: (orderData.cart || []).map(item => ({
-      id: item.itemId, // Use the menu item ID
-      name: item.name,
-      qty: item.quantity,
-      price: item.price,
-      extras: (item.extras || []).map(extra => ({
-        id: extra.id,
-        name: extra.name,
-        price: extra.price,
-      })),
-    })),
+    orderNo: orderData.orderNo || "Pending...", // The Cloud Function will assign the real number.
+    source: "website",
+    cart: cartItems,
+    items: orderData.items || null,
     
     // --- Customer Details ---
     customerName: orderData.customerName,
@@ -46,7 +61,8 @@ async function syncOrderToPOS(orderData) {
     customerEmail: orderData.email,
     deliveryAddress: orderData.address,
     deliveryZoneId: orderData.deliveryZoneId || "",
-    
+        deliveryZone: orderData.deliveryZone || "",
+
     // --- Financials & Fulfillment ---
     total: orderData.total,
     itemsTotal: orderData.subtotal,
@@ -56,14 +72,14 @@ async function syncOrderToPOS(orderData) {
 
     orderType: orderData.fulfillment === 'delivery' ? 'Delivery' : 'Pickup',
     
-    // --- Timestamps & Status ---
-    createdAt: orderData.createdAt, // Use the same timestamp
-    status: "new",
+   createdAt: orderData.createdAt,
+    status: orderData.status || "new",
+    isNumbered: Boolean(orderData.isNumbered),
   };
   
   try {
-    await setDoc(posOrderRef, posPayload);
-    console.log("Order successfully synced to POS:", orderData.id);
+  await setDoc(posOrderRef, posPayload, { merge: true });
+    console.log("Order successfully synced to POS:", profileOrderId);
   } catch (error) {
     console.error("Error syncing order to POS:", error);
   }
