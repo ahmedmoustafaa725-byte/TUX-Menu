@@ -16,44 +16,29 @@ import {
 // Add this new function to your order.js file
 async function syncOrderToPOS(orderData) {
   if (!db) return;
-   const profileOrderId = orderData.id;
-  if (!profileOrderId) {
-    console.error("Cannot sync order to POS without an order id", orderData);
-    return;
-  }
+  
   // This is the path your POS app will be listening to
-  const posOrderRef = doc(db, `shops/tux/onlineOrders/${profileOrderId}`);
-
-  // We re-format the website order to match what the POS expects
-const cartItems = (orderData.cart || []).map((item) => {
-    const quantity = Number(item.quantity ?? item.qty ?? 0) || 0;
-
-    return {
-      id: item.itemId || item.id,
-      name: item.name,
- quantity,
-      qty: quantity,      price: item.price,
-      extras: (item.extras || []).map((extra) => ({
-        id: extra.id,
-        name: extra.name,
-        price: extra.price,
-      })),
-   };
-  });
+  const posOrderRef = doc(db, `shops/tux/onlineOrders/${orderData.id}`);
 
   // We re-format the website order to match what the POS expects
   const posPayload = {
     // --- Key identifiers ---
     shopId: "tux",
-    idemKey: `website-order-${profileOrderId}`, // Idempotency key
-    profileOrderId,
-    userId: orderData.userId || null,
-
+    idemKey: `website-order-${orderData.id}`, // Idempotency key
+    
     // --- Order Details ---
-    orderNo: orderData.orderNo || "Pending...", // The Cloud Function will assign the real number.
-    source: "website",
-    cart: cartItems,
-    items: orderData.items || null,
+    orderNo: "Pending...", // The Cloud Function will assign the real number.
+    cart: (orderData.cart || []).map(item => ({
+      id: item.itemId, // Use the menu item ID
+      name: item.name,
+      qty: item.quantity,
+      price: item.price,
+      extras: (item.extras || []).map(extra => ({
+        id: extra.id,
+        name: extra.name,
+        price: extra.price,
+      })),
+    })),
     
     // --- Customer Details ---
     customerName: orderData.customerName,
@@ -61,8 +46,7 @@ const cartItems = (orderData.cart || []).map((item) => {
     customerEmail: orderData.email,
     deliveryAddress: orderData.address,
     deliveryZoneId: orderData.deliveryZoneId || "",
-        deliveryZone: orderData.deliveryZone || "",
-
+    
     // --- Financials & Fulfillment ---
     total: orderData.total,
     itemsTotal: orderData.subtotal,
@@ -72,14 +56,14 @@ const cartItems = (orderData.cart || []).map((item) => {
 
     orderType: orderData.fulfillment === 'delivery' ? 'Delivery' : 'Pickup',
     
-   createdAt: orderData.createdAt,
-    status: orderData.status || "new",
-    isNumbered: Boolean(orderData.isNumbered),
+    // --- Timestamps & Status ---
+    createdAt: orderData.createdAt, // Use the same timestamp
+    status: "new",
   };
   
   try {
-  await setDoc(posOrderRef, posPayload, { merge: true });
-    console.log("Order successfully synced to POS:", profileOrderId);
+    await setDoc(posOrderRef, posPayload);
+    console.log("Order successfully synced to POS:", orderData.id);
   } catch (error) {
     console.error("Error syncing order to POS:", error);
   }
@@ -124,6 +108,8 @@ const mobileMenuButton = document.getElementById("mobileMenuButton");
 const mobileMenu = document.getElementById("mobileMenu");
 
 const quickTransferKey = "tuxQuickCartTransfer";
+const quickTransferMaxAgeMs = 5 * 60 * 1000;
+
 let currentUser = null;
 let profileRef = null;
 let cart = [];
@@ -376,6 +362,11 @@ function loadQuickCartTransfer() {
     sessionStorage.removeItem(quickTransferKey);
     const parsed = JSON.parse(raw);
     if (!parsed || typeof parsed !== "object") return null;
+     const createdAt = Number(parsed.createdAt);
+    if (Number.isFinite(createdAt) && Date.now() - createdAt > quickTransferMaxAgeMs) {
+      console.info("Ignoring stale quick cart transfer payload.");
+      return null;
+    }
     return parsed;
   } catch (err) {
     console.warn("Failed to load quick cart transfer", err);
@@ -909,8 +900,9 @@ function updateCartUI() {
   if (!cartItemsContainer || !cartTotalEl || !cartSubtotalEl || !cartDeliveryEl) return;
   const hasItems = cart.length > 0;
 
-  cartItemsContainer.innerHTML = "";
+ cartItemsContainer.textContent = "";
 
+  const fragment = document.createDocumentFragment();
   if (!hasItems) {
     if (emptyCartEl) {
       emptyCartEl.style.display = "block";
@@ -984,9 +976,11 @@ function updateCartUI() {
 
       li.appendChild(controls);
 
-      cartItemsContainer.appendChild(li);
+      fragment.appendChild(li);
     });
   }
+    cartItemsContainer.appendChild(fragment);
+
   const { subtotal, deliveryFee, total, zone } = getOrderTotals();
   const fulfillment = selectedFulfillment();
   const needsDelivery = fulfillment === "delivery";
