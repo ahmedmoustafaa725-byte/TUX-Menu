@@ -218,8 +218,10 @@ function formatCurrency(value) {
   }
 }
 
-function persistState() {
-  try {
+let persistHandle = null;
+let persistHandleUsesIdle = false;
+
+function writeStateToStorage() {  try {
     const payload = {
       cart: state.cart.map((entry) => ({ id: entry.id, quantity: entry.quantity })),
       checkout: { ...state.checkout },
@@ -229,7 +231,48 @@ function persistState() {
     console.warn("Failed to store cart", err);
   }
 }
+function cancelScheduledPersist() {
+  if (persistHandle === null) return;
+  if (
+    persistHandleUsesIdle &&
+    typeof window !== "undefined" &&
+    typeof window.cancelIdleCallback === "function"
+  ) {
+    window.cancelIdleCallback(persistHandle);
+  } else {
+    clearTimeout(persistHandle);
+  }
+  persistHandle = null;
+}
 
+function persistState(options = {}) {
+  const immediate = options.immediate === true;
+  if (immediate) {
+    cancelScheduledPersist();
+    writeStateToStorage();
+    return;
+  }
+
+  if (persistHandle !== null) {
+    return;
+  }
+
+  const flush = () => {
+    persistHandle = null;
+    writeStateToStorage();
+  };
+
+  if (
+    typeof window !== "undefined" &&
+    typeof window.requestIdleCallback === "function"
+  ) {
+    persistHandleUsesIdle = true;
+    persistHandle = window.requestIdleCallback(flush, { timeout: 250 });
+  } else {
+    persistHandleUsesIdle = false;
+    persistHandle = window.setTimeout(flush, 120);
+  }
+}
 function calculateSubtotal() {
   return state.cart.reduce((total, entry) => {
     const menuItem = menuIndex.get(entry.id);
@@ -275,18 +318,18 @@ function closeOverlay() {
 
 function renderQuickMenu() {
   if (!quickOrderList) return;
-  quickOrderList.innerHTML = "";
+  const fragment = document.createDocumentFragment();
   quickMenu.forEach((group) => {
     const category = document.createElement("div");
     category.className = "quick-order__category";
     category.textContent = group.title;
-    quickOrderList.appendChild(category);
+    fragment.appendChild(category);
 
     if (group.note) {
       const note = document.createElement("div");
       note.className = "quick-order__note";
       note.textContent = group.note;
-      quickOrderList.appendChild(note);
+      fragment.appendChild(note);
     }
 
     group.items.forEach((item) => {
@@ -340,9 +383,11 @@ function renderQuickMenu() {
       actions.appendChild(addBtn);
 
       card.appendChild(actions);
-      quickOrderList.appendChild(card);
+      fragment.appendChild(card);
     });
   });
+  quickOrderList.textContent = "";
+  quickOrderList.appendChild(fragment);
 }
 
 function updateSplitVisibility() {
@@ -400,13 +445,15 @@ function updateCartSummary({ persist = true } = {}) {
 
 function renderCart({ persist = true } = {}) {
   if (!quickCartItems) return;
-  quickCartItems.innerHTML = "";
+ quickCartItems.textContent = "";
 
+  const fragment = document.createDocumentFragment();
   if (!state.cart.length) {
     const empty = document.createElement("div");
     empty.className = "quick-cart__empty";
     empty.textContent = "Your cart is empty.";
-    quickCartItems.appendChild(empty);
+  fragment.appendChild(empty);
+    quickCartItems.appendChild(fragment);
     updateCartSummary({ persist });
     updateCartBadge();
     return;
@@ -468,8 +515,9 @@ function renderCart({ persist = true } = {}) {
     controls.appendChild(remove);
 
     itemEl.appendChild(controls);
-    quickCartItems.appendChild(itemEl);
+    fragment.appendChild(itemEl);
   });
+  quickCartItems.appendChild(fragment);
 
   updateCartSummary({ persist });
   updateCartBadge();
@@ -546,31 +594,14 @@ function hydrateForm() {
 }
 
 function getAuthUser() {
- if (typeof globalThis === "undefined") {
-    return null;
-  }
-
-  return typeof globalThis.__tuxAuthUser !== "undefined" ? globalThis.__tuxAuthUser : null;}
+  return window.__tuxAuthUser || null;
+}
 function navigateToOrderPage() {
   const destination = getAuthUser()
     ? "order.html"
     : `account.html?redirect=${encodeURIComponent("order.html")}`;
- const locationObj = typeof globalThis !== "undefined" ? globalThis.location : undefined;
-  if (!locationObj) {
-    console.warn("Unable to navigate to destination without a global location.", { destination });
-    return;
-  }
-
-  if (typeof locationObj.assign === "function") {
-    locationObj.assign(destination);
-    return;
-  }
-
-  try {
-    locationObj.href = destination;
-  } catch (err) {
-    console.warn("Failed to update global location href.", err);
-  }}
+  window.location.href = destination;
+}
 function handlePlaceOrder(event) {
   event.preventDefault();
   if (!state.cart.length) {
@@ -590,7 +621,7 @@ function handlePlaceOrder(event) {
   state.checkout.phone = quickPhone?.value.trim() || "";
   state.checkout.notes = quickNotes?.value.trim() || "";
 
-  persistState();
+  persistState({ immediate: true });
 
   const transferPayload = {
     cart: state.cart.map((entry) => ({ id: entry.id, quantity: entry.quantity })),
@@ -691,7 +722,7 @@ function attachEvents() {
 
   quickCartClear?.addEventListener("click", () => {
     state.cart = [];
-    persistState();
+  persistState({ immediate: true });
     renderCart({ persist: false });
     updateCartSummary({ persist: true });
     updateCartBadge();
@@ -740,25 +771,47 @@ function attachEvents() {
 
 function initRevealAnimations() {
   const revealEls = document.querySelectorAll(".reveal");
-  if (typeof window === "undefined" || !("IntersectionObserver" in window)) {
+ if (!revealEls.length) return;
+
+  const prefersReducedMotion =
+    typeof window !== "undefined" &&
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  if (
+    prefersReducedMotion ||
+    typeof window === "undefined" ||
+    !("IntersectionObserver" in window)
+ ) {
     revealEls.forEach((el) => el.classList.add("is-visible"));
     return;
   }
-
+  const makeVisible = (el) => {
+    el.classList.add("is-visible");
+  };
   const observer = new IntersectionObserver(
     (entries, obs) => {
       entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("is-visible");
+   if (entry.isIntersecting || entry.intersectionRatio > 0) {
+          makeVisible(entry.target);
           obs.unobserve(entry.target);
         }
       });
     },
-    { threshold: 0.18 }
-  );
+{
+      root: null,
+      rootMargin: "0px 0px -10%",
+      threshold: 0,
+    }  );
 
-  revealEls.forEach((el) => observer.observe(el));
-}
+ revealEls.forEach((el) => {
+    const rect = el.getBoundingClientRect();
+    if (rect.top <= window.innerHeight * 0.9) {
+      makeVisible(el);
+    } else {
+      observer.observe(el);
+    }
+  });}
 
 renderQuickMenu();
 renderCart({ persist: false });
@@ -767,3 +820,6 @@ attachEvents();
 initRevealAnimations();
 updateCartSummary({ persist: false });
 updateCartBadge();
+if (typeof window !== "undefined") {
+  window.addEventListener("pagehide", () => persistState({ immediate: true }));
+}
