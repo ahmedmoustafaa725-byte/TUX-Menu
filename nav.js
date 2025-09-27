@@ -2,20 +2,40 @@ import { auth, db } from "./firebase-init.js";
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 import { doc, getDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 
-const headerLink = document.getElementById("accountLink");
-const mobileLink = document.getElementById("accountLinkMobile");
-const logoutLink = document.getElementById("logoutLink");
-const logoutLinkMobile = document.getElementById("logoutLinkMobile");
+const dom = typeof document !== "undefined" ? document : null;
 
-const accountDock = document.getElementById("accountDock");
-const orderLink = document.getElementById("orderLink");
-const orderLinkMobile = document.getElementById("orderLinkMobile");
+
+const headerLink = dom?.getElementById("accountLink") ?? null;
+const mobileLink = dom?.getElementById("accountLinkMobile") ?? null;
+const logoutLink = dom?.getElementById("logoutLink") ?? null;
+const logoutLinkMobile = dom?.getElementById("logoutLinkMobile") ?? null;
+
+const accountDock = dom?.getElementById("accountDock") ?? null;
+const orderLink = dom?.getElementById("orderLink") ?? null;
+const orderLinkMobile = dom?.getElementById("orderLinkMobile") ?? null;
 
 const loginHref = "account.html";
 const profileHref = "profile.html";
 const orderHref = "order.html";
 const orderRedirectHref = `account.html?redirect=${encodeURIComponent(orderHref)}`;
+function navigateTo(url) {
+  const locationObj = typeof globalThis !== "undefined" ? globalThis.location : undefined;
+  if (!locationObj) {
+    console.warn("Attempted to navigate without a global location object.", { url });
+    return;
+  }
 
+  if (typeof locationObj.assign === "function") {
+    locationObj.assign(url);
+    return;
+  }
+
+  try {
+    locationObj.href = url;
+  } catch (err) {
+    console.warn("Unable to update global location href.", err);
+  }
+}
 onAuthStateChanged(auth, async (user) => {
   if (logoutLink) {
     logoutLink.style.display = user ? "inline-block" : "none";
@@ -94,9 +114,11 @@ onAuthStateChanged(auth, async (user) => {
       if (label) label.textContent = "Account";
     }
   }
+ if (typeof globalThis !== "undefined") {
+    globalThis.__tuxAuthUser = summary;
+  }
 
-  window.__tuxAuthUser = summary;
-  document.dispatchEvent(
+  dom?.dispatchEvent(
     new CustomEvent("tux-auth-change", {
       detail: { user: summary },
     })
@@ -107,7 +129,7 @@ logoutLink?.addEventListener("click", async (event) => {
   event.preventDefault();
   try {
     await signOut(auth);
-    window.location.href = "index.html";
+    navigateTo("index.html");
   } catch (err) {
     console.error("Error signing out", err);
   }
@@ -116,7 +138,7 @@ logoutLinkMobile?.addEventListener("click", async (event) => {
   event.preventDefault();
   try {
     await signOut(auth);
-    window.location.href = "index.html";
+    navigateTo("index.html");
   } catch (err) {
     console.error("Error signing out", err);
   }
