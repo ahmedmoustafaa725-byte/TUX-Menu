@@ -28,6 +28,8 @@ async function syncOrderToPOS(orderData) {
     
     // --- Order Details ---
     orderNo: "Pending...", // The Cloud Function will assign the real number.
+        isNumbered: false,
+
     cart: (orderData.cart || []).map(item => ({
       id: item.itemId, // Use the menu item ID
       name: item.name,
