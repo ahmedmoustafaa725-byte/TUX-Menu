@@ -10,6 +10,8 @@ pnpm-debug.log*
 # Environment variables and local credentials
 .env
 .env.*
+!.env.example
+
 .firebase/
 .firebase*
 
