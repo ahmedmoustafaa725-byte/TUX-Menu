@@ -21,7 +21,24 @@ const ordersList = document.getElementById("profileOrders");
 const emptyOrders = document.getElementById("profileOrdersEmpty");
 const COUNTRY_CODE = "+20";
 const phonePattern = /^\d{10}$/;
+function navigateTo(url) {
+  const locationObj = typeof globalThis !== "undefined" ? globalThis.location : undefined;
+  if (!locationObj) {
+    console.warn("Attempted to navigate without a global location object.", { url });
+    return;
+  }
 
+  if (typeof locationObj.assign === "function") {
+    locationObj.assign(url);
+    return;
+  }
+
+  try {
+    locationObj.href = url;
+  } catch (err) {
+    console.warn("Failed to update global location href.", err);
+  }
+}
 function extractPhoneDigits(value) {
   if (typeof value !== "string") return "";
   const digits = value.replace(/\D/g, "");
@@ -135,7 +152,7 @@ async function loadOrders() {
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
-    window.location.href = `account.html?redirect=${encodeURIComponent("profile.html")}`;
+    navigateTo(`account.html?redirect=${encodeURIComponent("profile.html")}`);
     return;
   }
 
