@@ -10,7 +10,6 @@ import {
   query,
   orderBy,
   limit,
-    limitToLast,
   getDocs,
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
 function normalizeCurrencyValue(value) {
@@ -1240,9 +1239,10 @@ async function loadRecentOrders() {
   try {
  const ordersQuery = query(
       collection(profileRef, "orders"),
-      orderBy("createdAt", "asc"),
-      limitToLast(5)
-    );    const snapshot = await getDocs(ordersQuery);
+     orderBy("createdAt", "desc"),
+      limit(5)
+    );
+    const snapshot = await getDocs(ordersQuery);
 
     recentOrdersList.innerHTML = "";
 
