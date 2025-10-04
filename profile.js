@@ -275,9 +275,9 @@ const firstItemLine = (data.items || "")
         itemsSection.appendChild(list);
         infoColumn.appendChild(itemsSection);
       }
-      }
+      
 
-if (data.instructions) {
+        if (data.instructions) {
         const instructions = document.createElement("p");
         instructions.className = "order-card__notes";
         instructions.textContent = `Notes: ${data.instructions}`;
@@ -285,8 +285,9 @@ if (data.instructions) {
       }
 
       card.append(infoColumn, detailsColumn);
-      ordersList.appendChild(card);    });
-      if (pendingHistoryUpdates.length) {
+  ordersList.appendChild(card);
+    });
+  if (pendingHistoryUpdates.length) {
       await Promise.allSettled(pendingHistoryUpdates);
     }
   } catch (err) {
