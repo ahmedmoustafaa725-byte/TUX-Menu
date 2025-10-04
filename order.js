@@ -36,17 +36,20 @@ function calculateSplitSuggestion(total) {
   };
 }
 // Add this new function to your order.js file
+const POS_SHOP_ID = "tux";
+const posOnlineOrdersCollection = collection(db, "shops", POS_SHOP_ID, "onlineOrders");
 async function syncOrderToPOS(orderData) {
   if (!db || !orderData?.id) return;
   
   // This is the path your POS app will be listening to
-  const posOrderRef = doc(db, `shops/tux/onlineOrders/${orderData.id}`);
+  const posOrderRef = doc(posOnlineOrdersCollection, orderData.id);
 
   // We re-format the website order to match what the POS expects
   const posPayload = {
     // --- Key identifiers ---
-    shopId: "tux",
+     shopId: POS_SHOP_ID,
     idemKey: `website-order-${orderData.id}`,
+    userId: orderData.userId || null,
     orderNo: "Pending...",
     isNumbered: false,
     cart: (orderData.cart || []).map((item) => ({
@@ -1509,7 +1512,7 @@ cashAmount: cashAmountForStorage,
     await setDoc(profileRef, profileUpdate, { merge: true });
     const ordersCol = collection(profileRef, "orders");
     const orderDocRef = await addDoc(ordersCol, orderPayload);
-    await syncOrderToPOS({ ...orderPayload, id: orderDocRef.id });
+    await syncOrderToPOS({ ...orderPayload, id: orderDocRef.id, userId: currentUser?.uid || null });
 
     try {
       await setDoc(doc(db, "orders", orderDocRef.id), {
