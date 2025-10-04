@@ -37,7 +37,7 @@ function calculateSplitSuggestion(total) {
 }
 // Add this new function to your order.js file
 async function syncOrderToPOS(orderData) {
-  if (!db) return;
+  if (!db || !orderData?.id) return;
   
   // This is the path your POS app will be listening to
   const posOrderRef = doc(db, `shops/tux/onlineOrders/${orderData.id}`);
@@ -46,54 +46,46 @@ async function syncOrderToPOS(orderData) {
   const posPayload = {
     // --- Key identifiers ---
     shopId: "tux",
-    idemKey: `website-order-${orderData.id}`, // Idempotency key
-    
-    // --- Order Details ---
-    orderNo: "Pending...", // The Cloud Function will assign the real number.
-        isNumbered: false,
-
-    cart: (orderData.cart || []).map(item) => ({
-      id: item.itemId, // Use the menu item ID
+    idemKey: `website-order-${orderData.id}`,
+    orderNo: "Pending...",
+    isNumbered: false,
+    cart: (orderData.cart || []).map((item) => ({
+      id: item.itemId,
       name: item.name,
       qty: item.quantity,
       price: item.price,
-      extras: (item.extras || []).map(extra) => ({
+      extras: (item.extras || []).map((extra) => ({
         id: extra.id,
         name: extra.name,
         price: extra.price,
       })),
     })),
-    
-    // --- Customer Details ---
     customerName: orderData.customerName,
     customerPhone: orderData.phone,
     customerEmail: orderData.email,
     deliveryAddress: orderData.address,
     deliveryZoneId: orderData.deliveryZoneId || "",
-    
-    // --- Financials & Fulfillment ---
     total: orderData.total,
     itemsTotal: orderData.subtotal,
     deliveryFee: orderData.deliveryFee || 0,
     paymentMethod: orderData.paymentMethod,
     paymentBreakdown: orderData.paymentBreakdown || null,
 
-cashAmount: normalizeCurrencyValue(
+    cashAmount: normalizeCurrencyValue(
       orderData.cashAmount ?? orderData.paymentBreakdown?.cash
     ),
     instapayAmount: normalizeCurrencyValue(
       orderData.instapayAmount ?? orderData.paymentBreakdown?.instapay
     ),
 
-    orderType: orderData.fulfillment === "delivery" ? "Delivery" : "Pickup",    
-    // --- Timestamps & Status ---
-    createdAt: orderData.createdAt, // Use the same timestamp
+      orderType: orderData.fulfillment === "delivery" ? "Delivery" : "Pickup",
+    createdAt: orderData.createdAt,
     status: "new",
   };
   
   try {
     await setDoc(posOrderRef, posPayload);
-    console.log("Order successfully synced to POS:", orderData.id);
+    console.log(`Order successfully synced to POS: ${orderData.id}`);
   } catch (error) {
     console.error("Error syncing order to POS:", error);
   }
