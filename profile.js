@@ -289,7 +289,7 @@ const firstItemLine = (data.items || "")
       }
 
       card.append(infoColumn, detailsColumn);
-  ordersList.appendChild(card);
+      ordersList.prepend(card);
     });
  
   } catch (err) {
