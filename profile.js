@@ -142,10 +142,10 @@ async function loadOrders() {
       const li = document.createElement("li");
 
       const heading = document.createElement("h4");
- const orderIdentifier = data.orderNo ? `Order #${data.orderNo}` : `Order #${docSnap.id.slice(-5)}`;
+      const orderIdentifier = data.orderNo ? `Order ${data.orderNo}` : "Order";
       const orderTitle = data.items ? data.items.split("\n")[0] : "TUX order";
-      heading.textContent = `${index + 1}. ${orderIdentifier} — ${orderTitle}`;      li.appendChild(heading);
-
+  heading.textContent = `${index + 1}. ${orderIdentifier} — ${orderTitle}`;
+      li.appendChild(heading);
       const badge = document.createElement("span");
       badge.className = `badge ${data.fulfillment === "delivery" ? "delivery" : "pickup"}`;
       badge.textContent = data.fulfillment === "delivery" ? "Delivery" : "Pickup";
