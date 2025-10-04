@@ -142,7 +142,8 @@ async function loadOrders() {
 const ordersQuery = query(
       collection(profileRef, "orders"),
       orderBy("createdAt", "desc")
-    );    const snapshot = await getDocs(ordersQuery);
+    ); 
+    const snapshot = await getDocs(ordersQuery);
 
     ordersList.innerHTML = "";
 
@@ -156,7 +157,6 @@ const ordersQuery = query(
 
     snapshot.docs.forEach((docSnap, index) => {
       const data = docSnap.data();
-      const li = document.createElement("li");
       const hasStoredHistoryIndex =
         typeof data.historyIndex === "number" && Number.isFinite(data.historyIndex);
       const historyIndex = index + 1;
@@ -168,61 +168,124 @@ const ordersQuery = query(
           })
         );
       }
+       const card = document.createElement("article");
+      card.className = "order-card";
+      card.setAttribute("role", "listitem");
+
+      const infoColumn = document.createElement("div");
+      infoColumn.className = "order-card__info";
+
+      const header = document.createElement("div");
+      header.className = "order-card__header";
+
+      const titleWrapper = document.createElement("div");
+      titleWrapper.className = "order-card__title";
+
       const heading = document.createElement("h4");
       const orderIdentifier = data.orderNo ? `Order ${data.orderNo}` : "Order";
-      const orderTitle = data.items ? data.items.split("\n")[0] : "TUX order";
+const firstItemLine = (data.items || "")
+        .split("\n")
+        .map((line) => line.trim())
+        .find((line) => line.length > 0);
+      const orderTitle = firstItemLine || "TUX order";
       heading.textContent = `${historyIndex}. ${orderIdentifier} — ${orderTitle}`;
-      li.appendChild(heading);
-      const badge = document.createElement("span");
-      badge.className = `badge ${data.fulfillment === "delivery" ? "delivery" : "pickup"}`;
-      badge.textContent = data.fulfillment === "delivery" ? "Delivery" : "Pickup";
-      li.appendChild(badge);
+      titleWrapper.appendChild(heading);
 
-      const sub = document.createElement("p");
-      sub.textContent = formatDate(data.createdAt);
-      li.appendChild(sub);
+      const timestamp = document.createElement("p");
+      timestamp.className = "order-card__timestamp";
+      timestamp.textContent = formatDate(data.createdAt);
+      titleWrapper.appendChild(timestamp);
 
-      if (data.items) {
-        const items = document.createElement("p");
-        items.textContent = data.items;
-        li.appendChild(items);
-      }
+      header.appendChild(titleWrapper);
+      infoColumn.appendChild(header);
 
-      if (data.instructions) {
-        const instructions = document.createElement("p");
-        instructions.textContent = `Notes: ${data.instructions}`;
-        li.appendChild(instructions);
-      }
+      const detailsColumn = document.createElement("div");
+      detailsColumn.className = "order-card__details";
 
-    const status = (data.status || "").trim();
-      if (status && status.toLowerCase() !== "pending") {
-        const statusLine = document.createElement("p");
-        statusLine.textContent = `Status: ${data.status}`;
-        li.appendChild(statusLine);
+      const isDelivery = data.fulfillment === "delivery";      const badge = document.createElement("span");
+      badge.className = `order-card__badge ${
+        isDelivery ? "order-card__badge--delivery" : "order-card__badge--pickup"
+      }`;
+      badge.textContent = isDelivery ? "Delivery" : "Pickup";
+      detailsColumn.appendChild(badge);
+
+       const meta = document.createElement("div");
+      meta.className = "order-card__meta";
+
+      const appendMeta = (label, value) => {
+        if (!value) return;
+        const item = document.createElement("div");
+        item.className = "order-card__meta-item";
+
+        const labelEl = document.createElement("span");
+        labelEl.className = "order-card__meta-label";
+        labelEl.textContent = label;
+
+  const valueEl = document.createElement("p");
+        valueEl.className = "order-card__meta-value";
+        valueEl.textContent = value;
+
+        item.append(labelEl, valueEl);
+        meta.appendChild(item);
+      };
+
+      const status = (data.status || "").trim();      if (status && status.toLowerCase() !== "pending") {
+               appendMeta("Status", status);
+
       }
  if (data.paymentMethod) {
-        const paymentLine = document.createElement("p");
-        paymentLine.textContent = `Payment: ${formatPayment(data.paymentMethod, data.paymentBreakdown)}`;
-        li.appendChild(paymentLine);
+        appendMeta("Payment", formatPayment(data.paymentMethod, data.paymentBreakdown));
       }
 
       if (typeof data.total === "number") {
-        const totalLine = document.createElement("p");
-        totalLine.textContent = `Total: ${formatCurrency(data.total)}`;
-        li.appendChild(totalLine);
+              appendMeta("Total", formatCurrency(data.total));
+
       } else if (typeof data.subtotal === "number") {
-        const subtotalLine = document.createElement("p");
-        subtotalLine.textContent = `Subtotal: ${formatCurrency(data.subtotal)}`;
-        li.appendChild(subtotalLine);
-      }
-      if (data.fulfillment === "delivery" && data.address) {
-        const addressLine = document.createElement("p");
-        addressLine.textContent = `Deliver to: ${data.address}`;
-        li.appendChild(addressLine);
+                appendMeta("Subtotal", formatCurrency(data.subtotal));
       }
 
-      ordersList.appendChild(li);
-    });
+      if (isDelivery && data.address) {
+        appendMeta("Deliver to", data.address);
+      }
+
+      if (meta.children.length) {
+        detailsColumn.appendChild(meta);
+      }
+       const itemLines = (data.items || "")
+        .split("\n")
+        .map((line) => line.trim())
+        .filter((line) => line.length > 0);
+
+      if (itemLines.length) {
+        const itemsSection = document.createElement("div");
+        itemsSection.className = "order-card__items";
+
+        const itemsTitle = document.createElement("p");
+        itemsTitle.className = "order-card__section-title";
+        itemsTitle.textContent = "Items";
+        itemsSection.appendChild(itemsTitle);
+
+        const list = document.createElement("ul");
+        list.className = "order-card__item-list";
+        itemLines.forEach((line) => {
+          const listItem = document.createElement("li");
+          listItem.textContent = line;
+          list.appendChild(listItem);
+        });
+        itemsSection.appendChild(list);
+        infoColumn.appendChild(itemsSection);
+      }
+      }
+
+if (data.instructions) {
+        const instructions = document.createElement("p");
+        instructions.className = "order-card__notes";
+        instructions.textContent = `Notes: ${data.instructions}`;
+        infoColumn.appendChild(instructions);
+      }
+
+      card.append(infoColumn, detailsColumn);
+      ordersList.appendChild(card);    });
       if (pendingHistoryUpdates.length) {
       await Promise.allSettled(pendingHistoryUpdates);
     }
