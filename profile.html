@@ -73,9 +73,12 @@
       </div>
 
       <div class="panel">
-        <h3>Order history</h3>
-        <p id="profileOrdersEmpty" class="muted">You haven’t placed any orders yet.</p>
-        <ul id="profileOrders" class="order-history"></ul>
+       <div class="order-history__header">
+          <h3>Order history</h3>
+          <p class="muted">Review your recent purchases and track delivery details.</p>
+        </div>
+        <div id="profileOrdersEmpty" class="muted order-history__empty">You haven’t placed any orders yet.</div>
+        <div id="profileOrders" class="order-history-grid" role="list"></div>
       </div>
     </div>
   </main>
