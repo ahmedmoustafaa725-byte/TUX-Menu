@@ -21,6 +21,10 @@ const ordersList = document.getElementById("profileOrders");
 const emptyOrders = document.getElementById("profileOrdersEmpty");
 const COUNTRY_CODE = "+20";
 const phonePattern = /^\d{10}$/;
+const currencyFormatter = new Intl.NumberFormat("en-EG", {
+  style: "currency",
+  currency: "EGP",
+});
 function navigateTo(url) {
   const locationObj = typeof globalThis !== "undefined" ? globalThis.location : undefined;
   if (!locationObj) {
@@ -85,7 +89,39 @@ function formatDate(timestamp) {
   }
   return new Date().toLocaleString();
 }
+function formatCurrency(value) {
+  try {
+    return currencyFormatter.format(value);
+  } catch (err) {
+    return `EGP ${Number(value || 0).toFixed(2)}`;
+  }
+}
 
+function formatPayment(method, breakdown = null) {
+  if (method === "split") {
+    const parts = [];
+    if (breakdown?.cash) {
+      parts.push(`Cash ${formatCurrency(breakdown.cash)}`);
+    }
+    if (breakdown?.instapay) {
+      parts.push(`Instapay ${formatCurrency(breakdown.instapay)}`);
+    }
+    return parts.length ? parts.join(" + ") : "Split payment";
+  }
+
+  if (method === "instapay" || method === "card") {
+    if (breakdown?.instapay) {
+      return `Instapay ${formatCurrency(breakdown.instapay)}`;
+    }
+    return "Instapay";
+  }
+
+  if (breakdown?.cash) {
+    return `Cash ${formatCurrency(breakdown.cash)}`;
+  }
+
+  return "Cash";
+}
 async function loadOrders() {
   if (!profileRef || !ordersList) return;
   try {
@@ -101,13 +137,14 @@ async function loadOrders() {
 
     if (emptyOrders) emptyOrders.style.display = "none";
 
-    snapshot.forEach((docSnap) => {
+    snapshot.docs.forEach((docSnap, index) => {
       const data = docSnap.data();
       const li = document.createElement("li");
 
       const heading = document.createElement("h4");
-      heading.textContent = `${data.items ? data.items.split("\n")[0] : "TUX order"}`;
-      li.appendChild(heading);
+ const orderIdentifier = data.orderNo ? `Order #${data.orderNo}` : `Order #${docSnap.id.slice(-5)}`;
+      const orderTitle = data.items ? data.items.split("\n")[0] : "TUX order";
+      heading.textContent = `${index + 1}. ${orderIdentifier} — ${orderTitle}`;      li.appendChild(heading);
 
       const badge = document.createElement("span");
       badge.className = `badge ${data.fulfillment === "delivery" ? "delivery" : "pickup"}`;
@@ -136,7 +173,21 @@ async function loadOrders() {
         statusLine.textContent = `Status: ${data.status}`;
         li.appendChild(statusLine);
       }
+ if (data.paymentMethod) {
+        const paymentLine = document.createElement("p");
+        paymentLine.textContent = `Payment: ${formatPayment(data.paymentMethod, data.paymentBreakdown)}`;
+        li.appendChild(paymentLine);
+      }
 
+      if (typeof data.total === "number") {
+        const totalLine = document.createElement("p");
+        totalLine.textContent = `Total: ${formatCurrency(data.total)}`;
+        li.appendChild(totalLine);
+      } else if (typeof data.subtotal === "number") {
+        const subtotalLine = document.createElement("p");
+        subtotalLine.textContent = `Subtotal: ${formatCurrency(data.subtotal)}`;
+        li.appendChild(subtotalLine);
+      }
       if (data.fulfillment === "delivery" && data.address) {
         const addressLine = document.createElement("p");
         addressLine.textContent = `Deliver to: ${data.address}`;
