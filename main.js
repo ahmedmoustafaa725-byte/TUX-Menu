@@ -1,5 +1,28 @@
 const storageKey = "tuxQuickCart";
 const transferKey = "tuxQuickCartTransfer";
+function normalizeCurrencyValue(value) {
+  if (typeof value === "string") {
+    value = Number.parseFloat(value);
+  }
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    return 0;
+  }
+  const rounded = Math.round(value * 100) / 100;
+  return rounded < 0 ? 0 : rounded;
+}
+
+function calculateSplitSuggestion(total) {
+  const cents = Math.round(Math.max(total || 0, 0) * 100);
+  if (!cents) {
+    return { cash: 0, instapay: 0 };
+  }
+  const cashCents = Math.floor(cents / 2);
+  const instapayCents = cents - cashCents;
+  return {
+    cash: cashCents / 100,
+    instapay: instapayCents / 100,
+  };
+}
 
 const currencyFormatter = new Intl.NumberFormat("en-EG", {
   style: "currency",
@@ -400,17 +423,21 @@ function updateSplitVisibility() {
     return;
   }
   const total = calculateSubtotal();
+   state.checkout.cashAmount = normalizeCurrencyValue(state.checkout.cashAmount);
+  state.checkout.instapayAmount = normalizeCurrencyValue(state.checkout.instapayAmount);
   if (!state.checkout.cashAmount && !state.checkout.instapayAmount && total > 0) {
-    const half = Math.round((total / 2) * 100) / 100;
-    state.checkout.cashAmount = half;
-    state.checkout.instapayAmount = Math.round((total - half) * 100) / 100;
+  const suggestion = calculateSplitSuggestion(total);
+    state.checkout.cashAmount = suggestion.cash;
+    state.checkout.instapayAmount = suggestion.instapay;
   }
   if (quickCashAmount) {
-    quickCashAmount.value = state.checkout.cashAmount ? state.checkout.cashAmount.toFixed(2) : "";
-  }
+ quickCashAmount.value = state.checkout.cashAmount
+      ? state.checkout.cashAmount.toFixed(2)
+      : "";  }
   if (quickInstapayAmount) {
-    quickInstapayAmount.value = state.checkout.instapayAmount ? state.checkout.instapayAmount.toFixed(2) : "";
-  }
+ quickInstapayAmount.value = state.checkout.instapayAmount
+      ? state.checkout.instapayAmount.toFixed(2)
+      : "";  }
 }
 
 function updateCartSummary({ persist = true } = {}) {
@@ -423,11 +450,11 @@ function updateCartSummary({ persist = true } = {}) {
   if (quickCartClear) quickCartClear.hidden = !hasItems;
 
   if (state.checkout.paymentMethod === "cash") {
-    state.checkout.cashAmount = subtotal;
+    state.checkout.cashAmount = normalizeCurrencyValue(subtotal);
     state.checkout.instapayAmount = 0;
   } else if (state.checkout.paymentMethod === "instapay") {
     state.checkout.cashAmount = 0;
-    state.checkout.instapayAmount = subtotal;
+    state.checkout.instapayAmount = normalizeCurrencyValue(subtotal);
   }
 
   if (state.checkout.paymentMethod !== "split") {
@@ -552,12 +579,12 @@ function validatePaymentBreakdown() {
   if (!total) return true;
 
   if (state.checkout.paymentMethod === "split") {
-    const cash = Number.parseFloat(quickCashAmount?.value || "0") || 0;
-    const instapay = Number.parseFloat(quickInstapayAmount?.value || "0") || 0;
-    state.checkout.cashAmount = Math.max(0, Math.round(cash * 100) / 100);
-    state.checkout.instapayAmount = Math.max(0, Math.round(instapay * 100) / 100);
-    const paid = Math.round((state.checkout.cashAmount + state.checkout.instapayAmount) * 100) / 100;
-    if (!state.checkout.cashAmount || !state.checkout.instapayAmount) {
+ const cash = normalizeCurrencyValue(quickCashAmount?.value || "0");
+    const instapay = normalizeCurrencyValue(quickInstapayAmount?.value || "0");
+    state.checkout.cashAmount = cash;
+    state.checkout.instapayAmount = instapay;
+    const paid = Math.round((cash + instapay) * 100) / 100;
+    if (!cash || !instapay) {
       quickCartStatus.textContent = "Enter both cash and Instapay amounts.";
       return false;
     }
@@ -625,8 +652,11 @@ function handlePlaceOrder(event) {
 
   const transferPayload = {
     cart: state.cart.map((entry) => ({ id: entry.id, quantity: entry.quantity })),
-    checkout: { ...state.checkout },
-    createdAt: Date.now(),
+checkout: {
+      ...state.checkout,
+      cashAmount: normalizeCurrencyValue(state.checkout.cashAmount),
+      instapayAmount: normalizeCurrencyValue(state.checkout.instapayAmount),
+    },    createdAt: Date.now(),
   };
 
   try {
