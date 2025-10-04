@@ -1239,8 +1239,8 @@ async function loadRecentOrders() {
       const li = document.createElement("li");
 
       const heading = document.createElement("h4");
-      heading.textContent = `Order #${data.orderNo || docSnap.id.slice(-5)} • ${formatDate(data.createdAt)}`;
-      li.appendChild(heading);
+  const orderNumberLabel = data.orderNo ? `Order ${data.orderNo}` : "Order";
+      heading.textContent = `${orderNumberLabel} • ${formatDate(data.createdAt)}`;      li.appendChild(heading);
 
       const badge = document.createElement("span");
       badge.className = `badge ${data.fulfillment === "delivery" ? "delivery" : "pickup"}`;
