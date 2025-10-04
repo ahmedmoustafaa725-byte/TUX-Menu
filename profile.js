@@ -141,7 +141,7 @@ async function loadOrders() {
   try {
 const ordersQuery = query(
       collection(profileRef, "orders"),
-      orderBy("createdAt", "desc")
+      orderBy("createdAt", "asc")
     ); 
     const snapshot = await getDocs(ordersQuery);
 
@@ -153,20 +153,24 @@ const ordersQuery = query(
     }
 
     if (emptyOrders) emptyOrders.style.display = "none";
-    const pendingHistoryUpdates = [];
+    let maxHistoryIndex = 0;
 
-    snapshot.docs.forEach((docSnap, index) => {
+    snapshot.docs.forEach((docSnap) => {
       const data = docSnap.data();
-      const hasStoredHistoryIndex =
-        typeof data.historyIndex === "number" && Number.isFinite(data.historyIndex);
-      const historyIndex = index + 1;
+            const storedHistoryIndex = data.historyIndex;
 
-      if (!hasStoredHistoryIndex || data.historyIndex !== historyIndex) {
-        pendingHistoryUpdates.push(
-          setDoc(docSnap.ref, { historyIndex }, { merge: true }).catch((err) => {
-            console.warn("Failed to persist order history index", err);
-          })
-        );
+      const hasStoredHistoryIndex =
+       typeof storedHistoryIndex === "number" && Number.isFinite(storedHistoryIndex);
+      let historyIndex;
+
+      if (hasStoredHistoryIndex) {
+        historyIndex = storedHistoryIndex;
+        if (storedHistoryIndex > maxHistoryIndex) {
+          maxHistoryIndex = storedHistoryIndex;
+        }
+      } else {
+        historyIndex = maxHistoryIndex + 1;
+        maxHistoryIndex = historyIndex;
       }
        const card = document.createElement("article");
       card.className = "order-card";
@@ -287,9 +291,7 @@ const firstItemLine = (data.items || "")
       card.append(infoColumn, detailsColumn);
   ordersList.appendChild(card);
     });
-  if (pendingHistoryUpdates.length) {
-      await Promise.allSettled(pendingHistoryUpdates);
-    }
+ 
   } catch (err) {
     console.error("Failed to load order history", err);
   }
