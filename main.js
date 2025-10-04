@@ -171,6 +171,7 @@ function defaultState() {
     checkout: {
       name: "",
       phone: "",
+      email: "",
       notes: "",
       paymentMethod: "cash",
       cashAmount: 0,
@@ -790,11 +791,16 @@ function attachEvents() {
 
   document.addEventListener("tux-auth-change", (event) => {
     const detail = event.detail || {};
-    if (!accountDock) return;
-    if (detail.user) {
-      accountDock.href = "profile.html";
-    } else {
-      accountDock.href = "account.html";
+ const summary = detail.user || null;
+
+    if (accountDock) {
+      accountDock.href = summary ? "profile.html" : "account.html";
+    }
+
+    const nextEmail = summary?.email || "";
+    if (state.checkout.email !== nextEmail) {
+      state.checkout.email = nextEmail;
+      persistState();
     }
   });
 }
