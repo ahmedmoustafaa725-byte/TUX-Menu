@@ -74,20 +74,34 @@ function showStatus(message, isError = false) {
 
 function formatDate(timestamp) {
   try {
-    if (!timestamp) return new Date().toLocaleString();
-    if (typeof timestamp.toDate === "function") {
-      return timestamp.toDate().toLocaleString();
+  let date;
+
+    if (!timestamp) {
+      date = new Date();
+    } else if (typeof timestamp.toDate === "function") {
+      date = timestamp.toDate();
+    } else if (typeof timestamp.seconds === "number") {
+      date = new Date(timestamp.seconds * 1000);
+    } else if (timestamp instanceof Date) {
+      date = timestamp;
     }
-    if (typeof timestamp.seconds === "number") {
-      return new Date(timestamp.seconds * 1000).toLocaleString();
+    if (!(date instanceof Date) || Number.isNaN(date.getTime())) {
+      return "--/--/----";
     }
-    if (timestamp instanceof Date) {
-      return timestamp.toLocaleString();
-    }
+     const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
+    const rawHours = date.getHours();
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const period = rawHours >= 12 ? "PM" : "AM";
+    const hours12 = rawHours % 12 || 12;
+    const hours = String(hours12).padStart(2, "0");
+
+    return `${day}/${month}/${year} ${hours}:${minutes} ${period}`;
   } catch (err) {
     console.error("Failed to format timestamp", err);
   }
-  return new Date().toLocaleString();
+  return "--/--/----";
 }
 function formatCurrency(value) {
   try {
@@ -125,7 +139,7 @@ function formatPayment(method, breakdown = null) {
 async function loadOrders() {
   if (!profileRef || !ordersList) return;
   try {
-    const ordersQuery = query(collection(profileRef, "orders"), orderBy("createdAt", "desc"));
+    const ordersQuery = query(collection(profileRef, "orders"), orderBy("createdAt", "asc"));
     const snapshot = await getDocs(ordersQuery);
 
     ordersList.innerHTML = "";
@@ -136,15 +150,26 @@ async function loadOrders() {
     }
 
     if (emptyOrders) emptyOrders.style.display = "none";
+    const pendingHistoryUpdates = [];
 
     snapshot.docs.forEach((docSnap, index) => {
       const data = docSnap.data();
       const li = document.createElement("li");
+      const hasStoredHistoryIndex =
+        typeof data.historyIndex === "number" && Number.isFinite(data.historyIndex);
+      const historyIndex = hasStoredHistoryIndex ? data.historyIndex : index + 1;
 
+      if (!hasStoredHistoryIndex || data.historyIndex !== historyIndex) {
+        pendingHistoryUpdates.push(
+          setDoc(docSnap.ref, { historyIndex }, { merge: true }).catch((err) => {
+            console.warn("Failed to persist order history index", err);
+          })
+        );
+      }
       const heading = document.createElement("h4");
       const orderIdentifier = data.orderNo ? `Order ${data.orderNo}` : "Order";
       const orderTitle = data.items ? data.items.split("\n")[0] : "TUX order";
-  heading.textContent = `${index + 1}. ${orderIdentifier} — ${orderTitle}`;
+      heading.textContent = `${historyIndex}. ${orderIdentifier} — ${orderTitle}`;
       li.appendChild(heading);
       const badge = document.createElement("span");
       badge.className = `badge ${data.fulfillment === "delivery" ? "delivery" : "pickup"}`;
@@ -196,6 +221,9 @@ async function loadOrders() {
 
       ordersList.appendChild(li);
     });
+      if (pendingHistoryUpdates.length) {
+      await Promise.allSettled(pendingHistoryUpdates);
+    }
   } catch (err) {
     console.error("Failed to load order history", err);
   }
