@@ -139,8 +139,10 @@ function formatPayment(method, breakdown = null) {
 async function loadOrders() {
   if (!profileRef || !ordersList) return;
   try {
-    const ordersQuery = query(collection(profileRef, "orders"), orderBy("createdAt", "asc"));
-    const snapshot = await getDocs(ordersQuery);
+const ordersQuery = query(
+      collection(profileRef, "orders"),
+      orderBy("createdAt", "desc")
+    );    const snapshot = await getDocs(ordersQuery);
 
     ordersList.innerHTML = "";
 
