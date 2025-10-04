@@ -12,7 +12,29 @@ import {
   limit,
   getDocs,
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+function normalizeCurrencyValue(value) {
+  if (typeof value === "string") {
+    value = Number.parseFloat(value);
+  }
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    return 0;
+  }
+  const rounded = Math.round(value * 100) / 100;
+  return rounded < 0 ? 0 : rounded;
+}
 
+function calculateSplitSuggestion(total) {
+  const cents = Math.round(Math.max(total || 0, 0) * 100);
+  if (!cents) {
+    return { cash: 0, instapay: 0 };
+  }
+  const cashCents = Math.floor(cents / 2);
+  const instapayCents = cents - cashCents;
+  return {
+    cash: cashCents / 100,
+    instapay: instapayCents / 100,
+  };
+}
 // Add this new function to your order.js file
 async function syncOrderToPOS(orderData) {
   if (!db) return;
@@ -30,12 +52,12 @@ async function syncOrderToPOS(orderData) {
     orderNo: "Pending...", // The Cloud Function will assign the real number.
         isNumbered: false,
 
-    cart: (orderData.cart || []).map(item => ({
+    cart: (orderData.cart || []).map(item) => ({
       id: item.itemId, // Use the menu item ID
       name: item.name,
       qty: item.quantity,
       price: item.price,
-      extras: (item.extras || []).map(extra => ({
+      extras: (item.extras || []).map(extra) => ({
         id: extra.id,
         name: extra.name,
         price: extra.price,
@@ -56,8 +78,14 @@ async function syncOrderToPOS(orderData) {
     paymentMethod: orderData.paymentMethod,
     paymentBreakdown: orderData.paymentBreakdown || null,
 
-    orderType: orderData.fulfillment === 'delivery' ? 'Delivery' : 'Pickup',
-    
+cashAmount: normalizeCurrencyValue(
+      orderData.cashAmount ?? orderData.paymentBreakdown?.cash
+    ),
+    instapayAmount: normalizeCurrencyValue(
+      orderData.instapayAmount ?? orderData.paymentBreakdown?.instapay
+    ),
+
+    orderType: orderData.fulfillment === "delivery" ? "Delivery" : "Pickup",    
     // --- Timestamps & Status ---
     createdAt: orderData.createdAt, // Use the same timestamp
     status: "new",
@@ -418,13 +446,13 @@ function applyQuickCartSeed(seed) {
     }
 
     if (typeof checkout.cashAmount === "number" && cashAmountInput) {
-      cashAmountInput.value = checkout.cashAmount
-        ? checkout.cashAmount.toFixed(2)
-        : "";
+          const normalizedCash = normalizeCurrencyValue(checkout.cashAmount);
+      cashAmountInput.value = normalizedCash ? normalizedCash.toFixed(2) : "";
     }
     if (typeof checkout.instapayAmount === "number" && instapayAmountInput) {
-      instapayAmountInput.value = checkout.instapayAmount
-        ? checkout.instapayAmount.toFixed(2)
+      const normalizedInstapay = normalizeCurrencyValue(checkout.instapayAmount);
+      instapayAmountInput.value = normalizedInstapay
+        ? normalizedInstapay.toFixed(2)
         : "";
     }
 
@@ -454,8 +482,10 @@ function selectedFulfillment() {
 function parseAmountInput(input) {
   if (!(input instanceof HTMLInputElement)) return 0;
   const value = Number.parseFloat(input.value);
-  return Number.isFinite(value) ? value : 0;
-}
+ if (!Number.isFinite(value)) {
+    return 0;
+  }
+  return normalizeCurrencyValue(value);}
 
 function getPaymentSelection() {
   const selectedMethod = paymentMethodInputs.find((input) => input.checked)?.value ?? "cash";
@@ -529,13 +559,13 @@ function updatePaymentInputsState(orderTotal, { fromToggle = false } = {}) {
     const hasCashValue = Boolean(cashAmountInput?.value);
     const hasInstapayValue = Boolean(instapayAmountInput?.value);
     if (!hasCashValue && !hasInstapayValue) {
-      const half = Math.round((orderTotal / 2) * 100) / 100;
+      const suggestion = calculateSplitSuggestion(orderTotal);
       if (cashAmountInput) {
-        cashAmountInput.value = half.toFixed(2);
+        cashAmountInput.value = suggestion.cash.toFixed(2);
       }
       if (instapayAmountInput) {
-        const remainder = Math.round((orderTotal - half) * 100) / 100;
-        instapayAmountInput.value = remainder.toFixed(2);
+                instapayAmountInput.value = suggestion.instapay.toFixed(2);
+
       }
     }
   }
@@ -544,6 +574,8 @@ function updatePaymentInputsState(orderTotal, { fromToggle = false } = {}) {
 function validatePaymentBreakdown(total) {
   const selection = getPaymentSelection();
   const amountDue = Math.max(total || 0, 0);
+    const normalizedDue = normalizeCurrencyValue(amountDue);
+
 
   // For 'cash' and 'instapay', the breakdown should come directly
   // from the parsed input values in 'selection', not be recalculated here.
@@ -551,7 +583,7 @@ function validatePaymentBreakdown(total) {
     return {
       valid: true,
       method: "cash",
-      breakdown: selection.breakdown, // FIX: Use the breakdown from getPaymentSelection
+      breakdown: { cash: normalizedDue, instapay: 0 },
     };
   }
 
@@ -559,7 +591,7 @@ function validatePaymentBreakdown(total) {
     return {
       valid: true,
       method: "instapay",
-      breakdown: selection.breakdown, // FIX: Use the breakdown from getPaymentSelection
+      breakdown: { cash: 0, instapay: normalizedDue },
     };
   }
 
@@ -571,16 +603,17 @@ function validatePaymentBreakdown(total) {
     };
   }
 
-  if (selection.breakdown.cash <= 0 || selection.breakdown.instapay <= 0) {
-    return {
+ const cashPortion = normalizeCurrencyValue(selection.breakdown.cash);
+  const instapayPortion = normalizeCurrencyValue(selection.breakdown.instapay);
+
+  if (cashPortion <= 0 || instapayPortion <= 0) {    return {
       valid: false,
       message: "Enter both the cash and Instapay amounts for your split payment.",
     };
   }
 
-  const totalPaid = selection.breakdown.cash + selection.breakdown.instapay;
-  const roundedPaid = Math.round(totalPaid * 100);
-  const roundedDue = Math.round(amountDue * 100);
+ const roundedPaid = Math.round((cashPortion + instapayPortion) * 100);
+  const roundedDue = Math.round(normalizedDue * 100);
 
   if (roundedPaid !== roundedDue) {
     return {
@@ -593,8 +626,8 @@ function validatePaymentBreakdown(total) {
     valid: true,
     method: "split",
     breakdown: {
-      cash: selection.breakdown.cash,
-      instapay: selection.breakdown.instapay,
+     cash: cashPortion,
+      instapay: instapayPortion,
     },
   };
 }
@@ -1142,6 +1175,11 @@ paymentMethodInputs.forEach((radio) => {
     const numeric = Number.parseFloat(input.value);
     if (!Number.isFinite(numeric) || numeric < 0) {
       input.value = "";
+      } else {
+      const normalized = normalizeCurrencyValue(numeric);
+      if (normalized !== numeric) {
+        input.value = normalized ? normalized.toFixed(2) : "";
+      }
     }
     const { total } = getOrderTotals();
     updatePaymentSummary(total);
@@ -1359,22 +1397,24 @@ form?.addEventListener("submit", async (event) => {
    const paymentBreakdown = {};
   const rawBreakdown = paymentValidation.breakdown || {};
 
-  if (typeof rawBreakdown.cash === "number") {
-    const amount = Math.round(rawBreakdown.cash * 100) / 100;
-    if (amount > 0 || paymentMethod === "cash" || paymentMethod === "split") {
-      paymentBreakdown.cash = amount;
-    }
-  }
+ const normalizedCash = normalizeCurrencyValue(rawBreakdown.cash);
+  const normalizedInstapay = normalizeCurrencyValue(rawBreakdown.instapay);
 
-  if (typeof rawBreakdown.instapay === "number") {
-    const amount = Math.round(rawBreakdown.instapay * 100) / 100;
-    if (amount > 0 || paymentMethod === "instapay" || paymentMethod === "split") {
-      paymentBreakdown.instapay = amount;
-    }
+  if (normalizedCash > 0 || paymentMethod === "cash" || paymentMethod === "split") {
+    paymentBreakdown.cash = normalizedCash;
+  }
+ if (normalizedInstapay > 0 || paymentMethod === "instapay" || paymentMethod === "split") {
+    paymentBreakdown.instapay = normalizedInstapay;
   }
 
   const hasBreakdown = Object.keys(paymentBreakdown).length > 0;
   const paymentBreakdownForStorage = hasBreakdown ? paymentBreakdown : null;
+  const cashAmountForStorage = normalizeCurrencyValue(
+    paymentMethod === "cash" ? total : paymentBreakdown.cash
+  );
+  const instapayAmountForStorage = normalizeCurrencyValue(
+    paymentMethod === "instapay" ? total : paymentBreakdown.instapay
+  );
   updateItemsField();
 
   submitBtn.disabled = true;
@@ -1391,7 +1431,8 @@ form?.addEventListener("submit", async (event) => {
     fulfillment,
     paymentMethod,
     paymentBreakdown: paymentBreakdownForStorage,
-
+cashAmount: cashAmountForStorage,
+    instapayAmount: instapayAmountForStorage,
     status: "pending",
     createdAt,
     subtotal,
