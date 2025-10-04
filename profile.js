@@ -159,7 +159,7 @@ const ordersQuery = query(
       const li = document.createElement("li");
       const hasStoredHistoryIndex =
         typeof data.historyIndex === "number" && Number.isFinite(data.historyIndex);
-      const historyIndex = hasStoredHistoryIndex ? data.historyIndex : index + 1;
+      const historyIndex = index + 1;
 
       if (!hasStoredHistoryIndex || data.historyIndex !== historyIndex) {
         pendingHistoryUpdates.push(
