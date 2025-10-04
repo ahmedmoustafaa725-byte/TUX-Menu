@@ -171,6 +171,7 @@ const currencyFormatter = new Intl.NumberFormat("en-EG", {
 });
 const COUNTRY_CODE = "+20";
 const phonePattern = /^\d{10}$/;
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function extractPhoneDigits(value) {
   if (typeof value !== "string") return "";
@@ -432,6 +433,9 @@ function applyQuickCartSeed(seed) {
     if (checkout.phone && phoneEl && !phoneEl.value) {
       const digits = extractPhoneDigits(checkout.phone);
       phoneEl.value = digits || checkout.phone;
+    }
+     if (checkout.email && emailEl && !emailEl.value) {
+      emailEl.value = checkout.email;
     }
     if (checkout.notes && notesEl && !notesEl.value) {
       notesEl.value = checkout.notes;
@@ -1301,6 +1305,8 @@ onAuthStateChanged(auth, async (user) => {
 
   currentUser = user;
   profileRef = doc(db, "profiles", user.uid);
+    let resolvedEmail = user.email || "";
+
 
   try {
     const snap = await getDoc(profileRef);
@@ -1309,6 +1315,7 @@ onAuthStateChanged(auth, async (user) => {
       if (data.name && nameEl) nameEl.value = data.name;
       if (data.address && addressEl) addressEl.value = data.address;
       if (data.phone && phoneEl) phoneEl.value = extractPhoneDigits(data.phone);
+            if (data.email) resolvedEmail = data.email;
       if (data.fulfillmentPreference && fulfillmentInputs.length) {
         fulfillmentInputs.forEach((input) => {
           input.checked = input.value === data.fulfillmentPreference;
@@ -1324,7 +1331,7 @@ onAuthStateChanged(auth, async (user) => {
     console.error("Failed to load profile", err);
   }
 
-  if (emailEl) emailEl.value = user.email || "";
+  if (emailEl) emailEl.value = resolvedEmail || "";
   if (nameEl && !nameEl.value) nameEl.value = user.displayName || "";
 
   updateFulfillmentUI();
@@ -1355,8 +1362,8 @@ form?.addEventListener("submit", async (event) => {
   }
 
   const email = emailEl.value.trim();
-  if (!email) {
-    showStatus("Email is required for order updates.", true);
+ if (!emailPattern.test(email)) {
+    showStatus("Enter a valid email address for order updates.", true);
     emailEl.focus();
     return;
   }
@@ -1413,12 +1420,15 @@ form?.addEventListener("submit", async (event) => {
   showStatus("Sending your order…");
 
   const createdAt = serverTimestamp();
+    const authEmail = currentUser.email || "";
+
   const baseOrderPayload = {
     userId: currentUser.uid,
     customerName: name,
     phone: phoneForStorage,
     address: address || null,
-    email: currentUser.email || emailEl?.value.trim() || "",
+ email,
+    authEmail,
     items,
     fulfillment,
     paymentMethod,
@@ -1481,6 +1491,8 @@ cashAmount: cashAmountForStorage,
     const profileUpdate = {
       name,
       phone: phoneForStorage,
+            email,
+
       updatedAt: serverTimestamp(),
       fulfillmentPreference: fulfillment,
     };
