@@ -158,6 +158,8 @@ onAuthStateChanged(auth, async (user) => {
 
   currentUser = user;
   profileRef = doc(db, "profiles", user.uid);
+    let resolvedEmail = user.email || "";
+
 
   try {
     const snap = await getDoc(profileRef);
@@ -166,6 +168,8 @@ onAuthStateChanged(auth, async (user) => {
       if (data.name && nameEl) nameEl.value = data.name;
       if (data.address && addressEl) addressEl.value = data.address;
       if (data.phone && phoneEl) phoneEl.value = extractPhoneDigits(data.phone);
+            if (data.email) resolvedEmail = data.email;
+
     } else {
       await setDoc(profileRef, { createdAt: serverTimestamp() }, { merge: true });
     }
@@ -173,7 +177,7 @@ onAuthStateChanged(auth, async (user) => {
     console.error("Failed to load profile", err);
   }
 
-  if (emailEl) emailEl.value = user.email || "";
+  if (emailEl) emailEl.value = resolvedEmail || "";
   if (nameEl && !nameEl.value) nameEl.value = user.displayName || "";
 
   loadOrders();
@@ -214,6 +218,8 @@ if (!phonePattern.test(phoneDigits)) {
       name,
       address,
       phone: phoneForStorage,
+            email: emailEl?.value.trim() || currentUser.email || "",
+
       updatedAt: serverTimestamp(),
     }, { merge: true });
 
