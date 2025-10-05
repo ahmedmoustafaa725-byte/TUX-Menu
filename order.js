@@ -135,6 +135,17 @@ const mobileMenuButton = document.getElementById("mobileMenuButton");
 const mobileMenu = document.getElementById("mobileMenu");
 
 const quickTransferKey = "tuxQuickCartTransfer";
+const currentPageTarget = (() => {
+  try {
+    const path = globalThis?.location?.pathname || "";
+    if (typeof path === "string" && path.toLowerCase().endsWith("your-cart.html")) {
+      return "your-cart.html";
+    }
+  } catch (err) {
+    console.warn("Failed to resolve current pathname", err);
+  }
+  return "order.html";
+})();
 let currentUser = null;
 let profileRef = null;
 let cart = [];
@@ -1299,7 +1310,7 @@ async function loadRecentOrders() {
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
-    navigateTo(`account.html?redirect=${encodeURIComponent("order.html")}`);
+    navigateTo(`account.html?redirect=${encodeURIComponent(currentPageTarget)}`);
     return;
   }
 
