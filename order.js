@@ -203,7 +203,32 @@ const deliveryZones = [
   { id: "kornish-el-maadi", name: "Kornish El Maadi", fee: 40 },
 ];
 
+function populateDeliveryZones() {
+  if (!zoneSelect) {
+    return;
+  }
 
+  // Preserve any existing placeholder option and avoid duplicating zones
+  const existingValues = new Set(
+    Array.from(zoneSelect.options || []).map((option) => option.value)
+  );
+
+  deliveryZones.forEach((zone) => {
+    if (!zone || existingValues.has(zone.id)) {
+      return;
+    }
+
+    const option = document.createElement("option");
+    option.value = zone.id;
+    option.textContent = `${zone.name} — ${formatCurrency(zone.fee)}`;
+    option.dataset.fee = String(zone.fee);
+    zoneSelect.appendChild(option);
+  });
+
+  if (!zoneSelect.options.length && deliveryZoneField) {
+    deliveryZoneField.style.display = "none";
+  }
+}
 function loadQuickCartTransfer() {
   if (typeof window === "undefined") return null;
   try {
