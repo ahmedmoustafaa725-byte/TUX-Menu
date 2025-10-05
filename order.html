@@ -197,21 +197,38 @@
         </a>
         <nav class="hidden items-center gap-6 text-sm font-medium lg:flex">
            <a href="index.html#menu" class="text-gray-300 transition hover:text-gold">Back to Menu</a>
-                     <a href="your-cart.html" class="rounded-full border border-white/20 px-5 py-2 text-gray-200 transition hover:border-gold hover:text-gold">View Cart</a>
-
+  <a id="cartLinkDesktop" href="your-cart.html" class="relative inline-flex h-12 w-12 items-center justify-center rounded-full border border-white/20 text-gray-200 transition hover:border-gold hover:text-gold" aria-label="View cart">
+              <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l3-7H5.4" />
+                 <circle cx="9" cy="19" r="1.5" />
+                 <circle cx="17" cy="19" r="1.5" />
+              </svg>
+              <span id="cartCountDesktop" class="absolute -top-1 -right-1 hidden min-w-[1.5rem] rounded-full bg-gold px-1 text-center text-xs font-semibold text-black">0</span>
+              <span class="sr-only">View cart</span>
+           </a>
            <a id="accountLink" href="account.html" class="rounded-full bg-gold px-5 py-2 font-semibold text-black transition hover:scale-105 hover:bg-yellow-500">My Account</a>
            <a id="logoutLink" href="#" class="rounded-full border border-white/20 px-5 py-2 text-gray-200 transition hover:border-gold hover:text-gold">Log out</a>
         </nav>
-        <button id="mobileMenuButton" class="text-gray-300 transition hover:text-gold lg:hidden" aria-label="Toggle navigation" aria-expanded="false">
-           <svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
-           </svg>
-        </button>
+   <div class="flex items-center gap-4 lg:hidden">
+           <a id="cartLinkMobile" href="your-cart.html" class="relative inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/20 text-gray-200 transition hover:border-gold hover:text-gold" aria-label="View cart">
+              <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l3-7H5.4" />
+                 <circle cx="9" cy="19" r="1.5" />
+                 <circle cx="17" cy="19" r="1.5" />
+              </svg>
+              <span id="cartCountMobile" class="absolute -top-1 -right-1 hidden min-w-[1.4rem] rounded-full bg-gold px-1 text-center text-xs font-semibold text-black">0</span>
+              <span class="sr-only">View cart</span>
+           </a>
+           <button id="mobileMenuButton" class="text-gray-300 transition hover:text-gold" aria-label="Toggle navigation" aria-expanded="false">
+              <svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+              </svg>
+           </button>
+        </div>
      </div>
      <div id="mobileMenu" class="hidden border-t border-white/10 bg-slate-950/95 lg:hidden">
         <nav class="flex flex-col space-y-4 px-4 pt-4 pb-6 text-sm font-medium">
            <a href="index.html#menu" class="text-gray-300 transition hover:text-gold">Back to Menu</a>
-                     <a href="your-cart.html" class="text-gray-300 transition hover:text-gold">View Cart</a>
 
            <a id="accountLinkMobile" href="account.html" class="rounded-full bg-gold px-4 py-2 text-center font-semibold text-black transition hover:bg-yellow-500">My Account</a>
            <a id="logoutLinkMobile" href="#" class="hidden rounded-full border border-white/15 px-4 py-2 text-center font-semibold text-white transition hover:border-gold hover:text-gold">Log out</a>
