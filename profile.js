@@ -187,12 +187,8 @@ const ordersQuery = query(
 
       const heading = document.createElement("h4");
       const orderIdentifier = data.orderNo ? `Order ${data.orderNo}` : "Order";
-const firstItemLine = (data.items || "")
-        .split("\n")
-        .map((line) => line.trim())
-        .find((line) => line.length > 0);
-      const orderTitle = firstItemLine || "TUX order";
-      heading.textContent = `${historyIndex}. ${orderIdentifier} — ${orderTitle}`;
+      heading.textContent = `${historyIndex}. ${orderIdentifier}`;
+
       titleWrapper.appendChild(heading);
 
       const timestamp = document.createElement("p");
