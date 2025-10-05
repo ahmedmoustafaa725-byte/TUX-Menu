@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TUX — Your Cart</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: { gold: '#d7b968' },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            brand: ['Playfair Display', 'serif'],
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    :root {
+      color-scheme: dark;
+    }
+
+    body.order-page {
+      min-height: 100vh;
+      font-family: 'Inter', sans-serif;
+      background:
+        radial-gradient(circle at top, rgba(245, 201, 106, 0.16), transparent 48%),
+        radial-gradient(circle at bottom right, rgba(56, 189, 248, 0.18), transparent 38%),
+        #05060b;
+      color: #f7f7fb;
+    }
+
+    .order-page .menu-column::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .order-page .menu-column::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    .order-page .menu-column::-webkit-scrollbar-thumb {
+      background: rgba(245, 201, 106, 0.45);
+      border-radius: 999px;
+    }
+
+    .surface-card {
+      position: relative;
+      border-radius: 26px;
+      padding: 28px;
+      background: linear-gradient(145deg, rgba(13, 16, 26, 0.92), rgba(7, 9, 18, 0.85));
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 32px 72px rgba(5, 7, 12, 0.58);
+      backdrop-filter: blur(20px);
+      overflow: hidden;
+    }
+
+    .surface-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(circle at top left, rgba(245, 201, 106, 0.18), transparent 55%);
+      pointer-events: none;
+    }
+
+    .surface-card > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    #cartItems {
+      display: grid;
+      gap: 18px;
+      max-height: 460px;
+      overflow-y: auto;
+      padding-right: 6px;
+    }
+
+    #cartItems::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    #cartItems::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.18);
+      border-radius: 999px;
+    }
+
+    .order-page .cart-item {
+      list-style: none;
+      padding: 18px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(6, 8, 16, 0.7));
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 18px 40px rgba(5, 7, 12, 0.45);
+    }
+
+    .order-page .cart-item__row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+    }
+
+    .order-page .cart-item__name {
+      font-weight: 600;
+      letter-spacing: 0.01em;
+    }
+
+    .order-page .cart-item__extras {
+      margin-top: 8px;
+      font-size: 0.78rem;
+      color: rgba(198, 202, 220, 0.82);
+    }
+
+    .order-page .cart-item__controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+      align-items: center;
+    }
+
+    .order-page .cart-item__btn {
+      padding: 6px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(7, 8, 14, 0.6);
+      color: inherit;
+      transition: all 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .order-page .cart-item__btn:hover {
+      border-color: rgba(245, 201, 106, 0.6);
+      color: var(--primary);
+      transform: translateY(-1px);
+    }
+
+    .order-page .cart-item__qty {
+      width: 72px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(6, 8, 16, 0.65);
+      color: inherit;
+      padding: 6px 10px;
+      text-align: center;
+    }
+
+    .order-page .accent-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(245, 201, 106, 0.12);
+      color: rgba(245, 201, 106, 0.85);
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 1024px) {
+      body.order-page {
+        background:
+          radial-gradient(circle at top, rgba(245, 201, 106, 0.2), transparent 55%),
+          #05060b;
+      }
+
+      .surface-card {
+        padding: 24px;
+      }
+    }
+  </style>
+</head>
+<body class="order-page">
+  <header class="sticky top-0 z-50 border-b border-white/10 bg-slate-950/75 backdrop-blur-xl">
+    <div class="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
+      <a href="index.html" class="flex items-center gap-3" aria-label="TUX Home">
+        <img src="assets/img/logo.jpg" alt="TUX logo" class="h-12 w-12 rounded-2xl border border-gold/70 bg-black/60 p-1">
+        <div class="flex flex-col">
+          <span class="font-brand text-2xl font-semibold tracking-[0.08em] text-gold">TUX</span>
+          <span class="accent-pill mt-1 hidden sm:inline-flex">Your Cart</span>
+        </div>
+      </a>
+      <nav class="hidden items-center gap-6 text-sm font-medium lg:flex">
+        <a href="order.html" class="text-gray-300 transition hover:text-gold">Back to Order Builder</a>
+        <a href="order.html#checkoutPanel" class="rounded-full bg-gold px-5 py-2 font-semibold text-black transition hover:scale-105 hover:bg-yellow-500">Go to Checkout</a>
+        <a id="accountLink" href="account.html" class="rounded-full border border-white/20 px-5 py-2 text-gray-200 transition hover:border-gold hover:text-gold">My Account</a>
+        <a id="logoutLink" href="#" class="rounded-full border border-white/20 px-5 py-2 text-gray-200 transition hover:border-gold hover:text-gold">Log out</a>
+      </nav>
+      <button id="mobileMenuButton" class="text-gray-300 transition hover:text-gold lg:hidden" aria-label="Toggle navigation" aria-expanded="false">
+        <svg class="h-7 w-7" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+        </svg>
+      </button>
+    </div>
+    <div id="mobileMenu" class="hidden border-t border-white/10 bg-slate-950/95 lg:hidden">
+      <nav class="flex flex-col space-y-4 px-4 pt-4 pb-6 text-sm font-medium">
+        <a href="order.html" class="text-gray-300 transition hover:text-gold">Back to Order Builder</a>
+        <a href="order.html#checkoutPanel" class="text-gray-300 transition hover:text-gold">Go to Checkout</a>
+        <a id="accountLinkMobile" href="account.html" class="rounded-full bg-gold px-4 py-2 text-center font-semibold text-black transition hover:bg-yellow-500">My Account</a>
+        <a id="logoutLinkMobile" href="#" class="hidden rounded-full border border-white/15 px-4 py-2 text-center font-semibold text-white transition hover:border-gold hover:text-gold">Log out</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="relative mx-auto max-w-5xl px-4 py-12 lg:py-16">
+    <div class="pointer-events-none absolute inset-0 -z-[1] bg-[radial-gradient(circle_at_bottom_left,rgba(79,70,229,0.18),transparent_55%)]"></div>
+    <section id="cartPanel" class="surface-card space-y-6">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1 class="font-brand text-3xl font-semibold text-gold md:text-4xl">Your Cart</h1>
+          <p class="text-sm text-gray-400">Adjust quantities, remove items, or clear your bag before checkout.</p>
+        </div>
+        <a href="order.html" class="inline-flex items-center gap-2 rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-gold hover:text-gold">
+          <span>Continue ordering</span>
+        </a>
+      </div>
+      <ul id="cartItems" class="text-sm" aria-live="polite">
+        <li id="emptyCart" class="rounded-2xl border border-dashed border-white/15 px-4 py-6 text-center text-sm text-gray-400">Your cart is empty. Head back to the menu to add something delicious.</li>
+      </ul>
+      <div id="cartSummary" class="hidden space-y-3 border-t border-white/10 pt-4 text-sm">
+        <div class="flex justify-between text-gray-300"><span>Subtotal</span><span id="cartSubtotal">EGP 0.00</span></div>
+        <div id="deliveryFeeRow" class="hidden justify-between text-gray-300"><span>Delivery Fee</span><span id="cartDeliveryFee">EGP 0.00</span></div>
+        <div class="flex justify-between text-lg font-semibold text-gold"><span>Total</span><span id="cartTotal">EGP 0.00</span></div>
+        <div id="paymentSummary" class="hidden space-y-1 border-t border-white/10 pt-3 text-xs text-gray-300">
+          <div id="cashSummaryRow" class="flex justify-between"><span>Cash</span><span id="cashSummaryAmount">EGP 0.00</span></div>
+          <div id="instapaySummaryRow" class="flex justify-between"><span>Instapay</span><span id="instapaySummaryAmount">EGP 0.00</span></div>
+        </div>
+      </div>
+      <div class="flex flex-wrap items-center gap-3">
+        <button id="clearCart" class="hidden rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-red-400 transition hover:border-red-400 hover:text-red-300">Clear Cart</button>
+        <a href="order.html#checkoutPanel" class="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-gold via-amber-400 to-orange-400 px-5 py-2 text-sm font-semibold text-black transition hover:scale-[1.02] hover:shadow-[0_16px_40px_rgba(215,185,104,0.35)]">Proceed to checkout</a>
+      </div>
+    </section>
+  </main>
+
+  <script src="content.js"></script>
+  <script type="module" src="nav.js"></script>
+  <script type="module" src="cart.js"></script>
+</body>
+</html>
