@@ -313,6 +313,10 @@ function updateCartBadge() {
   } else {
     delete cartDock.dataset.count;
   }
+   const badgeLabel = cartDock.querySelector('[data-role="cart-count"]');
+  if (badgeLabel) {
+    badgeLabel.textContent = count > 0 ? `${count} item${count === 1 ? '' : 's'} in cart` : 'Cart is empty';
+  }
 }
 
 function openOverlay(panel) {
@@ -620,6 +624,51 @@ function hydrateForm() {
   updateCartSummary({ persist: false });
   updateCartBadge();
 }
+function applySharedCheckoutSnapshot(snapshot = {}) {
+  if (!snapshot || typeof snapshot !== "object") return;
+
+  if (typeof snapshot.name === "string") {
+    state.checkout.name = snapshot.name;
+  }
+  if (typeof snapshot.phone === "string") {
+    state.checkout.phone = snapshot.phone;
+  }
+  if (typeof snapshot.notes === "string") {
+    state.checkout.notes = snapshot.notes;
+  }
+  if (typeof snapshot.email === "string") {
+    state.checkout.email = snapshot.email;
+  }
+  if (typeof snapshot.paymentMethod === "string") {
+    state.checkout.paymentMethod = snapshot.paymentMethod;
+  }
+  if (typeof snapshot.cashAmount !== "undefined") {
+    state.checkout.cashAmount = normalizeCurrencyValue(snapshot.cashAmount);
+  }
+  if (typeof snapshot.instapayAmount !== "undefined") {
+    state.checkout.instapayAmount = normalizeCurrencyValue(snapshot.instapayAmount);
+  }
+
+  hydrateForm();
+}
+
+function handleSharedCartSync(detail = {}) {
+  const incomingCart = Array.isArray(detail.cart)
+    ? detail.cart
+        .map((entry) => ({
+          id: entry?.id,
+          quantity: Math.max(1, Number.parseInt(entry?.quantity, 10) || 1),
+        }))
+        .filter((entry) => typeof entry.id === "string" && menuIndex.has(entry.id))
+    : [];
+
+  state.cart = incomingCart;
+  renderCart({ persist: false });
+
+  if (detail.checkout && typeof detail.checkout === "object") {
+    applySharedCheckoutSnapshot(detail.checkout);
+  }
+}
 
 function getAuthUser() {
   return window.__tuxAuthUser || null;
@@ -857,5 +906,13 @@ initRevealAnimations();
 updateCartSummary({ persist: false });
 updateCartBadge();
 if (typeof window !== "undefined") {
+  window.addEventListener("tux-cart-sync", (event) => {
+    handleSharedCartSync(event?.detail || {});
+  });
+  window.addEventListener("message", (event) => {
+    if (event?.data && event.data.type === "tux-cart-sync") {
+      handleSharedCartSync(event.data.payload || {});
+    }
+  });
   window.addEventListener("pagehide", () => persistState({ immediate: true }));
 }
