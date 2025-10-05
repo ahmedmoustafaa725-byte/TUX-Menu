@@ -133,7 +133,10 @@ const cashSummaryAmount = document.getElementById("cashSummaryAmount");
 const instapaySummaryAmount = document.getElementById("instapaySummaryAmount");
 const mobileMenuButton = document.getElementById("mobileMenuButton");
 const mobileMenu = document.getElementById("mobileMenu");
-
+const cartLinkDesktop = document.getElementById("cartLinkDesktop");
+const cartLinkMobile = document.getElementById("cartLinkMobile");
+const cartCountDesktopEl = document.getElementById("cartCountDesktop");
+const cartCountMobileEl = document.getElementById("cartCountMobile");
 const quickTransferKey = "tuxQuickCartTransfer";
 const currentPageTarget = (() => {
   try {
@@ -645,7 +648,7 @@ function renderMenu() {
     return acc;
   }, {});
 
-  const entries = Object.entries(grouped);
+  const entries = Object.entries(grouped).filter(([category]) => category !== "Burger Extras");
   if (!entries.length) {
     menuContainer.innerHTML = "";
     return;
@@ -822,7 +825,28 @@ function calculateItemTotal(entry) {
 function calculateCartTotal() {
   return cart.reduce((total, entry) => total + calculateItemTotal(entry), 0);
 }
+function updateCartIconBadges(count) {
+  const safeCount = Math.max(0, Number.parseInt(count, 10) || 0);
+  const showBadge = safeCount > 0;
+  const labelBase = "View cart";
+  const label = showBadge
+    ? `${labelBase} (${safeCount} ${safeCount === 1 ? "item" : "items"})`
+    : labelBase;
 
+  [cartCountDesktopEl, cartCountMobileEl].forEach((badge) => {
+    if (!badge) return;
+    badge.textContent = String(safeCount);
+    badge.classList.toggle("hidden", !showBadge);
+  });
+
+  if (cartLinkDesktop) {
+    cartLinkDesktop.setAttribute("aria-label", label);
+  }
+
+  if (cartLinkMobile) {
+    cartLinkMobile.setAttribute("aria-label", label);
+  }
+}
 function mapCartForStorage() {
   return cart.map((entry) => ({
     id: entry.itemId,
@@ -909,43 +933,48 @@ function updateItemsField() {
 
 function updateCartUI() {
   const hasItems = cart.length > 0;
-
+const totalItems = cart.reduce((sum, entry) => {
+    const qty = Number.parseInt(entry?.quantity, 10);
+    return sum + (Number.isFinite(qty) && qty > 0 ? qty : 1);
+  }, 0);
+  updateCartIconBadges(totalItems);
 if (cartItemsContainer) {
     cartItemsContainer.innerHTML = "";
-  if (!hasItems) {
-    if (emptyCartEl) {
-      emptyCartEl.style.display = "block";
-      cartItemsContainer.appendChild(emptyCartEl);
-    }
-  } else {
-    if (emptyCartEl) emptyCartEl.style.display = "none";
-
-    cart.forEach((entry, index) => {
-      const li = document.createElement("li");
-      li.className = "cart-item";
-      li.dataset.index = String(index);
-
-      const row = document.createElement("div");
-      row.className = "cart-item__row";
-
-      const title = document.createElement("div");
-      title.className = "cart-item__name";
-      title.textContent = `${entry.quantity}× ${entry.name}`;
-      row.appendChild(title);
-
-      const price = document.createElement("div");
-      price.textContent = formatCurrency(calculateItemTotal(entry));
-      row.appendChild(price);
-
-      li.appendChild(row);
-
-      if (entry.extras && entry.extras.length) {
-        const extras = document.createElement("div");
-        extras.className = "cart-item__extras";
-        extras.textContent = `Extras: ${entry.extras.map((extra) => extra.name).join(", ")}`;
-        li.appendChild(extras);
+    if (!hasItems) {
+      if (emptyCartEl) {
+        emptyCartEl.style.display = "block";
+        cartItemsContainer.appendChild(emptyCartEl);
       }
+ } else {
+      if (emptyCartEl) emptyCartEl.style.display = "none";
 
+      cart.forEach((entry, index) => {
+        const li = document.createElement("li");
+        li.className = "cart-item";
+        li.dataset.index = String(index);
+
+        const row = document.createElement("div");
+        row.className = "cart-item__row";
+
+        const title = document.createElement("div");
+        title.className = "cart-item__name";
+        title.textContent = `${entry.quantity}× ${entry.name}`;
+        row.appendChild(title);
+
+        const price = document.createElement("div");
+        price.textContent = formatCurrency(calculateItemTotal(entry));
+        row.appendChild(price);
+
+        li.appendChild(row);
+
+        if (entry.extras && entry.extras.length) {
+          const extras = document.createElement("div");
+          extras.className = "cart-item__extras";
+          extras.textContent = `Extras: ${entry.extras
+            .map((extra) => extra.name)
+            .join(", ")}`;
+          li.appendChild(extras);
+        }
  const controls = document.createElement("div");
         controls.className = "cart-item__controls";
 
@@ -1035,7 +1064,7 @@ if (cartItemsContainer) {
   updateItemsField();
   updatePaymentInputsState(total);
   updatePaymentSummary(total);
-    syncSharedCart({ reason: hasItems ? "cart-update" : "cart-empty" });
+  syncSharedCart({ reason: hasItems ? "cart-update" : "cart-empty" });
 
 }
 
