@@ -26,8 +26,14 @@
         <a href="#gallery">Gallery</a>
        <a href="#location">Location</a>
       <a href="#contact">Contact</a>
-      <a href="your-cart.html" class="btn small outline">Cart</a>
-      <a href="order.html" id="orderLink" class="btn small red">Order Online</a>
+      <a href="your-cart.html" class="nav__cart" aria-label="View cart">
+        <svg class="nav__cart-icon" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l3-7H5.4" />
+          <circle cx="9" cy="19" r="1.5" />
+          <circle cx="17" cy="19" r="1.5" />
+        </svg>
+        <span class="sr-only">View cart</span>
+      </a>      <a href="order.html" id="orderLink" class="btn small red">Order Online</a>
       <a href="account.html" id="accountLink" class="btn small outline">Login / Sign up</a>
       <a href="#" id="logoutLink" class="btn small outline">Log out</a>
     </nav>
