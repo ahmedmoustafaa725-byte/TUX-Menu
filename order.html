@@ -221,7 +221,7 @@
 
   <main class="relative mx-auto max-w-6xl px-4 py-12 lg:py-16">
      <div class="pointer-events-none absolute inset-0 -z-[1] bg-[radial-gradient(circle_at_bottom_left,rgba(79,70,229,0.18),transparent_55%)]"></div>
-   <div class="lg:grid lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:gap-10">
+   <div>
         <section class="menu-column lg:h-[calc(100vh-160px)] lg:overflow-y-auto">
            <header class="mb-12 text-center lg:text-left">
               <p class="text-sm uppercase tracking-[0.45em] text-gray-400">Tux Burger Truck</p>
@@ -231,49 +231,6 @@
            <div id="menuList" class="space-y-10"></div>
         </section>
 
-   <section id="checkoutPanel" class="surface-card hidden space-y-6 mt-12 lg:mt-0">
-           <div class="space-y-4">
-              <div>
-               <h2 class="font-brand text-2xl font-semibold">Cart overview</h2>
-                 <p class="text-sm text-gray-400">Review what you’ve added so far. You’ll complete checkout from the cart page.</p>
-              </div>
- <div class="rounded-3xl border border-white/10 bg-white/5 p-5 space-y-4" aria-live="polite">
-                 <div class="flex flex-wrap items-start justify-between gap-3">
-                    <div>
-                       <h3 class="text-lg font-semibold text-white">Order summary</h3>
-                       <p class="text-xs text-gray-400">Items added here stay in sync with your cart page.</p>
-                    </div>
-                    <a href="your-cart.html" class="text-sm font-semibold text-gold transition hover:text-yellow-300">Go to cart</a>
-                 </div>
-                 <ul id="cartItems" class="space-y-4 text-sm" aria-live="polite">
-                    <li id="emptyCart" class="rounded-2xl border border-dashed border-white/15 px-4 py-6 text-center text-sm text-gray-400">Your cart is empty. Start adding your favourites.</li>
-                 </ul>
-                 <div id="cartSummary" class="hidden space-y-3 border-t border-white/10 pt-4 text-sm">
-                    <div class="flex justify-between text-gray-300"><span>Subtotal</span><span id="cartSubtotal">EGP 0.00</span></div>
-                    <div id="deliveryFeeRow" class="hidden justify-between text-gray-300"><span>Delivery Fee</span><span id="cartDeliveryFee">EGP 0.00</span></div>
-                    <div class="flex justify-between text-lg font-semibold text-gold"><span>Total</span><span id="cartTotal">EGP 0.00</span></div>
-                    <div id="paymentSummary" class="hidden space-y-1 border-t border-white/10 pt-3 text-xs text-gray-300">
-                       <div id="cashSummaryRow" class="flex justify-between"><span>Cash</span><span id="cashSummaryAmount">EGP 0.00</span></div>
-                       <div id="instapaySummaryRow" class="flex justify-between"><span>Instapay</span><span id="instapaySummaryAmount">EGP 0.00</span></div>
-                    </div>
-                 </div>
-                 <div class="flex flex-wrap items-center gap-3">
-                    <button id="clearCart" class="hidden rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-red-400 transition hover:border-red-400 hover:text-red-300">Clear Cart</button>
-                    <a href="your-cart.html" class="text-sm text-gray-400 underline-offset-4 transition hover:text-gold">Manage cart in detail</a>
-                 </div>
-              </div>
-           </div>
-
- <div class="space-y-5 border-t border-white/10 pt-4 text-sm text-gray-300">
-              <h3 class="text-lg font-semibold text-white">Ready to checkout?</h3>
-              <p>Keep adding items here, then open your cart to enter your details and place the order.</p>
-              <div class="flex flex-wrap gap-3">
-                 <a href="your-cart.html" class="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-gold via-amber-400 to-orange-400 px-5 py-2 text-sm font-semibold text-black transition hover:scale-[1.02] hover:shadow-[0_20px_45px_rgba(215,185,104,0.35)]">Open cart to checkout</a>
-                 <a href="your-cart.html" class="text-sm text-gray-400 underline-offset-4 transition hover:text-gold">View full cart</a>
-              </div>
-              <p id="orderStatus" class="min-h-[1.5rem] text-sm text-gray-400"></p>
-           </div>
-           </section>
      </div>
   </main>
   <script src="content.js"></script>
