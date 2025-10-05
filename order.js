@@ -12,6 +12,8 @@ import {
   limit,
   getDocs,
 } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+import { menuData, menuIndex } from "./menu-data.js";
+import { readSharedCart, writeSharedCart } from "./cart-storage.js";
 function normalizeCurrencyValue(value) {
   if (typeof value === "string") {
     value = Number.parseFloat(value);
@@ -201,199 +203,6 @@ const deliveryZones = [
   { id: "kornish-el-maadi", name: "Kornish El Maadi", fee: 40 },
 ];
 
-const burgerExtras = [
-  { id: "extra-smashed-patty", name: "Extra Smashed Patty", price: 40 },
-  { id: "bacon", name: "Bacon", price: 20 },
-  { id: "cheese", name: "Cheese", price: 15 },
-  { id: "ranch", name: "Ranch", price: 10 },
-  { id: "mushroom", name: "Mushroom", price: 15 },
-  { id: "caramelized-onion", name: "Caramelized Onion", price: 10 },
-  { id: "jalapeno", name: "Jalapeño", price: 10 },
-  { id: "tux-sauce", name: "TUX Sauce", price: 10 },
-  { id: "extra-bun", name: "Extra Bun", price: 10 },
-  { id: "pickle", name: "Pickle", price: 5 },
-  { id: "condiments", name: "BBQ / Ketchup / Sweet Chili / Hot Sauce", price: 5 },
-];
-
-const hawawshiExtras = [
-  { id: "mozzarella-cheese", name: "Mozzarella Cheese", price: 20 },
-  { id: "tux-hawawshi-sauce", name: "TUX Hawawshi Sauce", price: 10 },
-  { id: "hawawshi-condiments", name: "BBQ / Ketchup / Sweet Chili / Hot Sauce", price: 5 },
-];
-
-function populateDeliveryZones() {
-  if (!zoneSelect) return;
-
-  const previousValue = zoneSelect.value;
-  zoneSelect.innerHTML = "";
-
-  const placeholder = document.createElement("option");
-  placeholder.value = "";
-  placeholder.disabled = true;
-  placeholder.textContent = "Select your zone";
-  if (!previousValue) {
-    placeholder.selected = true;
-  }
-  zoneSelect.appendChild(placeholder);
-
-  deliveryZones.forEach((zone) => {
-    const option = document.createElement("option");
-    option.value = zone.id;
-    option.textContent = `${zone.name} — ${formatCurrency(zone.fee)}`;
-    zoneSelect.appendChild(option);
-  });
-
-  if (previousValue) {
-    const match = deliveryZones.find((zone) => zone.id === previousValue);
-    if (match) {
-      zoneSelect.value = match.id;
-      return;
-    }
-  }
-
-  zoneSelect.selectedIndex = 0;
-}
-
-const menuData = [
-  {
-    id: "single-smashed-patty",
-    name: "Single Smashed Patty",
-    description: "Smashed patty, cheese, TUX sauce, pickles, tomato, onion, lettuce.",
-    price: 95,
-    category: "Smash Burgers",
-    extras: burgerExtras,
-  },
-  {
-    id: "double-smashed-patty",
-    name: "Double Smashed Patty",
-    description: "Two smashed patties, cheese, TUX sauce, pickles, tomato, onion, lettuce.",
-    price: 140,
-    category: "Smash Burgers",
-    extras: burgerExtras,
-  },
-  {
-    id: "triple-smashed-patty",
-    name: "Triple Smashed Patty",
-    description: "Triple the patties with all the classic TUX toppings and sauce.",
-    price: 160,
-    category: "Smash Burgers",
-    extras: burgerExtras,
-  },
-  {
-    id: "quatro-smashed-patty",
-    name: "TUX Quatro Smashed Patty",
-    description: "Four smashed patties, cheese, caramelized onion, mushroom, TUX sauce.",
-    price: 190,
-    category: "Smash Burgers",
-    extras: burgerExtras,
-  },
-  {
-    id: "tuxify-single",
-    name: "TUXIFY Single",
-    description: "Brioche bun, beef patty, American cheese, pickles, chopped onion, ketchup, TUXIFY sauce.",
-    price: 120,
-    category: "TUXIFY",
-    extras: burgerExtras,
-  },
-  {
-    id: "tuxify-double",
-    name: "TUXIFY Double",
-    description: "Double beef patties with American cheese, pickles, onion, ketchup, TUXIFY sauce.",
-    price: 160,
-    category: "TUXIFY",
-    extras: burgerExtras,
-  },
-  {
-    id: "tuxify-triple",
-    name: "TUXIFY Triple",
-    description: "Three beef patties layered with American cheese and TUXIFY sauce.",
-    price: 200,
-    category: "TUXIFY",
-    extras: burgerExtras,
-  },
-  {
-    id: "tuxify-quatro",
-    name: "TUXIFY Quatro",
-    description: "Four beef patties, American cheese, pickles, chopped onion, ketchup, TUXIFY sauce.",
-    price: 240,
-    category: "TUXIFY",
-    extras: burgerExtras,
-  },
-  {
-    id: "classic-fries-small",
-    name: "Classic Fries (Small)",
-    price: 25,
-    category: "Fries",
-    extras: [],
-  },
-  {
-    id: "classic-fries-large",
-    name: "Classic Fries (Large)",
-    price: 30,
-    category: "Fries",
-    extras: [],
-  },
-  {
-    id: "cheese-fries",
-    name: "Cheese Fries",
-    price: 30,
-    category: "Fries",
-    extras: [],
-  },
-  {
-    id: "chili-fries",
-    name: "Chili Fries",
-    price: 40,
-    category: "Fries",
-    extras: [],
-  },
-  {
-    id: "tux-fries",
-    name: "TUX Fries",
-    description: "Fries, smashed patty, cheese, pickles, caramelised onion, jalapeño, TUX sauce.",
-    price: 75,
-    category: "Fries",
-    extras: [],
-  },
-  {
-    id: "doppy-fries",
-    name: "Doppy Fries",
-    price: 95,
-    category: "Fries",
-    extras: [],
-  },
-  {
-    id: "classic-hawawshi",
-    name: "Classic Hawawshi",
-    description: "Baladi bread, hawawshi meat, onion. Served with chili sauce.",
-    price: 80,
-    category: "Hawawshi",
-    extras: hawawshiExtras,
-  },
-  {
-    id: "tux-hawawshi",
-    name: "TUX Hawawshi",
-    description: "Baladi bread, hawawshi meat, mozzarella, onion, TUX hawawshi sauce.",
-    price: 100,
-    category: "Hawawshi",
-    extras: hawawshiExtras,
-  },
-  {
-    id: "soda",
-    name: "Soda",
-    price: 20,
-    category: "Drinks",
-    extras: [],
-  },
-  {
-    id: "water",
-    name: "Water",
-    price: 10,
-    category: "Drinks",
-  },
-];
-
-const menuIndex = new Map(menuData.map((item) => [item.id, item]));
 
 function loadQuickCartTransfer() {
   if (typeof window === "undefined") return null;
@@ -413,18 +222,67 @@ function loadQuickCartTransfer() {
 function applyQuickCartSeed(seed) {
   if (!seed || typeof seed !== "object") return;
   try {
-    if (Array.isArray(seed.cart) && seed.cart.length) {
+ const baseEntries = Array.isArray(seed.cart) && seed.cart.length
+      ? seed.cart
+      : Array.isArray(seed.details) && seed.details.length
+        ? seed.details
+        : [];
+
+    if (baseEntries.length) {
+      const detailLookup = new Map();
+      if (Array.isArray(seed.details)) {
+        seed.details.forEach((detail) => {
+          const detailId = detail?.id || detail?.itemId;
+          if (!detailId) return;
+          detailLookup.set(detailId, detail);
+        });
+      }
       cart = [];
-      seed.cart.forEach((entry) => {
-        const menuItem = menuIndex.get(entry.id);
+     baseEntries.forEach((entry) => {
+        const entryId = entry?.id || entry?.itemId;
+        if (!entryId) return;
+        const menuItem = menuIndex.get(entryId);
         if (!menuItem) return;
-        const quantity = Math.max(1, Number.parseInt(entry.quantity, 10) || 1);
+const quantity = Math.max(1, Number.parseInt(entry?.quantity, 10) || 1);
+        const detail = detailLookup.get(menuItem.id) || null;
+        const itemName = detail?.name && typeof detail.name === "string"
+          ? detail.name
+          : menuItem.name;
+        const normalizedItemPrice = normalizeCurrencyValue(
+          typeof detail?.price === "number" || typeof detail?.price === "string"
+            ? Number.parseFloat(detail.price)
+            : menuItem.price
+        );
+
+        const extras = Array.isArray(detail?.extras)
+          ? detail.extras
+              .map((extra) => {
+                const extraId = extra?.id;
+                if (!extraId) return null;
+                const menuExtra = Array.isArray(menuItem.extras)
+                  ? menuItem.extras.find((opt) => opt.id === extraId)
+                  : null;
+                const extraName = extra?.name && typeof extra.name === "string"
+                  ? extra.name
+                  : menuExtra?.name || extraId;
+                const rawPrice =
+                  typeof extra?.price === "number" || typeof extra?.price === "string"
+                    ? Number.parseFloat(extra.price)
+                    : menuExtra?.price || 0;
+                return {
+                  id: extraId,
+                  name: extraName,
+                  price: normalizeCurrencyValue(rawPrice),
+                };
+              })
+              .filter(Boolean)
+          : [];
         cart.push({
           itemId: menuItem.id,
-          name: menuItem.name,
-          price: menuItem.price,
+         name: itemName,
+          price: normalizedItemPrice,
           quantity,
-          extras: [],
+          extras,
         });
       });
     }
@@ -929,6 +787,72 @@ function calculateCartTotal() {
   return cart.reduce((total, entry) => total + calculateItemTotal(entry), 0);
 }
 
+function mapCartForStorage() {
+  return cart.map((entry) => ({
+    id: entry.itemId,
+    quantity: Math.max(1, Number.parseInt(entry.quantity, 10) || 1),
+  }));
+}
+
+function mapCartDetailsForStorage() {
+  return cart.map((entry) => ({
+    id: entry.itemId,
+    name: entry.name,
+    price: normalizeCurrencyValue(entry.price),
+    quantity: Math.max(1, Number.parseInt(entry.quantity, 10) || 1),
+    extras: Array.isArray(entry.extras)
+      ? entry.extras
+          .map((extra) => {
+            if (!extra?.id) return null;
+            return {
+              id: extra.id,
+              name: extra.name || extra.id,
+              price: normalizeCurrencyValue(extra.price),
+            };
+          })
+          .filter(Boolean)
+      : [],
+  }));
+}
+
+function getCheckoutSnapshot() {
+  const method = paymentMethodInputs.find((input) => input.checked)?.value ?? "cash";
+  const snapshot = {
+    name: nameEl?.value?.trim() ?? "",
+    phone: phoneEl?.value?.trim() ?? "",
+    email: emailEl?.value?.trim() ?? "",
+    address: addressEl?.value?.trim() ?? "",
+    notes: notesEl?.value?.trim() ?? "",
+    paymentMethod: method,
+    cashAmount: parseAmountInput(cashAmountInput),
+    instapayAmount: parseAmountInput(instapayAmountInput),
+    fulfillment: selectedFulfillment(),
+  };
+
+  const zone = getSelectedZone();
+  if (zone) {
+    snapshot.deliveryZoneId = zone.id;
+    snapshot.deliveryZoneName = zone.name;
+  } else if (zoneSelect) {
+    snapshot.deliveryZoneId = zoneSelect.value || "";
+  }
+
+  return snapshot;
+}
+
+function syncSharedCart({ reason = "cart-update" } = {}) {
+  try {
+    writeSharedCart({
+      cart: mapCartForStorage(),
+      details: mapCartDetailsForStorage(),
+      checkout: getCheckoutSnapshot(),
+      metadata: { reason, source: "order" },
+    });
+  } catch (err) {
+    console.warn("Failed to sync shared cart", err);
+  }
+}
+
 function buildCartSummary() {
   if (!cart.length) return "";
   return cart
@@ -948,11 +872,10 @@ function updateItemsField() {
 }
 
 function updateCartUI() {
-  if (!cartItemsContainer || !cartTotalEl || !cartSubtotalEl || !cartDeliveryEl) return;
   const hasItems = cart.length > 0;
 
-  cartItemsContainer.innerHTML = "";
-
+if (cartItemsContainer) {
+    cartItemsContainer.innerHTML = "";
   if (!hasItems) {
     if (emptyCartEl) {
       emptyCartEl.style.display = "block";
@@ -987,58 +910,67 @@ function updateCartUI() {
         li.appendChild(extras);
       }
 
-      const controls = document.createElement("div");
-      controls.className = "cart-item__controls";
+ const controls = document.createElement("div");
+        controls.className = "cart-item__controls";
 
-      const decrease = document.createElement("button");
-      decrease.type = "button";
-      decrease.className = "cart-item__btn";
-      decrease.dataset.action = "decrease";
-      decrease.dataset.index = String(index);
-      decrease.textContent = "−";
-      controls.appendChild(decrease);
+        const decrease = document.createElement("button");
+        decrease.type = "button";
+        decrease.className = "cart-item__btn";
+        decrease.dataset.action = "decrease";
+        decrease.dataset.index = String(index);
+        decrease.textContent = "−";
+        controls.appendChild(decrease);
 
-      const qtyInput = document.createElement("input");
-      qtyInput.type = "number";
-      qtyInput.min = "1";
-      qtyInput.max = "20";
-      qtyInput.value = String(entry.quantity);
-      qtyInput.className = "cart-item__qty";
-      qtyInput.dataset.action = "quantity";
-      qtyInput.dataset.index = String(index);
-      controls.appendChild(qtyInput);
+        const qtyInput = document.createElement("input");
+        qtyInput.type = "number";
+        qtyInput.min = "1";
+        qtyInput.max = "20";
+        qtyInput.value = String(entry.quantity);
+        qtyInput.className = "cart-item__qty";
+        qtyInput.dataset.action = "quantity";
+        qtyInput.dataset.index = String(index);
+        controls.appendChild(qtyInput);
 
-      const increase = document.createElement("button");
-      increase.type = "button";
-      increase.className = "cart-item__btn";
-      increase.dataset.action = "increase";
-      increase.dataset.index = String(index);
-      increase.textContent = "+";
-      controls.appendChild(increase);
+        const increase = document.createElement("button");
+        increase.type = "button";
+        increase.className = "cart-item__btn";
+        increase.dataset.action = "increase";
+        increase.dataset.index = String(index);
+        increase.textContent = "+";
+        controls.appendChild(increase);
 
-      const remove = document.createElement("button");
-      remove.type = "button";
-      remove.className = "cart-item__btn";
-      remove.dataset.action = "remove";
-      remove.dataset.index = String(index);
-      remove.textContent = "Remove";
-      controls.appendChild(remove);
+        const remove = document.createElement("button");
+        remove.type = "button";
+        remove.className = "cart-item__btn";
+        remove.dataset.action = "remove";
+        remove.dataset.index = String(index);
+        remove.textContent = "Remove";
+        controls.appendChild(remove);
 
-      li.appendChild(controls);
+        li.appendChild(controls);
 
-      cartItemsContainer.appendChild(li);
-    });
+        cartItemsContainer.appendChild(li);
+      });
+    }
+  } else if (emptyCartEl) {
+    emptyCartEl.style.display = hasItems ? "none" : "block";
   }
   const { subtotal, deliveryFee, total, zone } = getOrderTotals();
   const fulfillment = selectedFulfillment();
   const needsDelivery = fulfillment === "delivery";
-  cartSubtotalEl.textContent = formatCurrency(subtotal);
-  if (needsDelivery) {
-    cartDeliveryEl.textContent = zone ? formatCurrency(deliveryFee) : "Select zone";
-  } else {
-    cartDeliveryEl.textContent = formatCurrency(0);
+ if (cartSubtotalEl) {
+    cartSubtotalEl.textContent = formatCurrency(subtotal);
   }
-  cartTotalEl.textContent = formatCurrency(total);
+  if (cartDeliveryEl) {
+    cartDeliveryEl.textContent = needsDelivery
+      ? zone
+        ? formatCurrency(deliveryFee)
+        : "Select zone"
+      : formatCurrency(0);
+  }
+  if (cartTotalEl) {
+    cartTotalEl.textContent = formatCurrency(total);
+  }
 
   if (deliveryFeeRow) {
     deliveryFeeRow.style.display = needsDelivery && hasItems ? "flex" : "none";
@@ -1067,6 +999,8 @@ function updateCartUI() {
   updateItemsField();
   updatePaymentInputsState(total);
   updatePaymentSummary(total);
+    syncSharedCart({ reason: hasItems ? "cart-update" : "cart-empty" });
+
 }
 
 function handleAddToCart(menuItem, cardEl) {
@@ -1080,7 +1014,7 @@ function handleAddToCart(menuItem, cardEl) {
   const extras = Array.from(cardEl.querySelectorAll("input[data-extra-id]:checked")).map((checkbox) => ({
     id: checkbox.dataset.extraId,
     name: checkbox.dataset.extraName,
-    price: Number(checkbox.dataset.extraPrice) || 0,
+    price: normalizeCurrencyValue(Number(checkbox.dataset.extraPrice)),
   }));
 
   cart.push({
@@ -1161,6 +1095,8 @@ paymentMethodInputs.forEach((radio) => {
     const { total } = getOrderTotals();
     updatePaymentInputsState(total, { fromToggle: true });
     updatePaymentSummary(total);
+        syncSharedCart({ reason: "payment-method-change" });
+
   });
 });
 
@@ -1182,6 +1118,13 @@ paymentMethodInputs.forEach((radio) => {
     }
     const { total } = getOrderTotals();
     updatePaymentSummary(total);
+     syncSharedCart({ reason: "payment-amount-change" });
+  });
+});
+
+[nameEl, phoneEl, emailEl, notesEl, addressEl].forEach((input) => {
+  input?.addEventListener("input", () => {
+    syncSharedCart({ reason: "checkout-field-change" });
   });
 });
 
@@ -1198,6 +1141,15 @@ renderMenu();
 const quickCartSeed = loadQuickCartTransfer();
 if (quickCartSeed) {
   applyQuickCartSeed(quickCartSeed);
+}
+if (!cart.length) {
+  const sharedCartSeed = readSharedCart();
+  if (sharedCartSeed && (Array.isArray(sharedCartSeed.cart) || Array.isArray(sharedCartSeed.details))) {
+    const hasEntries = (sharedCartSeed.cart && sharedCartSeed.cart.length) || (sharedCartSeed.details && sharedCartSeed.details.length);
+    if (hasEntries) {
+      applyQuickCartSeed(sharedCartSeed);
+    }
+  }
 }
 updateCartUI();
 
