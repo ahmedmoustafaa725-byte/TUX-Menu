@@ -180,7 +180,7 @@
 </head>
 <body class="order-page">
   <header class="sticky top-0 z-50 border-b border-white/10 bg-slate-950/75 backdrop-blur-xl">
-    <div class="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
+    <div class="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
       <a href="index.html" class="flex items-center gap-3" aria-label="TUX Home">
         <img src="assets/img/logo.jpg" alt="TUX logo" class="h-12 w-12 rounded-2xl border border-gold/70 bg-black/60 p-1">
         <div class="flex flex-col">
@@ -190,7 +190,7 @@
       </a>
       <nav class="hidden items-center gap-6 text-sm font-medium lg:flex">
         <a href="order.html" class="text-gray-300 transition hover:text-gold">Back to Order Builder</a>
-        <a href="order.html#checkoutPanel" class="rounded-full bg-gold px-5 py-2 font-semibold text-black transition hover:scale-105 hover:bg-yellow-500">Go to Checkout</a>
+        <a href="#checkoutPanel" class="rounded-full bg-gold px-5 py-2 font-semibold text-black transition hover:scale-105 hover:bg-yellow-500">Go to checkout</a>
         <a id="accountLink" href="account.html" class="rounded-full border border-white/20 px-5 py-2 text-gray-200 transition hover:border-gold hover:text-gold">My Account</a>
         <a id="logoutLink" href="#" class="rounded-full border border-white/20 px-5 py-2 text-gray-200 transition hover:border-gold hover:text-gold">Log out</a>
       </nav>
@@ -203,46 +203,159 @@
     <div id="mobileMenu" class="hidden border-t border-white/10 bg-slate-950/95 lg:hidden">
       <nav class="flex flex-col space-y-4 px-4 pt-4 pb-6 text-sm font-medium">
         <a href="order.html" class="text-gray-300 transition hover:text-gold">Back to Order Builder</a>
-        <a href="order.html#checkoutPanel" class="text-gray-300 transition hover:text-gold">Go to Checkout</a>
+        <a href="#checkoutPanel" class="text-gray-300 transition hover:text-gold">Go to checkout</a>
         <a id="accountLinkMobile" href="account.html" class="rounded-full bg-gold px-4 py-2 text-center font-semibold text-black transition hover:bg-yellow-500">My Account</a>
         <a id="logoutLinkMobile" href="#" class="hidden rounded-full border border-white/15 px-4 py-2 text-center font-semibold text-white transition hover:border-gold hover:text-gold">Log out</a>
       </nav>
     </div>
   </header>
 
-  <main class="relative mx-auto max-w-5xl px-4 py-12 lg:py-16">
+  <main class="relative mx-auto max-w-6xl px-4 py-12 lg:py-16">
     <div class="pointer-events-none absolute inset-0 -z-[1] bg-[radial-gradient(circle_at_bottom_left,rgba(79,70,229,0.18),transparent_55%)]"></div>
-    <section id="cartPanel" class="surface-card space-y-6">
-      <div class="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 class="font-brand text-3xl font-semibold text-gold md:text-4xl">Your Cart</h1>
-          <p class="text-sm text-gray-400">Adjust quantities, remove items, or clear your bag before checkout.</p>
+ <div class="lg:grid lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:gap-10">
+      <section id="cartPanel" class="surface-card space-y-6 mb-12 lg:mb-0">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h1 class="font-brand text-3xl font-semibold text-gold md:text-4xl">Your Cart</h1>
+            <p class="text-sm text-gray-400">Adjust quantities, remove items, or clear your bag before checkout.</p>
+          </div>
+          <a href="order.html" class="inline-flex items-center gap-2 rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-gold hover:text-gold">
+            <span>Continue ordering</span>
+          </a>
         </div>
-        <a href="order.html" class="inline-flex items-center gap-2 rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-gray-200 transition hover:border-gold hover:text-gold">
-          <span>Continue ordering</span>
-        </a>
-      </div>
-      <ul id="cartItems" class="text-sm" aria-live="polite">
-        <li id="emptyCart" class="rounded-2xl border border-dashed border-white/15 px-4 py-6 text-center text-sm text-gray-400">Your cart is empty. Head back to the menu to add something delicious.</li>
-      </ul>
-      <div id="cartSummary" class="hidden space-y-3 border-t border-white/10 pt-4 text-sm">
-        <div class="flex justify-between text-gray-300"><span>Subtotal</span><span id="cartSubtotal">EGP 0.00</span></div>
-        <div id="deliveryFeeRow" class="hidden justify-between text-gray-300"><span>Delivery Fee</span><span id="cartDeliveryFee">EGP 0.00</span></div>
-        <div class="flex justify-between text-lg font-semibold text-gold"><span>Total</span><span id="cartTotal">EGP 0.00</span></div>
-        <div id="paymentSummary" class="hidden space-y-1 border-t border-white/10 pt-3 text-xs text-gray-300">
-          <div id="cashSummaryRow" class="flex justify-between"><span>Cash</span><span id="cashSummaryAmount">EGP 0.00</span></div>
-          <div id="instapaySummaryRow" class="flex justify-between"><span>Instapay</span><span id="instapaySummaryAmount">EGP 0.00</span></div>
+         <ul id="cartItems" class="space-y-4 text-sm" aria-live="polite">
+          <li id="emptyCart" class="rounded-2xl border border-dashed border-white/15 px-4 py-6 text-center text-sm text-gray-400">Your cart is empty. Head back to the menu to add something delicious.</li>
+        </ul>
+        <div id="cartSummary" class="hidden space-y-3 border-t border-white/10 pt-4 text-sm">
+          <div class="flex justify-between text-gray-300"><span>Subtotal</span><span id="cartSubtotal">EGP 0.00</span></div>
+          <div id="deliveryFeeRow" class="hidden justify-between text-gray-300"><span>Delivery Fee</span><span id="cartDeliveryFee">EGP 0.00</span></div>
+          <div class="flex justify-between text-lg font-semibold text-gold"><span>Total</span><span id="cartTotal">EGP 0.00</span></div>
+          <div id="paymentSummary" class="hidden space-y-1 border-t border-white/10 pt-3 text-xs text-gray-300">
+            <div id="cashSummaryRow" class="flex justify-between"><span>Cash</span><span id="cashSummaryAmount">EGP 0.00</span></div>
+            <div id="instapaySummaryRow" class="flex justify-between"><span>Instapay</span><span id="instapaySummaryAmount">EGP 0.00</span></div>
+          </div>
         </div>
-      </div>
       <div class="flex flex-wrap items-center gap-3">
-        <button id="clearCart" class="hidden rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-red-400 transition hover:border-red-400 hover:text-red-300">Clear Cart</button>
-        <a href="order.html#checkoutPanel" class="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-gold via-amber-400 to-orange-400 px-5 py-2 text-sm font-semibold text-black transition hover:scale-[1.02] hover:shadow-[0_16px_40px_rgba(215,185,104,0.35)]">Proceed to checkout</a>
-      </div>
-    </section>
+          <button id="clearCart" class="hidden rounded-full border border-white/15 px-4 py-2 text-sm font-semibold text-red-400 transition hover:border-red-400 hover:text-red-300">Clear Cart</button>
+          <a href="#checkoutPanel" class="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-gold via-amber-400 to-orange-400 px-5 py-2 text-sm font-semibold text-black transition hover:scale-[1.02] hover:shadow-[0_16px_40px_rgba(215,185,104,0.35)]">Proceed to checkout</a>
+        </div>
+      </section>
+
+      <section id="checkoutPanel" class="surface-card hidden space-y-6">
+        <div class="space-y-4">
+          <div>
+            <h2 class="font-brand text-2xl font-semibold">Checkout</h2>
+            <p class="text-sm text-gray-400">Review your cart on the left, then add your details to place the order.</p>
+          </div>
+          <div class="rounded-3xl border border-white/10 bg-white/5 p-5 text-sm text-gray-300">
+            <p class="mb-2 font-semibold text-white">Need to adjust something?</p>
+            <p>Use the cart panel to update quantities, remove items, or clear your selection before submitting.</p>
+            <a href="#cartPanel" class="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-gold transition hover:text-yellow-300">Back to cart items</a>
+          </div>
+        </div>
+
+        <form id="orderForm" class="space-y-5">
+          <fieldset>
+            <legend class="sr-only">Fulfilment</legend>
+            <div class="grid gap-3 sm:grid-cols-2">
+              <label class="group relative flex cursor-pointer flex-col gap-1 rounded-2xl border border-white/15 bg-white/5 px-4 py-4 text-center text-sm font-semibold text-gray-200 transition hover:border-gold/60 hover:bg-white/10">
+                <input type="radio" name="fulfillment" value="pickup" class="peer sr-only" checked>
+                <span class="text-base text-white">Pickup</span>
+                <span class="text-xs font-normal text-gray-400">Collect from the truck.</span>
+                <span class="pointer-events-none absolute inset-0 rounded-2xl border border-transparent transition peer-checked:border-gold peer-checked:shadow-[0_18px_45px_rgba(215,185,104,0.25)]"></span>
+              </label>
+              <label class="group relative flex cursor-pointer flex-col gap-1 rounded-2xl border border-white/15 bg-white/5 px-4 py-4 text-center text-sm font-semibold text-gray-200 transition hover:border-gold/60 hover:bg-white/10">
+                <input type="radio" name="fulfillment" value="delivery" class="peer sr-only">
+                <span class="text-base text-white">Delivery</span>
+                <span class="text-xs font-normal text-gray-400">Have it delivered to you.</span>
+                <span class="pointer-events-none absolute inset-0 rounded-2xl border border-transparent transition peer-checked:border-gold peer-checked:shadow-[0_18px_45px_rgba(215,185,104,0.25)]"></span>
+              </label>
+            </div>
+          </fieldset>
+
+          <fieldset class="space-y-4 border-t border-white/10 pt-4">
+            <legend class="sr-only">Your information</legend>
+            <label class="block text-sm font-medium text-gray-200">
+              Full name
+              <input id="orderName" type="text" required class="mt-2 w-full rounded-2xl border border-white/15 bg-black/40 px-4 py-3 text-sm text-white placeholder-gray-500 transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-gold">
+            </label>
+            <label class="block text-sm font-medium text-gray-200">
+              Phone (+20)
+              <input id="orderPhone" type="tel" required pattern="^\d{10}$" placeholder="1098765432" class="mt-2 w-full rounded-2xl border border-white/15 bg-black/40 px-4 py-3 text-sm text-white placeholder-gray-500 transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-gold">
+            </label>
+            <label class="block text-sm font-medium text-gray-200">
+              Email address
+              <input id="orderEmail" type="email" required autocomplete="email" placeholder="you@example.com" class="mt-2 w-full rounded-2xl border border-white/15 bg-black/40 px-4 py-3 text-sm text-white placeholder-gray-500 transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-gold">
+            </label>
+          </fieldset>
+
+          <fieldset id="deliveryDetails" class="space-y-4 border-t border-white/10 pt-4">
+            <legend class="sr-only">Delivery details</legend>
+            <label class="block text-sm font-medium text-gray-200">
+              Address
+              <input id="orderAddress" type="text" class="mt-2 w-full rounded-2xl border border-white/15 bg-black/40 px-4 py-3 text-sm text-white placeholder-gray-500 transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-gold" placeholder="Street, Building, Apartment">
+            </label>
+            <div id="deliveryZoneField" class="space-y-2" style="display:none">
+              <label class="block text-sm font-medium text-gray-200">
+                Delivery zone
+                <select id="deliveryZone" class="mt-2 w-full rounded-2xl border border-white/15 bg-black/40 px-4 py-3 text-sm text-white transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-gold">
+                  <option value="" disabled selected>Select your zone</option>
+                </select>
+              </label>
+              <p id="deliveryZoneNote" class="text-xs text-gray-400" style="display:none">Delivery fee appears after choosing your zone.</p>
+            </div>
+          </fieldset>
+
+          <label class="block text-sm font-medium text-gray-200">
+            Order notes
+            <textarea id="orderNotes" rows="2" class="mt-2 w-full rounded-2xl border border-white/15 bg-black/40 px-4 py-3 text-sm text-white placeholder-gray-500 transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-gold" placeholder="Sauces, no pickles, etc."></textarea>
+          </label>
+
+          <fieldset class="space-y-4 border-t border-white/10 pt-4">
+            <legend class="text-sm font-semibold text-gray-200">Payment</legend>
+            <p class="text-xs text-gray-400">Choose how you want to pay when your order is ready.</p>
+            <div class="grid gap-3 sm:grid-cols-3" id="paymentMethodGrid">
+              <label class="relative flex cursor-pointer flex-col gap-1 rounded-2xl border border-white/15 bg-white/5 px-4 py-4 text-sm text-gray-200 transition hover:border-gold/60 hover:bg-white/10">
+                <input type="radio" name="paymentMethod" value="cash" class="peer sr-only" checked>
+                <span class="text-base font-semibold text-white">Cash</span>
+                <span class="text-xs text-gray-400">Pay the full total in cash.</span>
+                <span class="pointer-events-none absolute inset-0 rounded-2xl border border-transparent transition peer-checked:border-gold peer-checked:shadow-[0_18px_45px_rgba(215,185,104,0.25)]"></span>
+              </label>
+              <label class="relative flex cursor-pointer flex-col gap-1 rounded-2xl border border-white/15 bg-white/5 px-4 py-4 text-sm text-gray-200 transition hover:border-gold/60 hover:bg-white/10">
+                <input type="radio" name="paymentMethod" value="instapay" class="peer sr-only">
+                <span class="text-base font-semibold text-white">Instapay</span>
+                <span class="text-xs text-gray-400">Transfer the full total digitally.</span>
+                <span class="pointer-events-none absolute inset-0 rounded-2xl border border-transparent transition peer-checked:border-gold peer-checked:shadow-[0_18px_45px_rgba(56,189,248,0.35)]"></span>
+              </label>
+              <label class="relative flex cursor-pointer flex-col gap-1 rounded-2xl border border-white/15 bg-white/5 px-4 py-4 text-sm text-gray-200 transition hover:border-gold/60 hover:bg-white/10">
+                <input type="radio" name="paymentMethod" value="split" class="peer sr-only">
+                <span class="text-base font-semibold text-white">Split</span>
+                <span class="text-xs text-gray-400">Split between cash and Instapay.</span>
+                <span class="pointer-events-none absolute inset-0 rounded-2xl border border-transparent transition peer-checked:border-gold peer-checked:shadow-[0_18px_45px_rgba(16,185,129,0.35)]"></span>
+              </label>
+            </div>
+            <div id="splitFields" class="split-fields hidden grid gap-4 sm:grid-cols-2">
+              <label class="text-sm font-medium text-gray-200">
+                Cash amount
+                <input id="cashAmount" type="number" min="0" step="0.5" placeholder="0.00" class="mt-2 w-full rounded-2xl border border-white/15 bg-black/40 px-4 py-3 text-sm text-white placeholder-gray-500 transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-gold">
+              </label>
+              <label class="text-sm font-medium text-gray-200">
+                Instapay amount
+                <input id="instapayAmount" type="number" min="0" step="0.5" placeholder="0.00" class="mt-2 w-full rounded-2xl border border-white/15 bg-black/40 px-4 py-3 text-sm text-white placeholder-gray-500 transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-sky-400">
+              </label>
+            </div>
+          </fieldset>
+
+          <textarea id="orderItems" class="hidden" aria-hidden="true"></textarea>
+          <button id="orderSubmit" type="submit" class="w-full rounded-full bg-gradient-to-r from-gold via-amber-400 to-orange-400 px-4 py-3 text-lg font-semibold text-black transition hover:scale-[1.02] hover:shadow-[0_20px_45px_rgba(215,185,104,0.35)]">Place Order</button>
+          <p id="orderStatus" class="min-h-[1.5rem] text-center text-sm text-gray-400"></p>
+        </form>
+      </section>
+    </div>
   </main>
 
   <script src="content.js"></script>
   <script type="module" src="nav.js"></script>
-  <script type="module" src="cart.js"></script>
+  <script type="module" src="order.js"></script>
 </body>
 </html>
