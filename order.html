@@ -234,8 +234,8 @@
    <section id="checkoutPanel" class="surface-card hidden space-y-6 mt-12 lg:mt-0">
            <div class="space-y-4">
               <div>
-                 <h2 class="font-brand text-2xl font-semibold">Checkout</h2>
-                 <p class="text-sm text-gray-400">Add your details and choose how you’ll receive your order.</p>
+               <h2 class="font-brand text-2xl font-semibold">Cart overview</h2>
+                 <p class="text-sm text-gray-400">Review what you’ve added so far. You’ll complete checkout from the cart page.</p>
               </div>
  <div class="rounded-3xl border border-white/10 bg-white/5 p-5 space-y-4" aria-live="polite">
                  <div class="flex flex-wrap items-start justify-between gap-3">
@@ -243,7 +243,7 @@
                        <h3 class="text-lg font-semibold text-white">Order summary</h3>
                        <p class="text-xs text-gray-400">Items added here stay in sync with your cart page.</p>
                     </div>
-                    <a href="your-cart.html" class="text-sm font-semibold text-gold transition hover:text-yellow-300">Open cart</a>
+                    <a href="your-cart.html" class="text-sm font-semibold text-gold transition hover:text-yellow-300">Go to cart</a>
                  </div>
                  <ul id="cartItems" class="space-y-4 text-sm" aria-live="polite">
                     <li id="emptyCart" class="rounded-2xl border border-dashed border-white/15 px-4 py-6 text-center text-sm text-gray-400">Your cart is empty. Start adding your favourites.</li>
@@ -264,100 +264,15 @@
               </div>
            </div>
 
-           <form id="orderForm" class="space-y-5">                 <fieldset>
-                    <legend class="sr-only">Fulfilment</legend>
-                    <div class="grid gap-3 sm:grid-cols-2">
-                       <label class="group relative flex cursor-pointer flex-col gap-1 rounded-2xl border border-white/15 bg-white/5 px-4 py-4 text-center text-sm font-semibold text-gray-200 transition hover:border-gold/60 hover:bg-white/10">
-                          <input type="radio" name="fulfillment" value="pickup" class="peer sr-only" checked>
-                          <span class="text-base text-white">Pickup</span>
-                          <span class="text-xs font-normal text-gray-400">Collect from the truck.</span>
-                          <span class="pointer-events-none absolute inset-0 rounded-2xl border border-transparent transition peer-checked:border-gold peer-checked:shadow-[0_18px_45px_rgba(215,185,104,0.25)]"></span>
-                       </label>
-                       <label class="group relative flex cursor-pointer flex-col gap-1 rounded-2xl border border-white/15 bg-white/5 px-4 py-4 text-center text-sm font-semibold text-gray-200 transition hover:border-gold/60 hover:bg-white/10">
-                          <input type="radio" name="fulfillment" value="delivery" class="peer sr-only">
-                          <span class="text-base text-white">Delivery</span>
-                          <span class="text-xs font-normal text-gray-400">Have it delivered to you.</span>
-                          <span class="pointer-events-none absolute inset-0 rounded-2xl border border-transparent transition peer-checked:border-gold peer-checked:shadow-[0_18px_45px_rgba(215,185,104,0.25)]"></span>
-                       </label>
-                    </div>
-                 </fieldset>
-
-                 <fieldset class="space-y-4 border-t border-white/10 pt-4">
-                    <legend class="sr-only">Your information</legend>
-                    <label class="block text-sm font-medium text-gray-200">
-                      Full name
-                      <input id="orderName" type="text" required class="mt-2 w-full rounded-2xl border border-white/15 bg-black/40 px-4 py-3 text-sm text-white placeholder-gray-500 transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-gold">
-                    </label>
-                    <label class="block text-sm font-medium text-gray-200">
-                      Phone (+20)
-                      <input id="orderPhone" type="tel" required pattern="^\d{10}$" placeholder="1098765432" class="mt-2 w-full rounded-2xl border border-white/15 bg-black/40 px-4 py-3 text-sm text-white placeholder-gray-500 transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-gold">
-                    </label>
-  <label class="block text-sm font-medium text-gray-200">
-                      Email address
-                      <input id="orderEmail" type="email" required autocomplete="email" placeholder="you@example.com" class="mt-2 w-full rounded-2xl border border-white/15 bg-black/40 px-4 py-3 text-sm text-white placeholder-gray-500 transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-gold">
-                    </label>                 </fieldset>
-
-                 <fieldset id="deliveryDetails" class="space-y-4 border-t border-white/10 pt-4">
-                   <legend class="sr-only">Delivery details</legend>
-                   <label class="block text-sm font-medium text-gray-200">
-                     Address
-                     <input id="orderAddress" type="text" class="mt-2 w-full rounded-2xl border border-white/15 bg-black/40 px-4 py-3 text-sm text-white placeholder-gray-500 transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-gold" placeholder="Street, Building, Apartment">
-                   </label>
-                   <div id="deliveryZoneField" class="space-y-2" style="display:none">
-                     <label class="block text-sm font-medium text-gray-200">
-                       Delivery zone
-                       <select id="deliveryZone" class="mt-2 w-full rounded-2xl border border-white/15 bg-black/40 px-4 py-3 text-sm text-white transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-gold">
-                         <option value="" disabled selected>Select your zone</option>
-                       </select>
-                     </label>
-                     <p id="deliveryZoneNote" class="text-xs text-gray-400" style="display:none">Delivery fee appears after choosing your zone.</p>
-                   </div>
-                 </fieldset>
-
-                 <label class="block text-sm font-medium text-gray-200">
-                   Order notes
-                   <textarea id="orderNotes" rows="2" class="mt-2 w-full rounded-2xl border border-white/15 bg-black/40 px-4 py-3 text-sm text-white placeholder-gray-500 transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-gold" placeholder="Sauces, no pickles, etc."></textarea>
-                 </label>
-
-                 <fieldset class="space-y-4 border-t border-white/10 pt-4">
-                   <legend class="text-sm font-semibold text-gray-200">Payment</legend>
-                   <p class="text-xs text-gray-400">Choose how you want to pay when your order is ready.</p>
-                   <div class="grid gap-3 sm:grid-cols-3" id="paymentMethodGrid">
-                     <label class="relative flex cursor-pointer flex-col gap-1 rounded-2xl border border-white/15 bg-white/5 px-4 py-4 text-sm text-gray-200 transition hover:border-gold/60 hover:bg-white/10">
-                       <input type="radio" name="paymentMethod" value="cash" class="peer sr-only" checked>
-                       <span class="text-base font-semibold text-white">Cash</span>
-                       <span class="text-xs text-gray-400">Pay the full total in cash.</span>
-                       <span class="pointer-events-none absolute inset-0 rounded-2xl border border-transparent transition peer-checked:border-gold peer-checked:shadow-[0_18px_45px_rgba(215,185,104,0.25)]"></span>
-                     </label>
-                     <label class="relative flex cursor-pointer flex-col gap-1 rounded-2xl border border-white/15 bg-white/5 px-4 py-4 text-sm text-gray-200 transition hover:border-gold/60 hover:bg-white/10">
-                       <input type="radio" name="paymentMethod" value="instapay" class="peer sr-only">
-                       <span class="text-base font-semibold text-white">Instapay</span>
-                       <span class="text-xs text-gray-400">Transfer the full total digitally.</span>
-                       <span class="pointer-events-none absolute inset-0 rounded-2xl border border-transparent transition peer-checked:border-gold peer-checked:shadow-[0_18px_45px_rgba(56,189,248,0.35)]"></span>
-                     </label>
-                     <label class="relative flex cursor-pointer flex-col gap-1 rounded-2xl border border-white/15 bg-white/5 px-4 py-4 text-sm text-gray-200 transition hover:border-gold/60 hover:bg-white/10">
-                       <input type="radio" name="paymentMethod" value="split" class="peer sr-only">
-                       <span class="text-base font-semibold text-white">Split</span>
-                       <span class="text-xs text-gray-400">Split between cash and Instapay.</span>
-                       <span class="pointer-events-none absolute inset-0 rounded-2xl border border-transparent transition peer-checked:border-gold peer-checked:shadow-[0_18px_45px_rgba(16,185,129,0.35)]"></span>
-                     </label>
-                   </div>
-                   <div id="splitFields" class="split-fields hidden grid gap-4 sm:grid-cols-2">
-                     <label class="text-sm font-medium text-gray-200">
-                       Cash amount
-                       <input id="cashAmount" type="number" min="0" step="0.5" placeholder="0.00" class="mt-2 w-full rounded-2xl border border-white/15 bg-black/40 px-4 py-3 text-sm text-white placeholder-gray-500 transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-gold">
-                     </label>
-                     <label class="text-sm font-medium text-gray-200">
-                       Instapay amount
-                       <input id="instapayAmount" type="number" min="0" step="0.5" placeholder="0.00" class="mt-2 w-full rounded-2xl border border-white/15 bg-black/40 px-4 py-3 text-sm text-white placeholder-gray-500 transition focus:border-transparent focus:outline-none focus:ring-2 focus:ring-sky-400">
-                     </label>
-                   </div>
-                 </fieldset>
-
-                 <textarea id="orderItems" class="hidden" aria-hidden="true"></textarea>
-                 <button id="orderSubmit" type="submit" class="w-full rounded-full bg-gradient-to-r from-gold via-amber-400 to-orange-400 px-4 py-3 text-lg font-semibold text-black transition hover:scale-[1.02] hover:shadow-[0_20px_45px_rgba(215,185,104,0.35)]">Place Order</button>
-                 <p id="orderStatus" class="min-h-[1.5rem] text-center text-sm text-gray-400"></p>
-              </form>
+ <div class="space-y-5 border-t border-white/10 pt-4 text-sm text-gray-300">
+              <h3 class="text-lg font-semibold text-white">Ready to checkout?</h3>
+              <p>Keep adding items here, then open your cart to enter your details and place the order.</p>
+              <div class="flex flex-wrap gap-3">
+                 <a href="your-cart.html" class="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-gold via-amber-400 to-orange-400 px-5 py-2 text-sm font-semibold text-black transition hover:scale-[1.02] hover:shadow-[0_20px_45px_rgba(215,185,104,0.35)]">Open cart to checkout</a>
+                 <a href="your-cart.html" class="text-sm text-gray-400 underline-offset-4 transition hover:text-gold">View full cart</a>
+              </div>
+              <p id="orderStatus" class="min-h-[1.5rem] text-sm text-gray-400"></p>
+           </div>
            </section>
      </div>
   </main>
