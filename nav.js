@@ -16,8 +16,7 @@ const orderLinkMobile = dom?.getElementById("orderLinkMobile") ?? null;
 
 const loginHref = "account.html";
 const profileHref = "profile.html";
-const orderHref = "order.html";
-const orderRedirectHref = `account.html?redirect=${encodeURIComponent(orderHref)}`;
+const orderHref = "your-cart.html";
 function navigateTo(url) {
   const locationObj = typeof globalThis !== "undefined" ? globalThis.location : undefined;
   if (!locationObj) {
@@ -43,7 +42,7 @@ onAuthStateChanged(auth, async (user) => {
  if (logoutLinkMobile) {
     logoutLinkMobile.classList.toggle("hidden", !user);
   }
-  const orderTarget = user ? orderHref : orderRedirectHref;
+  const orderTarget = orderHref;
   if (orderLink) orderLink.href = orderTarget;
   if (orderLinkMobile) orderLinkMobile.href = orderTarget;
 

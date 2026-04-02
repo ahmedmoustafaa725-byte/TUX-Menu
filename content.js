@@ -6,7 +6,7 @@
       : {};
 
   const defaultCheckout = {
-    order: "order.html",
+    order: "your-cart.html",
     account: "account.html",
     profile: "profile.html",
     register: "register.html",
