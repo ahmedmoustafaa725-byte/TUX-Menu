@@ -3,133 +3,19 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>TUX — Account</title>
+  <title>TUX — Account Closed</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="topbar">
-    <div class="container bar">
-      <a href="index.html" class="brand" aria-label="TUX Home">
-        <img src="assets/img/logo.jpg" alt="TUX logo" class="brand__logo">
-        <div class="brand__text">
-          <div class="brand__title">TUX</div>
-          <div class="brand__tag">Burgers Worth The Chase …</div>
-        </div>
-      </a>
-      <nav class="nav">
-        <a href="index.html#menu">Menu</a>
-        <a href="index.html#gallery">Gallery</a>
-        <a href="index.html#location">Location</a>
-        <a href="index.html#contact">Contact</a>
-                <a href="your-cart.html">Cart</a>
-
-      </nav>
-    </div>
-  </header>
-
   <main class="section">
-    <div class="container" style="max-width:520px">
-      <header class="section__head">
-        <h2>Log in</h2>
-        <p class="muted">Welcome back 👋</p>
-      </header>
-
-      <div class="panel">
-        <form id="loginForm" style="display:grid;gap:12px">
-          <label>Email
-            <input id="loginEmail" type="email" required placeholder="you@example.com" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:#0e0e0e;color:var(--ink)">
-          </label>
-          <label>Password
-            <input id="loginPassword" type="password" required placeholder="••••••••" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:#0e0e0e;color:var(--ink)">
-          </label>
-          <button class="btn red" type="submit">Log in</button>
-          <button class="btn outline" id="forgotBtn" type="button">Forgot password?</button>
-          <div id="loginMsg" class="muted"></div>
-        </form>
+    <div class="container" style="max-width:640px;text-align:center">
+      <h1>Account access removed</h1>
+      <p class="muted">Customer profiles, login, and signup are no longer available.</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:20px;">
+        <a class="btn red" href="https://wa.me/201151960048?text=Hi%20TUX%20I%20want%20to%20order%20" target="_blank" rel="noreferrer">Order on WhatsApp</a>
+        <a class="btn outline" href="index.html">Back to home</a>
       </div>
-
-      <p style="margin-top:16px">
-        Don’t have an account?
-        <a class="btn" id="createAccountLink" href="register.html">Create an account</a>
-      </p>
     </div>
   </main>
- <script src="content.js"></script>
-
- <script type="module">
-  import { auth } from "./firebase-init.js";
-  import {
-    signInWithEmailAndPassword,
-    sendPasswordResetEmail,
-  } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-
-  // Map Firebase auth error codes to friendly messages
-  function mapAuthError(err) {
-    const code = (err && err.code) || "";
-    switch (code) {
-      case "auth/invalid-credential":
-      case "auth/wrong-password":
-      case "auth/user-not-found":
-        return "Email or password is incorrect.";
-      case "auth/invalid-email":
-        return "Please enter a valid email address.";
-      case "auth/user-disabled":
-        return "This account has been disabled. Contact support.";
-      case "auth/too-many-requests":
-        return "Too many attempts. Please try again later.";
-      case "auth/network-request-failed":
-        return "Network error. Check your connection and try again.";
-      default:
-        return "Something went wrong. Please try again.";
-    }
-  }
-
-  const $ = (id) => document.getElementById(id);
-  const loginForm = $("loginForm");
-  const emailEl   = $("loginEmail");
-  const passEl    = $("loginPassword");
-  const msg       = $("loginMsg");
-  const forgot    = $("forgotBtn");
-  const registerLink = $("createAccountLink");
-
-  const params = new URLSearchParams(window.location.search);
-  const redirectParam = params.get("redirect");
-  const safeRedirect =
-    redirectParam && !/^https?:/i.test(redirectParam) ? redirectParam : "";
-
-  if (registerLink && safeRedirect) {
-    registerLink.href = `register.html?redirect=${encodeURIComponent(safeRedirect)}`;
-  }
-
-  // Helper to show status text
-  function setMsg(text) {
-    msg.textContent = text || "";
-  }
-
-  loginForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
-    setMsg("Logging in…");
-    try {
-      await signInWithEmailAndPassword(auth, emailEl.value.trim(), passEl.value);
-      const destination = safeRedirect || "index.html";
-      window.location.href = destination;
-    } catch (err) {
-      setMsg(mapAuthError(err)); // <-- friendly message here
-    }
-  });
-
-  forgot.addEventListener("click", async () => {
-    const email = emailEl.value.trim();
-    if (!email) { setMsg("Enter your email above first."); return; }
-    setMsg("Sending reset email…");
-    try {
-      await sendPasswordResetEmail(auth, email);
-      setMsg("Password reset email sent. Check your inbox.");
-    } catch (err) {
-      setMsg(mapAuthError(err)); // <-- friendly message here too
-    }
-  });
-</script>
-
 </body>
 </html>

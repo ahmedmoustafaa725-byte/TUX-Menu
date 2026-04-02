@@ -3,134 +3,19 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>TUX — Create Account</title>
+  <title>TUX — Signup Removed</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="topbar">
-    <div class="container bar">
-      <a href="index.html" class="brand" aria-label="TUX Home">
-        <img src="assets/img/logo.jpg" alt="TUX logo" class="brand__logo">
-        <div class="brand__text">
-          <div class="brand__title">TUX</div>
-          <div class="brand__tag">Burgers Worth The Chase …</div>
-        </div>
-      </a>
-      <nav class="nav">
-        <a href="index.html#menu">Menu</a>
-        <a href="index.html#gallery">Gallery</a>
-        <a href="index.html#location">Location</a>
-        <a href="index.html#contact">Contact</a>
-                <a href="your-cart.html">Cart</a>
-
-      </nav>
-    </div>
-  </header>
-
   <main class="section">
-    <div class="container" style="max-width:520px">
-      <header class="section__head">
-        <h2>Create an account</h2>
-        <p class="muted">We’ll save your details for faster checkout.</p>
-      </header>
-
-      <div class="panel">
-        <form id="regForm" style="display:grid;gap:12px">
-          <label>Name
-            <input id="name" type="text" required placeholder="Full name" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:#0e0e0e;color:var(--ink)">
-          </label>
-          <label>Address
-            <input id="address" type="text" required placeholder="Street, City" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:#0e0e0e;color:var(--ink)">
-          </label>
-          <label class="phone-field">Phone number
-            <div class="phone-input">
-              <span class="phone-input__prefix">+20</span>
-              <input
-                id="phone"
-                class="phone-input__field"
-                type="tel"
-                required
-                pattern="^\d{10}$"
-                inputmode="numeric"
-                maxlength="10"
-                title="Enter the 10 digits after +20"
-                placeholder="Phone number (10 digits)"
-              >
-            </div>
-          <label>Email
-            <input id="email" type="email" required placeholder="you@example.com" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:#0e0e0e;color:var(--ink)">
-          </label>
-          <label>Password
-            <input id="password" type="password" required minlength="6" placeholder="At least 6 characters" style="width:100%;padding:10px;border-radius:10px;border:1px solid var(--border);background:#0e0e0e;color:var(--ink)">
-          </label>
-          <button class="btn" type="submit">Create account</button>
-          <div id="regMsg" class="muted"></div>
-        </form>
+    <div class="container" style="max-width:640px;text-align:center">
+      <h1>Signup is disabled</h1>
+      <p class="muted">New customer account creation has been removed.</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:20px;">
+        <a class="btn red" href="https://wa.me/201151960048?text=Hi%20TUX%20I%20want%20to%20order%20" target="_blank" rel="noreferrer">Order on WhatsApp</a>
+        <a class="btn outline" href="index.html">Back to home</a>
       </div>
-
-      <p style="margin-top:16px">
-        Already have an account?
-        <a class="btn outline" id="backToLogin" href="account.html">Back to login</a>
-      </p>
     </div>
   </main>
- <script src="content.js"></script>
-
- <script type="module">
-    import { auth, db } from "./firebase-init.js";
-    import { createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-    import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
-    const $ = (id) => document.getElementById(id);
-    const form = $("regForm");
-    const msg  = $("regMsg");
- const phoneInput = $("phone");
-    const phonePattern = /^\d{10}$/;
-    const loginLink = $("backToLogin");
-    const params = new URLSearchParams(window.location.search);
-    const redirectParam = params.get("redirect");
-    const safeRedirect = redirectParam && !/^https?:/i.test(redirectParam) ? redirectParam : "";
-
-    if (loginLink && safeRedirect) {
-      loginLink.href = `account.html?redirect=${encodeURIComponent(safeRedirect)}`;
-    }
-
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      msg.textContent = "Creating your account…";
-
-      const name    = $("name").value.trim();
-      const address = $("address").value.trim();
-      const phoneDigits = phoneInput.value.replace(/\D/g, "");
-      const email   = $("email").value.trim();
-      const pass    = $("password").value;
-  if (!phonePattern.test(phoneDigits)) {
-        msg.textContent = "Enter a 10-digit phone number. We'll add +20 for you.";
-        phoneInput.focus();
-        return;
-      }
-
-      const phoneForStorage = `+20${phoneDigits}`;
-      try {
-        const cred = await createUserWithEmailAndPassword(auth, email, pass);
-
-        // Save profile in Firestore (/profiles/{uid})
-        await setDoc(doc(db, "profiles", cred.user.uid), {
- name,
-          address,
-          phone: phoneForStorage,          email,
-          createdAt: serverTimestamp()
-        });
-
-        // Put the name on the Auth user too (so we can read displayName on home)
-        await updateProfile(cred.user, { displayName: name });
-
-        // Done → Back to main site; header will show the name
-   const destination = safeRedirect || "index.html";
-        window.location.href = destination;
-      } catch (err) {
-        msg.textContent = err.message;
-      }
-    });
-  </script>
 </body>
 </html>

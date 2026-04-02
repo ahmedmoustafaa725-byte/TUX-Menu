@@ -3,102 +3,19 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>TUX — Your Profile</title>
+  <title>TUX — Profile Removed</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="topbar">
-    <div class="container bar">
-      <a href="index.html" class="brand" aria-label="TUX Home">
-        <img src="assets/img/logo.jpg" alt="TUX logo" class="brand__logo">
-        <div class="brand__text">
-          <div class="brand__title">TUX</div>
-          <div class="brand__tag">Burgers Worth The Chase …</div>
-        </div>
-      </a>
-      <nav class="nav">
-        <a href="index.html#menu">Menu</a>
-        <a href="index.html#gallery">Gallery</a>
-        <a href="index.html#location">Location</a>
-        <a href="index.html#contact">Contact</a>
-                <a href="your-cart.html" class="cta outline">Cart</a>
-
-        <a href="your-cart.html" id="orderLink" class="cta green">View Cart</a>
-        <a href="profile.html" id="accountLink" class="cta gold">Account</a>
-        <a href="#" id="logoutLink" style="display:none">Log out</a>
-        <a class="cta blue" href="https://forms.gle/rKJoUeHkgLoqTmmXA" target="_blank" rel="noreferrer">Help Us Improve</a>
-      </nav>
-    </div>
-  </header>
-
-
   <main class="section">
-    <div class="container" style="max-width:760px">
-      <header class="section__head">
-        <h2>Your saved details</h2>
-        <p class="muted">Update your contact information and review previous orders.</p>
-      </header>
-
-      <div class="panel">
-        <form id="profileForm" class="form-stack">
-          <label>Name
-            <input id="profileName" class="form-field" type="text" required placeholder="Full name">
-          </label>
-          <label>Delivery address
-            <input id="profileAddress" class="form-field" type="text" placeholder="Street, City">
-          </label>
-         <label class="phone-field">Phone number
-            <div class="phone-input">
-              <span class="phone-input__prefix">+20</span>
-              <input
-                id="profilePhone"
-                class="form-field phone-input__field"
-                type="tel"
-                required
-                pattern="^\d{10}$"
-                inputmode="numeric"
-                maxlength="10"
-                title="Enter the 10 digits after +20"
-                placeholder="Phone number (10 digits)"
-              >
-            </div>
-          </label>
-          <label>Email
-            <input id="profileEmail" class="form-field" type="email" required readonly>
-          </label>
-          <div class="text-right">
-            <a class="btn outline" href="index.html#menu">Back to menu</a>
-          </div>
-          <button class="btn" type="submit">Save changes</button>
-          <div id="profileStatus" class="muted"></div>
-        </form>
-      </div>
-
-      <div class="panel">
-       <div class="order-history__header">
-          <h3>Order history</h3>
-          <p class="muted">Review your recent purchases and track delivery details.</p>
-        </div>
-        <div id="profileOrdersEmpty" class="muted order-history__empty">You haven’t placed any orders yet.</div>
-        <div id="profileOrders" class="order-history-grid" role="list"></div>
+    <div class="container" style="max-width:640px;text-align:center">
+      <h1>Profile page removed</h1>
+      <p class="muted">Customer profile management is no longer part of the website.</p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:20px;">
+        <a class="btn red" href="https://wa.me/201151960048?text=Hi%20TUX%20I%20want%20to%20order%20" target="_blank" rel="noreferrer">Order on WhatsApp</a>
+        <a class="btn outline" href="index.html">Back to home</a>
       </div>
     </div>
   </main>
-
-  <footer class="footer">
-    <div class="container footer__row">
-      <div class="footer__brand">
-        <img src="assets/img/logo.jpg" alt="TUX" class="footer__logo">
-        <span>© 2025 TUX — Egypt</span>
-      </div>
-      <a class="footer__link" href="https://maps.app.goo.gl/V8U4SKzMqHvT5o2m7" target="_blank" rel="noreferrer">
-        El-Saada St – Zahraa El-Maadi • Open in Maps
-      </a>
-    </div>
-  </footer>
-  <script src="content.js"></script>
-
-  <script type="module" src="nav.js"></script>
-  <script type="module" src="profile.js"></script>
 </body>
 </html>
