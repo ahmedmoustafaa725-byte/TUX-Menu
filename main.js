@@ -675,8 +675,8 @@ function getAuthUser() {
 }
 function navigateToOrderPage() {
   const destination = getAuthUser()
-    ? "order.html"
-    : `account.html?redirect=${encodeURIComponent("order.html")}`;
+    ? "your-cart.html"
+    : `account.html?redirect=${encodeURIComponent("your-cart.html")}`;
   window.location.href = destination;
 }
 function handlePlaceOrder(event) {
